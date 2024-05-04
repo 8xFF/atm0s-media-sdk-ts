@@ -1,0 +1,238 @@
+syntax = "proto3";
+
+import "shared.proto";
+
+package conn;
+
+message Request {
+    message Session {
+        message UpdateSdp {
+            shared.Tracks tracks = 1;
+            string sdp = 2;
+        }
+
+        message Disconnect {
+
+        }
+
+        oneof request {
+            UpdateSdp sdp = 1;
+            Disconnect disconnect = 2;
+        }
+    }
+
+    message Sender {
+        message Switch {
+            optional shared.Sender.Source source = 1;
+            optional string metadata = 2;
+        }
+
+        string id = 1;
+        oneof request {
+            Switch switch = 2;
+        }
+    }
+
+    message Receiver {
+        message Switch {
+            optional shared.Receiver.Source source = 1;
+            optional shared.Receiver.Limit limit = 2;
+        }
+
+        message Limit {
+            shared.Receiver.Limit limit = 1;
+        }
+
+        string id = 1;
+        oneof request {
+            Switch switch = 2;
+            Limit limit = 3;
+        }
+    }
+
+    uint32 seq = 1;
+    oneof request {
+        Session session = 2;
+    }
+}
+
+message Response {
+    message Session {
+        message UpdateSdp {
+            string sdp = 1;
+        }
+
+        message Disconnect {
+
+        }
+
+        oneof response {
+            UpdateSdp sdp = 1;
+        }
+    }
+
+    message Sender {
+        message Switch {
+
+        }
+
+        oneof response {
+            Switch switch = 1;
+        }
+    }
+
+    message Receiver {
+        message Switch {
+
+        }
+
+        message Limit {
+
+        }
+
+        oneof response {
+            Switch switch = 1;
+            Limit limit = 2;
+        }
+    }
+
+    uint32 seq = 1;
+    oneof response {
+        shared.Error error = 2;
+        Session session = 3;
+        Sender sender = 4;
+        Receiver receiver = 5;
+    }
+}
+
+message ServerEvent {
+    message Session {
+        message Connected {
+
+        }
+
+        message JoinedRoom {
+            string room = 1;
+            string peer = 2;
+            string token = 3;
+        }
+
+        message LeavedRoom {
+            string room = 1;
+            string peer = 2;
+        }
+
+        message Disconnected {
+            string reason =  1;
+        }
+
+        oneof event {
+            Connected connected = 1;
+            JoinedRoom joined = 2;
+            LeavedRoom leaved = 3;
+            Disconnected disconnected = 4;
+        }
+    }
+
+    message Room {
+        message PeerJoined {
+            string peer = 1;
+            optional string metadata = 2;
+        }
+
+        message PeerUpdated {
+            string peer = 1;
+            optional string metadata = 2;
+        }
+
+        message PeerLeaved {
+            string peer = 1;
+        }
+
+        message TrackStarted {
+            string peer = 1;
+            string track = 2;
+            optional string metadata = 3;
+        }
+
+        message TrackUpdated {
+            string peer = 1;
+            string track = 2;
+            optional string metadata = 3;
+        }
+
+        message TrackStopped {
+            string peer = 1;
+            string track = 2;
+        }
+
+        oneof event {
+            PeerJoined peer_joined = 1;
+            PeerUpdated peer_updated = 2;
+            PeerLeaved peer_leaved = 3;
+            TrackStarted track_started = 4;
+            TrackUpdated track_updated = 5;
+            TrackStopped track_stopped = 6;
+        }
+    }
+
+    message Sender {
+        message State {
+            enum StateType {
+                WATING = 0;
+                NO_SOURCE = 1;
+                ACTIVE = 2;
+                INACTIVE = 3;
+            }
+
+            StateType state = 1;
+        }
+
+        string id = 1;
+    }
+
+    message Receiver {
+        message State {
+            enum StateType {
+                NO_SOURCE = 0;
+                WAITING = 1;
+                LIVE = 2;
+                INACTIVE = 3;
+            }
+
+            StateType state = 1;
+        }
+
+        message Stats {
+            message Source {
+                uint32 bitrate_kbps = 1;
+                float rtt = 2;
+                float lost = 3;
+                float jitter = 4;
+            }
+
+            message Transmit {
+                uint32 spatial = 1;
+                uint32 temporal = 2;
+                uint32 bitrate_kbps = 3;
+            }
+
+            optional Source source = 1;
+            optional Transmit transmit = 2;
+        }
+
+        string id = 1;
+        oneof event {
+            State state = 2;
+            Stats stats = 3;
+        }
+    }
+
+    uint32 seq = 1;
+    oneof event {
+        Session session = 2;
+        Room room = 3;
+        Sender sender = 4;
+        Receiver receiver = 5;
+    }
+}

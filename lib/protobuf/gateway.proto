@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+import "shared.proto";
+import "features.proto";
+
+package gateway;
+
+service Gateway {
+    rpc Connect(ConnectRequest) returns (ConnectResponse);
+    rpc RemoteIce(RemoteIceRequest) returns (RemoteIceRespone);
+    rpc RestartIce(ConnectRequest) returns (ConnectResponse);
+}
+
+message ConnectRequest {
+    string token = 1;
+    string version = 2;
+    optional string room = 3;
+    optional string peer = 4;
+    optional string metadata = 5;
+    shared.RoomInfo info = 6;
+    shared.BitrateControlMode bitrate = 7;
+    features.Features features = 8;
+    shared.Tracks tracks = 9;
+    string sdp = 10;
+}
+
+message ConnectResponse {
+    string conn_id = 1;
+    string sdp = 2;
+}
+
+message RemoteIceRequest {
+    string conn_id = 1;
+    string candidate = 2;
+}
+
+message RemoteIceRespone {
+    repeated string candidates = 1;
+}
