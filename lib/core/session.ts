@@ -24,7 +24,7 @@ export enum SessionEvent {
   ROOM_PEER_LEAVED = "room.peer.leaved",
   ROOM_TRACK_STARTED = "room.track.started",
   ROOM_TRACK_UPDATED = "room.track.updated",
-  ROOM_TRACK_ENDED = "room.track.ended",
+  ROOM_TRACK_STOPPED = "room.track.stopped",
 }
 
 export class Session extends EventEmitter {
@@ -53,7 +53,7 @@ export class Session extends EventEmitter {
       } else if (event.trackUpdated) {
         this.emit(SessionEvent.ROOM_TRACK_UPDATED, event.trackUpdated);
       } else if (event.trackStopped) {
-        this.emit(SessionEvent.ROOM_TRACK_ENDED, event.trackStopped);
+        this.emit(SessionEvent.ROOM_TRACK_STOPPED, event.trackStopped);
       }
     });
     this.peer.onconnectionstatechange = (_event) => {

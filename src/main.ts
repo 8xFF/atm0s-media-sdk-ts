@@ -1,4 +1,9 @@
-import { Session, SessionEvent } from "../lib/main";
+import {
+  RoomTrackStarted,
+  RoomTrackStopped,
+  Session,
+  SessionEvent,
+} from "../lib/main";
 
 async function connect(_e: any) {
   const session = new Session("http://localhost:3000", {
@@ -9,13 +14,6 @@ async function connect(_e: any) {
       publish: { peer: true, tracks: true },
       subscribe: { peers: true, tracks: true },
     },
-  });
-  session.on(SessionEvent.ROOM_TRACK_STARTED, (track: any) => {
-    console.log("Track started", track);
-  });
-
-  session.on(SessionEvent.ROOM_TRACK_ENDED, (track: any) => {
-    console.log("Track stopped", track);
   });
   const stream = await navigator.mediaDevices.getUserMedia({
     audio: true,
@@ -38,6 +36,19 @@ async function connect(_e: any) {
     audio_recv_track.stream;
   (document.getElementById("video-main")! as HTMLVideoElement).srcObject =
     video_recv_track.stream;
+
+  session.on(SessionEvent.ROOM_TRACK_STARTED, (track: RoomTrackStarted) => {
+    console.log("Track started", track);
+    if (track.track == "audio_main") {
+      audio_recv_track.switch(track);
+    } else {
+      video_recv_track.switch(track);
+    }
+  });
+
+  session.on(SessionEvent.ROOM_TRACK_STOPPED, (track: RoomTrackStopped) => {
+    console.log("Track stopped", track);
+  });
   await session.connect();
 }
 

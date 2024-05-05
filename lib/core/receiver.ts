@@ -1,4 +1,9 @@
-import { Receiver, Kind } from "../generated/protobuf/shared";
+import {
+  Receiver,
+  Kind,
+  Receiver_Config,
+  Receiver_Source,
+} from "../generated/protobuf/shared";
 import { Datachannel } from "./data";
 import { MediaKind } from "./types";
 
@@ -6,7 +11,7 @@ export class TrackReceiver {
   media_stream: MediaStream;
 
   constructor(
-    dc: Datachannel,
+    private dc: Datachannel,
     private track_name: string,
     private kind: MediaKind,
     private priority: number,
@@ -25,6 +30,22 @@ export class TrackReceiver {
       throw new Error("media_stream already set");
     }
     this.media_stream.addTrack(track);
+  }
+
+  public async switch(source?: Receiver_Source) {
+    await this.dc.wait_connect();
+    await this.dc.request_receiver({
+      name: this.track_name,
+      switch: { source },
+    });
+  }
+
+  public async config(config: Receiver_Config) {
+    await this.dc.wait_connect();
+    await this.dc.request_receiver({
+      name: this.track_name,
+      config,
+    });
   }
 
   get stream() {

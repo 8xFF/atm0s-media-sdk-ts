@@ -1,4 +1,15 @@
-import { ServerEvent } from "../generated/protobuf/conn";
+import {
+  ClientEvent,
+  ServerEvent,
+  Request as ProtoRequest,
+  Response as ProtoResponse,
+  Request_Session,
+  Response_Session,
+  Request_Sender,
+  Response_Sender,
+  Request_Receiver,
+  Response_Receiver,
+} from "../generated/protobuf/conn";
 import EventEmitter from "../utils";
 
 export enum DatachannelEvent {
@@ -10,14 +21,16 @@ export enum DatachannelEvent {
 
 export class Datachannel extends EventEmitter {
   wait_connects: [() => any, (err: any) => any][] = [];
+  seq_id: number = 0;
   req_id: number = 0;
+  reqs: Map<number, (a: ProtoResponse) => void> = new Map();
 
   constructor(private dc: RTCDataChannel) {
     super();
     dc.onopen = () => {
       console.log("[Datachannel] on open");
       while (this.wait_connects.length > 0) {
-        let [success, _] = this.wait_connects.shift()!;
+        const [success, _] = this.wait_connects.shift()!;
         success();
       }
     };
@@ -34,13 +47,23 @@ export class Datachannel extends EventEmitter {
       } else if (msg.receiver) {
         this.emit(DatachannelEvent.RECEIVER + msg.receiver.name, msg.receiver);
       } else if (msg.response) {
-        console.log("[Datachannel] on response", msg.response);
+        const req_cb = this.reqs.get(msg.response.reqId);
+        if (req_cb) {
+          console.log("[Datachannel] on response", msg.response);
+          this.reqs.delete(msg.response.reqId);
+          req_cb(msg.response);
+        } else {
+          console.warn(
+            "[Datachannel] unknown request with response",
+            msg.response,
+          );
+        }
       }
     };
     dc.onerror = (e) => {
       console.error("[Datachannel] on error", e);
       while (this.wait_connects.length > 0) {
-        let [_, error] = this.wait_connects.shift()!;
+        const [_, error] = this.wait_connects.shift()!;
         error(e);
       }
     };
@@ -59,12 +82,72 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request(_req: any): Promise<any> {
-    return {};
+  public async request_session(
+    req: Request_Session,
+  ): Promise<Response_Session> {
+    const reqId = this.gen_req_id();
+    const res = await this.request({ reqId, session: req });
+    if (res.session) {
+      return res.session;
+    } else {
+      throw Error("INVALID_SERVER_RESPONSE");
+    }
+  }
+
+  public async request_sender(req: Request_Sender): Promise<Response_Sender> {
+    const reqId = this.gen_req_id();
+    const res = await this.request({ reqId, sender: req });
+    if (res.sender) {
+      return res.sender;
+    } else {
+      throw Error("INVALID_SERVER_RESPONSE");
+    }
+  }
+
+  public async request_receiver(
+    req: Request_Receiver,
+  ): Promise<Response_Receiver> {
+    const reqId = this.gen_req_id();
+    const res = await this.request({ reqId, receiver: req });
+    if (res.receiver) {
+      return res.receiver;
+    } else {
+      throw Error("INVALID_SERVER_RESPONSE");
+    }
+  }
+
+  async request(request: ProtoRequest): Promise<ProtoResponse> {
+    const seq = this.gen_seq_id();
+    const buf = ClientEvent.encode({
+      seq,
+      request,
+    }).finish();
+    this.dc.send(buf);
+    const reqId = request.reqId;
+    const res = await new Promise<ProtoResponse>((resolve, reject) => {
+      this.reqs.set(reqId, resolve);
+      setTimeout(() => {
+        if (this.reqs.has(reqId)) {
+          this.reqs.delete(reqId);
+          reject(new Error("TIMEOUT"));
+        }
+      }, 5000);
+    });
+
+    if (res.error) {
+      throw res.error;
+    } else {
+      return res;
+    }
   }
 
   gen_req_id(): number {
     this.req_id += 1;
     return this.req_id;
+  }
+
+  gen_seq_id(): number {
+    this.seq_id += 1;
+    return this.seq_id;
   }
 }

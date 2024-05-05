@@ -11,8 +11,10 @@ import { Error, Receiver_Config, Receiver_Source, RoomJoin, Sender_Config, Sende
 export const protobufPackage = "conn";
 
 export interface Request {
-  seq: number;
+  reqId: number;
   session?: Request_Session | undefined;
+  sender?: Request_Sender | undefined;
+  receiver?: Request_Receiver | undefined;
 }
 
 export interface Request_Session {
@@ -59,7 +61,7 @@ export interface Request_Receiver_Switch {
 }
 
 export interface Response {
-  seq: number;
+  reqId: number;
   error?: Error | undefined;
   session?: Response_Session | undefined;
   sender?: Response_Sender | undefined;
@@ -311,16 +313,22 @@ export interface ClientEvent {
 }
 
 function createBaseRequest(): Request {
-  return { seq: 0, session: undefined };
+  return { reqId: 0, session: undefined, sender: undefined, receiver: undefined };
 }
 
 export const Request = {
   encode(message: Request, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.seq !== 0) {
-      writer.uint32(8).uint32(message.seq);
+    if (message.reqId !== 0) {
+      writer.uint32(8).uint32(message.reqId);
     }
     if (message.session !== undefined) {
       Request_Session.encode(message.session, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.sender !== undefined) {
+      Request_Sender.encode(message.sender, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.receiver !== undefined) {
+      Request_Receiver.encode(message.receiver, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -337,7 +345,7 @@ export const Request = {
             break;
           }
 
-          message.seq = reader.uint32();
+          message.reqId = reader.uint32();
           continue;
         case 2:
           if (tag !== 18) {
@@ -345,6 +353,20 @@ export const Request = {
           }
 
           message.session = Request_Session.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.sender = Request_Sender.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.receiver = Request_Receiver.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -357,18 +379,26 @@ export const Request = {
 
   fromJSON(object: any): Request {
     return {
-      seq: isSet(object.seq) ? globalThis.Number(object.seq) : 0,
+      reqId: isSet(object.reqId) ? globalThis.Number(object.reqId) : 0,
       session: isSet(object.session) ? Request_Session.fromJSON(object.session) : undefined,
+      sender: isSet(object.sender) ? Request_Sender.fromJSON(object.sender) : undefined,
+      receiver: isSet(object.receiver) ? Request_Receiver.fromJSON(object.receiver) : undefined,
     };
   },
 
   toJSON(message: Request): unknown {
     const obj: any = {};
-    if (message.seq !== 0) {
-      obj.seq = Math.round(message.seq);
+    if (message.reqId !== 0) {
+      obj.reqId = Math.round(message.reqId);
     }
     if (message.session !== undefined) {
       obj.session = Request_Session.toJSON(message.session);
+    }
+    if (message.sender !== undefined) {
+      obj.sender = Request_Sender.toJSON(message.sender);
+    }
+    if (message.receiver !== undefined) {
+      obj.receiver = Request_Receiver.toJSON(message.receiver);
     }
     return obj;
   },
@@ -378,9 +408,15 @@ export const Request = {
   },
   fromPartial<I extends Exact<DeepPartial<Request>, I>>(object: I): Request {
     const message = createBaseRequest();
-    message.seq = object.seq ?? 0;
+    message.reqId = object.reqId ?? 0;
     message.session = (object.session !== undefined && object.session !== null)
       ? Request_Session.fromPartial(object.session)
+      : undefined;
+    message.sender = (object.sender !== undefined && object.sender !== null)
+      ? Request_Sender.fromPartial(object.sender)
+      : undefined;
+    message.receiver = (object.receiver !== undefined && object.receiver !== null)
+      ? Request_Receiver.fromPartial(object.receiver)
       : undefined;
     return message;
   },
@@ -1039,13 +1075,13 @@ export const Request_Receiver_Switch = {
 };
 
 function createBaseResponse(): Response {
-  return { seq: 0, error: undefined, session: undefined, sender: undefined, receiver: undefined };
+  return { reqId: 0, error: undefined, session: undefined, sender: undefined, receiver: undefined };
 }
 
 export const Response = {
   encode(message: Response, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.seq !== 0) {
-      writer.uint32(8).uint32(message.seq);
+    if (message.reqId !== 0) {
+      writer.uint32(8).uint32(message.reqId);
     }
     if (message.error !== undefined) {
       Error.encode(message.error, writer.uint32(18).fork()).ldelim();
@@ -1074,7 +1110,7 @@ export const Response = {
             break;
           }
 
-          message.seq = reader.uint32();
+          message.reqId = reader.uint32();
           continue;
         case 2:
           if (tag !== 18) {
@@ -1115,7 +1151,7 @@ export const Response = {
 
   fromJSON(object: any): Response {
     return {
-      seq: isSet(object.seq) ? globalThis.Number(object.seq) : 0,
+      reqId: isSet(object.reqId) ? globalThis.Number(object.reqId) : 0,
       error: isSet(object.error) ? Error.fromJSON(object.error) : undefined,
       session: isSet(object.session) ? Response_Session.fromJSON(object.session) : undefined,
       sender: isSet(object.sender) ? Response_Sender.fromJSON(object.sender) : undefined,
@@ -1125,8 +1161,8 @@ export const Response = {
 
   toJSON(message: Response): unknown {
     const obj: any = {};
-    if (message.seq !== 0) {
-      obj.seq = Math.round(message.seq);
+    if (message.reqId !== 0) {
+      obj.reqId = Math.round(message.reqId);
     }
     if (message.error !== undefined) {
       obj.error = Error.toJSON(message.error);
@@ -1148,7 +1184,7 @@ export const Response = {
   },
   fromPartial<I extends Exact<DeepPartial<Response>, I>>(object: I): Response {
     const message = createBaseResponse();
-    message.seq = object.seq ?? 0;
+    message.reqId = object.reqId ?? 0;
     message.error = (object.error !== undefined && object.error !== null) ? Error.fromPartial(object.error) : undefined;
     message.session = (object.session !== undefined && object.session !== null)
       ? Response_Session.fromPartial(object.session)
