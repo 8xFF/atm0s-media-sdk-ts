@@ -1,1 +1,3 @@
-export { Session } from "./session";
+export { Session, SessionEvent } from "./core/session";
+export { TrackSender } from "./core/sender";
+export { TrackReceiver } from "./core/receiver";

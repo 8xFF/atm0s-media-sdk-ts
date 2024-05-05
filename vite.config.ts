@@ -5,6 +5,9 @@ import dts from "vite-plugin-dts";
 
 export default defineConfig({
   plugins: [dts({ include: ["lib"] })],
+  define: {
+    SDK_VERSION: JSON.stringify(process.env.npm_package_version),
+  },
   build: {
     copyPublicDir: false,
     lib: {

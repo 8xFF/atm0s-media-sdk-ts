@@ -5,22 +5,15 @@
 // source: gateway.proto
 
 /* eslint-disable */
-import { grpc } from "@improbable-eng/grpc-web";
-import { BrowserHeaders } from "browser-headers";
 import * as _m0 from "protobufjs/minimal";
 import { Features } from "./features";
-import { BitrateControlMode, bitrateControlModeFromJSON, bitrateControlModeToJSON, RoomInfo, Tracks } from "./shared";
+import { RoomJoin, Tracks } from "./shared";
 
 export const protobufPackage = "gateway";
 
 export interface ConnectRequest {
-  token: string;
   version: string;
-  room?: string | undefined;
-  peer?: string | undefined;
-  metadata?: string | undefined;
-  info: RoomInfo | undefined;
-  bitrate: BitrateControlMode;
+  join?: RoomJoin | undefined;
   features: Features | undefined;
   tracks: Tracks | undefined;
   sdp: string;
@@ -36,56 +29,29 @@ export interface RemoteIceRequest {
   candidate: string;
 }
 
-export interface RemoteIceRespone {
-  candidates: string[];
+export interface RemoteIceResponse {
 }
 
 function createBaseConnectRequest(): ConnectRequest {
-  return {
-    token: "",
-    version: "",
-    room: undefined,
-    peer: undefined,
-    metadata: undefined,
-    info: undefined,
-    bitrate: 0,
-    features: undefined,
-    tracks: undefined,
-    sdp: "",
-  };
+  return { version: "", join: undefined, features: undefined, tracks: undefined, sdp: "" };
 }
 
 export const ConnectRequest = {
   encode(message: ConnectRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.token !== "") {
-      writer.uint32(10).string(message.token);
-    }
     if (message.version !== "") {
       writer.uint32(18).string(message.version);
     }
-    if (message.room !== undefined) {
-      writer.uint32(26).string(message.room);
-    }
-    if (message.peer !== undefined) {
-      writer.uint32(34).string(message.peer);
-    }
-    if (message.metadata !== undefined) {
-      writer.uint32(42).string(message.metadata);
-    }
-    if (message.info !== undefined) {
-      RoomInfo.encode(message.info, writer.uint32(50).fork()).ldelim();
-    }
-    if (message.bitrate !== 0) {
-      writer.uint32(56).int32(message.bitrate);
+    if (message.join !== undefined) {
+      RoomJoin.encode(message.join, writer.uint32(26).fork()).ldelim();
     }
     if (message.features !== undefined) {
-      Features.encode(message.features, writer.uint32(66).fork()).ldelim();
+      Features.encode(message.features, writer.uint32(34).fork()).ldelim();
     }
     if (message.tracks !== undefined) {
-      Tracks.encode(message.tracks, writer.uint32(74).fork()).ldelim();
+      Tracks.encode(message.tracks, writer.uint32(42).fork()).ldelim();
     }
     if (message.sdp !== "") {
-      writer.uint32(82).string(message.sdp);
+      writer.uint32(50).string(message.sdp);
     }
     return writer;
   },
@@ -97,13 +63,6 @@ export const ConnectRequest = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.token = reader.string();
-          continue;
         case 2:
           if (tag !== 18) {
             break;
@@ -116,52 +75,24 @@ export const ConnectRequest = {
             break;
           }
 
-          message.room = reader.string();
+          message.join = RoomJoin.decode(reader, reader.uint32());
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
-          message.peer = reader.string();
+          message.features = Features.decode(reader, reader.uint32());
           continue;
         case 5:
           if (tag !== 42) {
             break;
           }
 
-          message.metadata = reader.string();
+          message.tracks = Tracks.decode(reader, reader.uint32());
           continue;
         case 6:
           if (tag !== 50) {
-            break;
-          }
-
-          message.info = RoomInfo.decode(reader, reader.uint32());
-          continue;
-        case 7:
-          if (tag !== 56) {
-            break;
-          }
-
-          message.bitrate = reader.int32() as any;
-          continue;
-        case 8:
-          if (tag !== 66) {
-            break;
-          }
-
-          message.features = Features.decode(reader, reader.uint32());
-          continue;
-        case 9:
-          if (tag !== 74) {
-            break;
-          }
-
-          message.tracks = Tracks.decode(reader, reader.uint32());
-          continue;
-        case 10:
-          if (tag !== 82) {
             break;
           }
 
@@ -178,13 +109,8 @@ export const ConnectRequest = {
 
   fromJSON(object: any): ConnectRequest {
     return {
-      token: isSet(object.token) ? globalThis.String(object.token) : "",
       version: isSet(object.version) ? globalThis.String(object.version) : "",
-      room: isSet(object.room) ? globalThis.String(object.room) : undefined,
-      peer: isSet(object.peer) ? globalThis.String(object.peer) : undefined,
-      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : undefined,
-      info: isSet(object.info) ? RoomInfo.fromJSON(object.info) : undefined,
-      bitrate: isSet(object.bitrate) ? bitrateControlModeFromJSON(object.bitrate) : 0,
+      join: isSet(object.join) ? RoomJoin.fromJSON(object.join) : undefined,
       features: isSet(object.features) ? Features.fromJSON(object.features) : undefined,
       tracks: isSet(object.tracks) ? Tracks.fromJSON(object.tracks) : undefined,
       sdp: isSet(object.sdp) ? globalThis.String(object.sdp) : "",
@@ -193,26 +119,11 @@ export const ConnectRequest = {
 
   toJSON(message: ConnectRequest): unknown {
     const obj: any = {};
-    if (message.token !== "") {
-      obj.token = message.token;
-    }
     if (message.version !== "") {
       obj.version = message.version;
     }
-    if (message.room !== undefined) {
-      obj.room = message.room;
-    }
-    if (message.peer !== undefined) {
-      obj.peer = message.peer;
-    }
-    if (message.metadata !== undefined) {
-      obj.metadata = message.metadata;
-    }
-    if (message.info !== undefined) {
-      obj.info = RoomInfo.toJSON(message.info);
-    }
-    if (message.bitrate !== 0) {
-      obj.bitrate = bitrateControlModeToJSON(message.bitrate);
+    if (message.join !== undefined) {
+      obj.join = RoomJoin.toJSON(message.join);
     }
     if (message.features !== undefined) {
       obj.features = Features.toJSON(message.features);
@@ -231,13 +142,8 @@ export const ConnectRequest = {
   },
   fromPartial<I extends Exact<DeepPartial<ConnectRequest>, I>>(object: I): ConnectRequest {
     const message = createBaseConnectRequest();
-    message.token = object.token ?? "";
     message.version = object.version ?? "";
-    message.room = object.room ?? undefined;
-    message.peer = object.peer ?? undefined;
-    message.metadata = object.metadata ?? undefined;
-    message.info = (object.info !== undefined && object.info !== null) ? RoomInfo.fromPartial(object.info) : undefined;
-    message.bitrate = object.bitrate ?? 0;
+    message.join = (object.join !== undefined && object.join !== null) ? RoomJoin.fromPartial(object.join) : undefined;
     message.features = (object.features !== undefined && object.features !== null)
       ? Features.fromPartial(object.features)
       : undefined;
@@ -397,32 +303,22 @@ export const RemoteIceRequest = {
   },
 };
 
-function createBaseRemoteIceRespone(): RemoteIceRespone {
-  return { candidates: [] };
+function createBaseRemoteIceResponse(): RemoteIceResponse {
+  return {};
 }
 
-export const RemoteIceRespone = {
-  encode(message: RemoteIceRespone, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.candidates) {
-      writer.uint32(10).string(v!);
-    }
+export const RemoteIceResponse = {
+  encode(_: RemoteIceResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): RemoteIceRespone {
+  decode(input: _m0.Reader | Uint8Array, length?: number): RemoteIceResponse {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRemoteIceRespone();
+    const message = createBaseRemoteIceResponse();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.candidates.push(reader.string());
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -432,199 +328,23 @@ export const RemoteIceRespone = {
     return message;
   },
 
-  fromJSON(object: any): RemoteIceRespone {
-    return {
-      candidates: globalThis.Array.isArray(object?.candidates)
-        ? object.candidates.map((e: any) => globalThis.String(e))
-        : [],
-    };
+  fromJSON(_: any): RemoteIceResponse {
+    return {};
   },
 
-  toJSON(message: RemoteIceRespone): unknown {
+  toJSON(_: RemoteIceResponse): unknown {
     const obj: any = {};
-    if (message.candidates?.length) {
-      obj.candidates = message.candidates;
-    }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<RemoteIceRespone>, I>>(base?: I): RemoteIceRespone {
-    return RemoteIceRespone.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<RemoteIceResponse>, I>>(base?: I): RemoteIceResponse {
+    return RemoteIceResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<RemoteIceRespone>, I>>(object: I): RemoteIceRespone {
-    const message = createBaseRemoteIceRespone();
-    message.candidates = object.candidates?.map((e) => e) || [];
+  fromPartial<I extends Exact<DeepPartial<RemoteIceResponse>, I>>(_: I): RemoteIceResponse {
+    const message = createBaseRemoteIceResponse();
     return message;
   },
 };
-
-export interface Gateway {
-  Connect(request: DeepPartial<ConnectRequest>, metadata?: grpc.Metadata): Promise<ConnectResponse>;
-  RemoteIce(request: DeepPartial<RemoteIceRequest>, metadata?: grpc.Metadata): Promise<RemoteIceRespone>;
-  RestartIce(request: DeepPartial<ConnectRequest>, metadata?: grpc.Metadata): Promise<ConnectResponse>;
-}
-
-export class GatewayClientImpl implements Gateway {
-  private readonly rpc: Rpc;
-
-  constructor(rpc: Rpc) {
-    this.rpc = rpc;
-    this.Connect = this.Connect.bind(this);
-    this.RemoteIce = this.RemoteIce.bind(this);
-    this.RestartIce = this.RestartIce.bind(this);
-  }
-
-  Connect(request: DeepPartial<ConnectRequest>, metadata?: grpc.Metadata): Promise<ConnectResponse> {
-    return this.rpc.unary(GatewayConnectDesc, ConnectRequest.fromPartial(request), metadata);
-  }
-
-  RemoteIce(request: DeepPartial<RemoteIceRequest>, metadata?: grpc.Metadata): Promise<RemoteIceRespone> {
-    return this.rpc.unary(GatewayRemoteIceDesc, RemoteIceRequest.fromPartial(request), metadata);
-  }
-
-  RestartIce(request: DeepPartial<ConnectRequest>, metadata?: grpc.Metadata): Promise<ConnectResponse> {
-    return this.rpc.unary(GatewayRestartIceDesc, ConnectRequest.fromPartial(request), metadata);
-  }
-}
-
-export const GatewayDesc = { serviceName: "gateway.Gateway" };
-
-export const GatewayConnectDesc: UnaryMethodDefinitionish = {
-  methodName: "Connect",
-  service: GatewayDesc,
-  requestStream: false,
-  responseStream: false,
-  requestType: {
-    serializeBinary() {
-      return ConnectRequest.encode(this).finish();
-    },
-  } as any,
-  responseType: {
-    deserializeBinary(data: Uint8Array) {
-      const value = ConnectResponse.decode(data);
-      return {
-        ...value,
-        toObject() {
-          return value;
-        },
-      };
-    },
-  } as any,
-};
-
-export const GatewayRemoteIceDesc: UnaryMethodDefinitionish = {
-  methodName: "RemoteIce",
-  service: GatewayDesc,
-  requestStream: false,
-  responseStream: false,
-  requestType: {
-    serializeBinary() {
-      return RemoteIceRequest.encode(this).finish();
-    },
-  } as any,
-  responseType: {
-    deserializeBinary(data: Uint8Array) {
-      const value = RemoteIceRespone.decode(data);
-      return {
-        ...value,
-        toObject() {
-          return value;
-        },
-      };
-    },
-  } as any,
-};
-
-export const GatewayRestartIceDesc: UnaryMethodDefinitionish = {
-  methodName: "RestartIce",
-  service: GatewayDesc,
-  requestStream: false,
-  responseStream: false,
-  requestType: {
-    serializeBinary() {
-      return ConnectRequest.encode(this).finish();
-    },
-  } as any,
-  responseType: {
-    deserializeBinary(data: Uint8Array) {
-      const value = ConnectResponse.decode(data);
-      return {
-        ...value,
-        toObject() {
-          return value;
-        },
-      };
-    },
-  } as any,
-};
-
-interface UnaryMethodDefinitionishR extends grpc.UnaryMethodDefinition<any, any> {
-  requestStream: any;
-  responseStream: any;
-}
-
-type UnaryMethodDefinitionish = UnaryMethodDefinitionishR;
-
-interface Rpc {
-  unary<T extends UnaryMethodDefinitionish>(
-    methodDesc: T,
-    request: any,
-    metadata: grpc.Metadata | undefined,
-  ): Promise<any>;
-}
-
-export class GrpcWebImpl {
-  private host: string;
-  private options: {
-    transport?: grpc.TransportFactory;
-
-    debug?: boolean;
-    metadata?: grpc.Metadata;
-    upStreamRetryCodes?: number[];
-  };
-
-  constructor(
-    host: string,
-    options: {
-      transport?: grpc.TransportFactory;
-
-      debug?: boolean;
-      metadata?: grpc.Metadata;
-      upStreamRetryCodes?: number[];
-    },
-  ) {
-    this.host = host;
-    this.options = options;
-  }
-
-  unary<T extends UnaryMethodDefinitionish>(
-    methodDesc: T,
-    _request: any,
-    metadata: grpc.Metadata | undefined,
-  ): Promise<any> {
-    const request = { ..._request, ...methodDesc.requestType };
-    const maybeCombinedMetadata = metadata && this.options.metadata
-      ? new BrowserHeaders({ ...this.options?.metadata.headersMap, ...metadata?.headersMap })
-      : metadata ?? this.options.metadata;
-    return new Promise((resolve, reject) => {
-      grpc.unary(methodDesc, {
-        request,
-        host: this.host,
-        metadata: maybeCombinedMetadata ?? {},
-        ...(this.options.transport !== undefined ? { transport: this.options.transport } : {}),
-        debug: this.options.debug ?? false,
-        onEnd: function (response) {
-          if (response.status === grpc.Code.OK) {
-            resolve(response.message!.toObject());
-          } else {
-            const err = new GrpcWebError(response.statusMessage, response.status, response.trailers);
-            reject(err);
-          }
-        },
-      });
-    });
-  }
-}
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
@@ -640,10 +360,4 @@ export type Exact<P, I extends P> = P extends Builtin ? P
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;
-}
-
-export class GrpcWebError extends globalThis.Error {
-  constructor(message: string, public code: grpc.Code, public metadata: grpc.Metadata) {
-    super(message);
-  }
 }

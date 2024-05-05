@@ -77,8 +77,8 @@ export function bitrateControlModeToJSON(object: BitrateControlMode): string {
 
 export interface Receiver {
   kind: Kind;
-  id: string;
-  state?: Receiver_State | undefined;
+  name: string;
+  state: Receiver_State | undefined;
 }
 
 export interface Receiver_Source {
@@ -86,7 +86,7 @@ export interface Receiver_Source {
   track: string;
 }
 
-export interface Receiver_Limit {
+export interface Receiver_Config {
   priority: number;
   maxSpatial: number;
   maxTemporal: number;
@@ -95,24 +95,30 @@ export interface Receiver_Limit {
 }
 
 export interface Receiver_State {
+  config: Receiver_Config | undefined;
   source?: Receiver_Source | undefined;
-  limit?: Receiver_Limit | undefined;
 }
 
 export interface Sender {
   kind: Kind;
-  id: string;
-  state?: Sender_State | undefined;
+  name: string;
+  state: Sender_State | undefined;
 }
 
 export interface Sender_Source {
   id: string;
   screen: boolean;
+  metadata?: string | undefined;
+}
+
+export interface Sender_Config {
+  priority: number;
+  bitrate?: BitrateControlMode | undefined;
 }
 
 export interface Sender_State {
+  config: Sender_Config | undefined;
   source?: Sender_Source | undefined;
-  priority?: number | undefined;
 }
 
 export interface Tracks {
@@ -121,18 +127,21 @@ export interface Tracks {
 }
 
 export interface RoomInfoPublish {
-  room: boolean;
   peer: boolean;
+  tracks: boolean;
 }
 
 export interface RoomInfoSubscribe {
-  room: boolean;
-  peer: boolean;
+  peers: boolean;
+  tracks: boolean;
 }
 
-export interface RoomInfo {
+export interface RoomJoin {
+  room: string;
+  peer: string;
   publish: RoomInfoPublish | undefined;
   subscribe: RoomInfoSubscribe | undefined;
+  metadata?: string | undefined;
 }
 
 export interface Error {
@@ -141,7 +150,7 @@ export interface Error {
 }
 
 function createBaseReceiver(): Receiver {
-  return { kind: 0, id: "", state: undefined };
+  return { kind: 0, name: "", state: undefined };
 }
 
 export const Receiver = {
@@ -149,8 +158,8 @@ export const Receiver = {
     if (message.kind !== 0) {
       writer.uint32(8).int32(message.kind);
     }
-    if (message.id !== "") {
-      writer.uint32(18).string(message.id);
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
     }
     if (message.state !== undefined) {
       Receiver_State.encode(message.state, writer.uint32(26).fork()).ldelim();
@@ -177,7 +186,7 @@ export const Receiver = {
             break;
           }
 
-          message.id = reader.string();
+          message.name = reader.string();
           continue;
         case 3:
           if (tag !== 26) {
@@ -198,7 +207,7 @@ export const Receiver = {
   fromJSON(object: any): Receiver {
     return {
       kind: isSet(object.kind) ? kindFromJSON(object.kind) : 0,
-      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
       state: isSet(object.state) ? Receiver_State.fromJSON(object.state) : undefined,
     };
   },
@@ -208,8 +217,8 @@ export const Receiver = {
     if (message.kind !== 0) {
       obj.kind = kindToJSON(message.kind);
     }
-    if (message.id !== "") {
-      obj.id = message.id;
+    if (message.name !== "") {
+      obj.name = message.name;
     }
     if (message.state !== undefined) {
       obj.state = Receiver_State.toJSON(message.state);
@@ -223,7 +232,7 @@ export const Receiver = {
   fromPartial<I extends Exact<DeepPartial<Receiver>, I>>(object: I): Receiver {
     const message = createBaseReceiver();
     message.kind = object.kind ?? 0;
-    message.id = object.id ?? "";
+    message.name = object.name ?? "";
     message.state = (object.state !== undefined && object.state !== null)
       ? Receiver_State.fromPartial(object.state)
       : undefined;
@@ -305,12 +314,12 @@ export const Receiver_Source = {
   },
 };
 
-function createBaseReceiver_Limit(): Receiver_Limit {
-  return { priority: 0, maxSpatial: 0, maxTemporal: 0, minSpatial: undefined, minTemporal: undefined };
+function createBaseReceiver_Config(): Receiver_Config {
+  return { priority: 0, maxSpatial: 0, maxTemporal: 0, minSpatial: 0, minTemporal: 0 };
 }
 
-export const Receiver_Limit = {
-  encode(message: Receiver_Limit, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const Receiver_Config = {
+  encode(message: Receiver_Config, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.priority !== 0) {
       writer.uint32(8).uint32(message.priority);
     }
@@ -320,19 +329,19 @@ export const Receiver_Limit = {
     if (message.maxTemporal !== 0) {
       writer.uint32(24).uint32(message.maxTemporal);
     }
-    if (message.minSpatial !== undefined) {
+    if (message.minSpatial !== undefined && message.minSpatial !== 0) {
       writer.uint32(32).uint32(message.minSpatial);
     }
-    if (message.minTemporal !== undefined) {
+    if (message.minTemporal !== undefined && message.minTemporal !== 0) {
       writer.uint32(40).uint32(message.minTemporal);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Receiver_Limit {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Receiver_Config {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseReceiver_Limit();
+    const message = createBaseReceiver_Config();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -380,17 +389,17 @@ export const Receiver_Limit = {
     return message;
   },
 
-  fromJSON(object: any): Receiver_Limit {
+  fromJSON(object: any): Receiver_Config {
     return {
       priority: isSet(object.priority) ? globalThis.Number(object.priority) : 0,
       maxSpatial: isSet(object.maxSpatial) ? globalThis.Number(object.maxSpatial) : 0,
       maxTemporal: isSet(object.maxTemporal) ? globalThis.Number(object.maxTemporal) : 0,
-      minSpatial: isSet(object.minSpatial) ? globalThis.Number(object.minSpatial) : undefined,
-      minTemporal: isSet(object.minTemporal) ? globalThis.Number(object.minTemporal) : undefined,
+      minSpatial: isSet(object.minSpatial) ? globalThis.Number(object.minSpatial) : 0,
+      minTemporal: isSet(object.minTemporal) ? globalThis.Number(object.minTemporal) : 0,
     };
   },
 
-  toJSON(message: Receiver_Limit): unknown {
+  toJSON(message: Receiver_Config): unknown {
     const obj: any = {};
     if (message.priority !== 0) {
       obj.priority = Math.round(message.priority);
@@ -401,40 +410,40 @@ export const Receiver_Limit = {
     if (message.maxTemporal !== 0) {
       obj.maxTemporal = Math.round(message.maxTemporal);
     }
-    if (message.minSpatial !== undefined) {
+    if (message.minSpatial !== undefined && message.minSpatial !== 0) {
       obj.minSpatial = Math.round(message.minSpatial);
     }
-    if (message.minTemporal !== undefined) {
+    if (message.minTemporal !== undefined && message.minTemporal !== 0) {
       obj.minTemporal = Math.round(message.minTemporal);
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Receiver_Limit>, I>>(base?: I): Receiver_Limit {
-    return Receiver_Limit.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<Receiver_Config>, I>>(base?: I): Receiver_Config {
+    return Receiver_Config.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Receiver_Limit>, I>>(object: I): Receiver_Limit {
-    const message = createBaseReceiver_Limit();
+  fromPartial<I extends Exact<DeepPartial<Receiver_Config>, I>>(object: I): Receiver_Config {
+    const message = createBaseReceiver_Config();
     message.priority = object.priority ?? 0;
     message.maxSpatial = object.maxSpatial ?? 0;
     message.maxTemporal = object.maxTemporal ?? 0;
-    message.minSpatial = object.minSpatial ?? undefined;
-    message.minTemporal = object.minTemporal ?? undefined;
+    message.minSpatial = object.minSpatial ?? 0;
+    message.minTemporal = object.minTemporal ?? 0;
     return message;
   },
 };
 
 function createBaseReceiver_State(): Receiver_State {
-  return { source: undefined, limit: undefined };
+  return { config: undefined, source: undefined };
 }
 
 export const Receiver_State = {
   encode(message: Receiver_State, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.source !== undefined) {
-      Receiver_Source.encode(message.source, writer.uint32(10).fork()).ldelim();
+    if (message.config !== undefined) {
+      Receiver_Config.encode(message.config, writer.uint32(10).fork()).ldelim();
     }
-    if (message.limit !== undefined) {
-      Receiver_Limit.encode(message.limit, writer.uint32(18).fork()).ldelim();
+    if (message.source !== undefined) {
+      Receiver_Source.encode(message.source, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -451,14 +460,14 @@ export const Receiver_State = {
             break;
           }
 
-          message.source = Receiver_Source.decode(reader, reader.uint32());
+          message.config = Receiver_Config.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.limit = Receiver_Limit.decode(reader, reader.uint32());
+          message.source = Receiver_Source.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -471,18 +480,18 @@ export const Receiver_State = {
 
   fromJSON(object: any): Receiver_State {
     return {
+      config: isSet(object.config) ? Receiver_Config.fromJSON(object.config) : undefined,
       source: isSet(object.source) ? Receiver_Source.fromJSON(object.source) : undefined,
-      limit: isSet(object.limit) ? Receiver_Limit.fromJSON(object.limit) : undefined,
     };
   },
 
   toJSON(message: Receiver_State): unknown {
     const obj: any = {};
+    if (message.config !== undefined) {
+      obj.config = Receiver_Config.toJSON(message.config);
+    }
     if (message.source !== undefined) {
       obj.source = Receiver_Source.toJSON(message.source);
-    }
-    if (message.limit !== undefined) {
-      obj.limit = Receiver_Limit.toJSON(message.limit);
     }
     return obj;
   },
@@ -492,18 +501,18 @@ export const Receiver_State = {
   },
   fromPartial<I extends Exact<DeepPartial<Receiver_State>, I>>(object: I): Receiver_State {
     const message = createBaseReceiver_State();
+    message.config = (object.config !== undefined && object.config !== null)
+      ? Receiver_Config.fromPartial(object.config)
+      : undefined;
     message.source = (object.source !== undefined && object.source !== null)
       ? Receiver_Source.fromPartial(object.source)
-      : undefined;
-    message.limit = (object.limit !== undefined && object.limit !== null)
-      ? Receiver_Limit.fromPartial(object.limit)
       : undefined;
     return message;
   },
 };
 
 function createBaseSender(): Sender {
-  return { kind: 0, id: "", state: undefined };
+  return { kind: 0, name: "", state: undefined };
 }
 
 export const Sender = {
@@ -511,8 +520,8 @@ export const Sender = {
     if (message.kind !== 0) {
       writer.uint32(8).int32(message.kind);
     }
-    if (message.id !== "") {
-      writer.uint32(18).string(message.id);
+    if (message.name !== "") {
+      writer.uint32(18).string(message.name);
     }
     if (message.state !== undefined) {
       Sender_State.encode(message.state, writer.uint32(26).fork()).ldelim();
@@ -539,7 +548,7 @@ export const Sender = {
             break;
           }
 
-          message.id = reader.string();
+          message.name = reader.string();
           continue;
         case 3:
           if (tag !== 26) {
@@ -560,7 +569,7 @@ export const Sender = {
   fromJSON(object: any): Sender {
     return {
       kind: isSet(object.kind) ? kindFromJSON(object.kind) : 0,
-      id: isSet(object.id) ? globalThis.String(object.id) : "",
+      name: isSet(object.name) ? globalThis.String(object.name) : "",
       state: isSet(object.state) ? Sender_State.fromJSON(object.state) : undefined,
     };
   },
@@ -570,8 +579,8 @@ export const Sender = {
     if (message.kind !== 0) {
       obj.kind = kindToJSON(message.kind);
     }
-    if (message.id !== "") {
-      obj.id = message.id;
+    if (message.name !== "") {
+      obj.name = message.name;
     }
     if (message.state !== undefined) {
       obj.state = Sender_State.toJSON(message.state);
@@ -585,7 +594,7 @@ export const Sender = {
   fromPartial<I extends Exact<DeepPartial<Sender>, I>>(object: I): Sender {
     const message = createBaseSender();
     message.kind = object.kind ?? 0;
-    message.id = object.id ?? "";
+    message.name = object.name ?? "";
     message.state = (object.state !== undefined && object.state !== null)
       ? Sender_State.fromPartial(object.state)
       : undefined;
@@ -594,7 +603,7 @@ export const Sender = {
 };
 
 function createBaseSender_Source(): Sender_Source {
-  return { id: "", screen: false };
+  return { id: "", screen: false, metadata: "" };
 }
 
 export const Sender_Source = {
@@ -604,6 +613,9 @@ export const Sender_Source = {
     }
     if (message.screen !== false) {
       writer.uint32(16).bool(message.screen);
+    }
+    if (message.metadata !== undefined && message.metadata !== "") {
+      writer.uint32(26).string(message.metadata);
     }
     return writer;
   },
@@ -629,6 +641,13 @@ export const Sender_Source = {
 
           message.screen = reader.bool();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.metadata = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -642,6 +661,7 @@ export const Sender_Source = {
     return {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       screen: isSet(object.screen) ? globalThis.Boolean(object.screen) : false,
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
     };
   },
 
@@ -653,6 +673,9 @@ export const Sender_Source = {
     if (message.screen !== false) {
       obj.screen = message.screen;
     }
+    if (message.metadata !== undefined && message.metadata !== "") {
+      obj.metadata = message.metadata;
+    }
     return obj;
   },
 
@@ -663,21 +686,96 @@ export const Sender_Source = {
     const message = createBaseSender_Source();
     message.id = object.id ?? "";
     message.screen = object.screen ?? false;
+    message.metadata = object.metadata ?? "";
+    return message;
+  },
+};
+
+function createBaseSender_Config(): Sender_Config {
+  return { priority: 0, bitrate: 0 };
+}
+
+export const Sender_Config = {
+  encode(message: Sender_Config, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.priority !== 0) {
+      writer.uint32(8).uint32(message.priority);
+    }
+    if (message.bitrate !== undefined && message.bitrate !== 0) {
+      writer.uint32(16).int32(message.bitrate);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Sender_Config {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseSender_Config();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.priority = reader.uint32();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.bitrate = reader.int32() as any;
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Sender_Config {
+    return {
+      priority: isSet(object.priority) ? globalThis.Number(object.priority) : 0,
+      bitrate: isSet(object.bitrate) ? bitrateControlModeFromJSON(object.bitrate) : 0,
+    };
+  },
+
+  toJSON(message: Sender_Config): unknown {
+    const obj: any = {};
+    if (message.priority !== 0) {
+      obj.priority = Math.round(message.priority);
+    }
+    if (message.bitrate !== undefined && message.bitrate !== 0) {
+      obj.bitrate = bitrateControlModeToJSON(message.bitrate);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Sender_Config>, I>>(base?: I): Sender_Config {
+    return Sender_Config.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Sender_Config>, I>>(object: I): Sender_Config {
+    const message = createBaseSender_Config();
+    message.priority = object.priority ?? 0;
+    message.bitrate = object.bitrate ?? 0;
     return message;
   },
 };
 
 function createBaseSender_State(): Sender_State {
-  return { source: undefined, priority: undefined };
+  return { config: undefined, source: undefined };
 }
 
 export const Sender_State = {
   encode(message: Sender_State, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.source !== undefined) {
-      Sender_Source.encode(message.source, writer.uint32(10).fork()).ldelim();
+    if (message.config !== undefined) {
+      Sender_Config.encode(message.config, writer.uint32(10).fork()).ldelim();
     }
-    if (message.priority !== undefined) {
-      writer.uint32(16).uint32(message.priority);
+    if (message.source !== undefined) {
+      Sender_Source.encode(message.source, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -694,14 +792,14 @@ export const Sender_State = {
             break;
           }
 
-          message.source = Sender_Source.decode(reader, reader.uint32());
+          message.config = Sender_Config.decode(reader, reader.uint32());
           continue;
         case 2:
-          if (tag !== 16) {
+          if (tag !== 18) {
             break;
           }
 
-          message.priority = reader.uint32();
+          message.source = Sender_Source.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -714,18 +812,18 @@ export const Sender_State = {
 
   fromJSON(object: any): Sender_State {
     return {
+      config: isSet(object.config) ? Sender_Config.fromJSON(object.config) : undefined,
       source: isSet(object.source) ? Sender_Source.fromJSON(object.source) : undefined,
-      priority: isSet(object.priority) ? globalThis.Number(object.priority) : undefined,
     };
   },
 
   toJSON(message: Sender_State): unknown {
     const obj: any = {};
+    if (message.config !== undefined) {
+      obj.config = Sender_Config.toJSON(message.config);
+    }
     if (message.source !== undefined) {
       obj.source = Sender_Source.toJSON(message.source);
-    }
-    if (message.priority !== undefined) {
-      obj.priority = Math.round(message.priority);
     }
     return obj;
   },
@@ -735,10 +833,12 @@ export const Sender_State = {
   },
   fromPartial<I extends Exact<DeepPartial<Sender_State>, I>>(object: I): Sender_State {
     const message = createBaseSender_State();
+    message.config = (object.config !== undefined && object.config !== null)
+      ? Sender_Config.fromPartial(object.config)
+      : undefined;
     message.source = (object.source !== undefined && object.source !== null)
       ? Sender_Source.fromPartial(object.source)
       : undefined;
-    message.priority = object.priority ?? undefined;
     return message;
   },
 };
@@ -820,16 +920,16 @@ export const Tracks = {
 };
 
 function createBaseRoomInfoPublish(): RoomInfoPublish {
-  return { room: false, peer: false };
+  return { peer: false, tracks: false };
 }
 
 export const RoomInfoPublish = {
   encode(message: RoomInfoPublish, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.room !== false) {
-      writer.uint32(8).bool(message.room);
-    }
     if (message.peer !== false) {
-      writer.uint32(16).bool(message.peer);
+      writer.uint32(8).bool(message.peer);
+    }
+    if (message.tracks !== false) {
+      writer.uint32(16).bool(message.tracks);
     }
     return writer;
   },
@@ -846,14 +946,14 @@ export const RoomInfoPublish = {
             break;
           }
 
-          message.room = reader.bool();
+          message.peer = reader.bool();
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.peer = reader.bool();
+          message.tracks = reader.bool();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -866,18 +966,18 @@ export const RoomInfoPublish = {
 
   fromJSON(object: any): RoomInfoPublish {
     return {
-      room: isSet(object.room) ? globalThis.Boolean(object.room) : false,
       peer: isSet(object.peer) ? globalThis.Boolean(object.peer) : false,
+      tracks: isSet(object.tracks) ? globalThis.Boolean(object.tracks) : false,
     };
   },
 
   toJSON(message: RoomInfoPublish): unknown {
     const obj: any = {};
-    if (message.room !== false) {
-      obj.room = message.room;
-    }
     if (message.peer !== false) {
       obj.peer = message.peer;
+    }
+    if (message.tracks !== false) {
+      obj.tracks = message.tracks;
     }
     return obj;
   },
@@ -887,23 +987,23 @@ export const RoomInfoPublish = {
   },
   fromPartial<I extends Exact<DeepPartial<RoomInfoPublish>, I>>(object: I): RoomInfoPublish {
     const message = createBaseRoomInfoPublish();
-    message.room = object.room ?? false;
     message.peer = object.peer ?? false;
+    message.tracks = object.tracks ?? false;
     return message;
   },
 };
 
 function createBaseRoomInfoSubscribe(): RoomInfoSubscribe {
-  return { room: false, peer: false };
+  return { peers: false, tracks: false };
 }
 
 export const RoomInfoSubscribe = {
   encode(message: RoomInfoSubscribe, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.room !== false) {
-      writer.uint32(8).bool(message.room);
+    if (message.peers !== false) {
+      writer.uint32(8).bool(message.peers);
     }
-    if (message.peer !== false) {
-      writer.uint32(16).bool(message.peer);
+    if (message.tracks !== false) {
+      writer.uint32(16).bool(message.tracks);
     }
     return writer;
   },
@@ -920,14 +1020,14 @@ export const RoomInfoSubscribe = {
             break;
           }
 
-          message.room = reader.bool();
+          message.peers = reader.bool();
           continue;
         case 2:
           if (tag !== 16) {
             break;
           }
 
-          message.peer = reader.bool();
+          message.tracks = reader.bool();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -940,18 +1040,18 @@ export const RoomInfoSubscribe = {
 
   fromJSON(object: any): RoomInfoSubscribe {
     return {
-      room: isSet(object.room) ? globalThis.Boolean(object.room) : false,
-      peer: isSet(object.peer) ? globalThis.Boolean(object.peer) : false,
+      peers: isSet(object.peers) ? globalThis.Boolean(object.peers) : false,
+      tracks: isSet(object.tracks) ? globalThis.Boolean(object.tracks) : false,
     };
   },
 
   toJSON(message: RoomInfoSubscribe): unknown {
     const obj: any = {};
-    if (message.room !== false) {
-      obj.room = message.room;
+    if (message.peers !== false) {
+      obj.peers = message.peers;
     }
-    if (message.peer !== false) {
-      obj.peer = message.peer;
+    if (message.tracks !== false) {
+      obj.tracks = message.tracks;
     }
     return obj;
   },
@@ -961,31 +1061,40 @@ export const RoomInfoSubscribe = {
   },
   fromPartial<I extends Exact<DeepPartial<RoomInfoSubscribe>, I>>(object: I): RoomInfoSubscribe {
     const message = createBaseRoomInfoSubscribe();
-    message.room = object.room ?? false;
-    message.peer = object.peer ?? false;
+    message.peers = object.peers ?? false;
+    message.tracks = object.tracks ?? false;
     return message;
   },
 };
 
-function createBaseRoomInfo(): RoomInfo {
-  return { publish: undefined, subscribe: undefined };
+function createBaseRoomJoin(): RoomJoin {
+  return { room: "", peer: "", publish: undefined, subscribe: undefined, metadata: "" };
 }
 
-export const RoomInfo = {
-  encode(message: RoomInfo, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const RoomJoin = {
+  encode(message: RoomJoin, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.room !== "") {
+      writer.uint32(10).string(message.room);
+    }
+    if (message.peer !== "") {
+      writer.uint32(18).string(message.peer);
+    }
     if (message.publish !== undefined) {
-      RoomInfoPublish.encode(message.publish, writer.uint32(10).fork()).ldelim();
+      RoomInfoPublish.encode(message.publish, writer.uint32(26).fork()).ldelim();
     }
     if (message.subscribe !== undefined) {
-      RoomInfoSubscribe.encode(message.subscribe, writer.uint32(18).fork()).ldelim();
+      RoomInfoSubscribe.encode(message.subscribe, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.metadata !== undefined && message.metadata !== "") {
+      writer.uint32(42).string(message.metadata);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): RoomInfo {
+  decode(input: _m0.Reader | Uint8Array, length?: number): RoomJoin {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRoomInfo();
+    const message = createBaseRoomJoin();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -994,14 +1103,35 @@ export const RoomInfo = {
             break;
           }
 
-          message.publish = RoomInfoPublish.decode(reader, reader.uint32());
+          message.room = reader.string();
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
+          message.peer = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.publish = RoomInfoPublish.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
           message.subscribe = RoomInfoSubscribe.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.metadata = reader.string();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1012,35 +1142,50 @@ export const RoomInfo = {
     return message;
   },
 
-  fromJSON(object: any): RoomInfo {
+  fromJSON(object: any): RoomJoin {
     return {
+      room: isSet(object.room) ? globalThis.String(object.room) : "",
+      peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
       publish: isSet(object.publish) ? RoomInfoPublish.fromJSON(object.publish) : undefined,
       subscribe: isSet(object.subscribe) ? RoomInfoSubscribe.fromJSON(object.subscribe) : undefined,
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
     };
   },
 
-  toJSON(message: RoomInfo): unknown {
+  toJSON(message: RoomJoin): unknown {
     const obj: any = {};
+    if (message.room !== "") {
+      obj.room = message.room;
+    }
+    if (message.peer !== "") {
+      obj.peer = message.peer;
+    }
     if (message.publish !== undefined) {
       obj.publish = RoomInfoPublish.toJSON(message.publish);
     }
     if (message.subscribe !== undefined) {
       obj.subscribe = RoomInfoSubscribe.toJSON(message.subscribe);
     }
+    if (message.metadata !== undefined && message.metadata !== "") {
+      obj.metadata = message.metadata;
+    }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<RoomInfo>, I>>(base?: I): RoomInfo {
-    return RoomInfo.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<RoomJoin>, I>>(base?: I): RoomJoin {
+    return RoomJoin.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<RoomInfo>, I>>(object: I): RoomInfo {
-    const message = createBaseRoomInfo();
+  fromPartial<I extends Exact<DeepPartial<RoomJoin>, I>>(object: I): RoomJoin {
+    const message = createBaseRoomJoin();
+    message.room = object.room ?? "";
+    message.peer = object.peer ?? "";
     message.publish = (object.publish !== undefined && object.publish !== null)
       ? RoomInfoPublish.fromPartial(object.publish)
       : undefined;
     message.subscribe = (object.subscribe !== undefined && object.subscribe !== null)
       ? RoomInfoSubscribe.fromPartial(object.subscribe)
       : undefined;
+    message.metadata = object.metadata ?? "";
     return message;
   },
 };

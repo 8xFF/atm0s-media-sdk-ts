@@ -1,4 +1,4 @@
-syntax = "proto3";
+syntax = "proto2";
 
 import "shared.proto";
 
@@ -6,9 +6,18 @@ package conn;
 
 message Request {
     message Session {
+        message RoomJoin {
+            required shared.RoomJoin info = 1;
+            required string token = 2;
+        }
+
+        message RoomLeave {
+
+        }
+
         message UpdateSdp {
-            shared.Tracks tracks = 1;
-            string sdp = 2;
+            required shared.Tracks tracks = 1;
+            required string sdp = 2;
         }
 
         message Disconnect {
@@ -16,41 +25,38 @@ message Request {
         }
 
         oneof request {
-            UpdateSdp sdp = 1;
-            Disconnect disconnect = 2;
+            RoomJoin join = 1;
+            RoomLeave leave = 2;
+            UpdateSdp sdp = 3;
+            Disconnect disconnect = 4;
         }
     }
 
     message Sender {
         message Switch {
             optional shared.Sender.Source source = 1;
-            optional string metadata = 2;
         }
 
-        string id = 1;
+        required string name = 1;
         oneof request {
             Switch switch = 2;
+            shared.Sender.Config config = 3;
         }
     }
 
     message Receiver {
         message Switch {
             optional shared.Receiver.Source source = 1;
-            optional shared.Receiver.Limit limit = 2;
         }
 
-        message Limit {
-            shared.Receiver.Limit limit = 1;
-        }
-
-        string id = 1;
+        required string name = 1;
         oneof request {
             Switch switch = 2;
-            Limit limit = 3;
+            shared.Receiver.Config config = 3;
         }
     }
 
-    uint32 seq = 1;
+    required uint32 seq = 1;
     oneof request {
         Session session = 2;
     }
@@ -58,8 +64,16 @@ message Request {
 
 message Response {
     message Session {
+        message RoomJoin {
+
+        }
+
+        message RoomLeave {
+
+        }
+
         message UpdateSdp {
-            string sdp = 1;
+            required string sdp = 1;
         }
 
         message Disconnect {
@@ -67,7 +81,10 @@ message Response {
         }
 
         oneof response {
-            UpdateSdp sdp = 1;
+            RoomJoin join = 1;
+            RoomLeave leave = 2;
+            UpdateSdp sdp = 3;
+            Disconnect disconnect = 4;
         }
     }
 
@@ -96,7 +113,7 @@ message Response {
         }
     }
 
-    uint32 seq = 1;
+    required uint32 seq = 1;
     oneof response {
         shared.Error error = 2;
         Session session = 3;
@@ -112,18 +129,18 @@ message ServerEvent {
         }
 
         message JoinedRoom {
-            string room = 1;
-            string peer = 2;
-            string token = 3;
+            required string room = 1;
+            required string peer = 2;
+            required string token = 3;
         }
 
         message LeavedRoom {
-            string room = 1;
-            string peer = 2;
+            required string room = 1;
+            required string peer = 2;
         }
 
         message Disconnected {
-            string reason =  1;
+            required string reason =  1;
         }
 
         oneof event {
@@ -136,34 +153,34 @@ message ServerEvent {
 
     message Room {
         message PeerJoined {
-            string peer = 1;
+            required string peer = 1;
             optional string metadata = 2;
         }
 
         message PeerUpdated {
-            string peer = 1;
+            required string peer = 1;
             optional string metadata = 2;
         }
 
         message PeerLeaved {
-            string peer = 1;
+            required string peer = 1;
         }
 
         message TrackStarted {
-            string peer = 1;
-            string track = 2;
+            required string peer = 1;
+            required string track = 2;
             optional string metadata = 3;
         }
 
         message TrackUpdated {
-            string peer = 1;
-            string track = 2;
+            required string peer = 1;
+            required string track = 2;
             optional string metadata = 3;
         }
 
         message TrackStopped {
-            string peer = 1;
-            string track = 2;
+            required string peer = 1;
+            required string track = 2;
         }
 
         oneof event {
@@ -185,10 +202,13 @@ message ServerEvent {
                 INACTIVE = 3;
             }
 
-            StateType state = 1;
+            required StateType state = 1;
         }
 
-        string id = 1;
+        required string name = 1;
+        oneof event {
+            State state = 2;
+        }
     }
 
     message Receiver {
@@ -200,39 +220,47 @@ message ServerEvent {
                 INACTIVE = 3;
             }
 
-            StateType state = 1;
+            required StateType state = 1;
         }
 
         message Stats {
             message Source {
-                uint32 bitrate_kbps = 1;
-                float rtt = 2;
-                float lost = 3;
-                float jitter = 4;
+                required uint32 bitrate_kbps = 1;
+                required float rtt = 2;
+                required float lost = 3;
+                required float jitter = 4;
             }
 
             message Transmit {
-                uint32 spatial = 1;
-                uint32 temporal = 2;
-                uint32 bitrate_kbps = 3;
+                required uint32 spatial = 1;
+                required uint32 temporal = 2;
+                required uint32 bitrate_kbps = 3;
             }
 
             optional Source source = 1;
             optional Transmit transmit = 2;
         }
 
-        string id = 1;
+        required string name = 1;
         oneof event {
             State state = 2;
             Stats stats = 3;
         }
     }
 
-    uint32 seq = 1;
+    required uint32 seq = 1;
     oneof event {
         Session session = 2;
         Room room = 3;
         Sender sender = 4;
         Receiver receiver = 5;
+        Response response = 6;
+    }
+}
+
+message ClientEvent {
+    required uint32 seq = 1;
+    oneof event {
+        Request request = 2;
     }
 }

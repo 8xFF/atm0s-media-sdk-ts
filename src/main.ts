@@ -1,8 +1,44 @@
-import { Session } from "../lib/main";
+import { Session, SessionEvent } from "../lib/main";
 
-async function boot() {
-  const test = new Session("http://localhost:3000");
-  await test.connect();
+async function connect(_e: any) {
+  const session = new Session("http://localhost:3000", {
+    token: "demo-token",
+    join: {
+      room: "demo",
+      peer: "web-1",
+      publish: { peer: true, tracks: true },
+      subscribe: { peers: true, tracks: true },
+    },
+  });
+  session.on(SessionEvent.ROOM_TRACK_STARTED, (track: any) => {
+    console.log("Track started", track);
+  });
+
+  session.on(SessionEvent.ROOM_TRACK_ENDED, (track: any) => {
+    console.log("Track stopped", track);
+  });
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: true,
+    video: true,
+  });
+  let audio_send_track = session.sender(
+    "audio_main",
+    stream.getAudioTracks()[0],
+    100,
+  );
+  let video_send_track = session.sender(
+    "video_main",
+    stream.getVideoTracks()[0],
+    100,
+  );
+  console.log(audio_send_track, video_send_track);
+  let audio_recv_track = session.receiver("audio", 100);
+  let video_recv_track = session.receiver("video", 100);
+  (document.getElementById("audio-main")! as HTMLVideoElement).srcObject =
+    audio_recv_track.stream;
+  (document.getElementById("video-main")! as HTMLVideoElement).srcObject =
+    video_recv_track.stream;
+  await session.connect();
 }
 
-boot();
+document.getElementById("connect")!.onclick = connect;
