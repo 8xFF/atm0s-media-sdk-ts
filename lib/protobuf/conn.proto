@@ -103,27 +103,42 @@ message Response {
     }
 
     message Sender {
-        message Switch {
+        message Attach {
+
+        }
+
+        message Detach {
+
+        }
+
+        message Config {
 
         }
 
         oneof response {
-            Switch switch = 1;
+            Attach attach = 1;
+            Detach detach = 2;
+            Config config = 3;
         }
     }
 
     message Receiver {
-        message Switch {
+        message Attach {
 
         }
 
-        message Limit {
+        message Detach {
+
+        }
+
+        message Config {
 
         }
 
         oneof response {
-            Switch switch = 1;
-            Limit limit = 2;
+            Attach attach = 1;
+            Detach detach = 2;
+            Config config = 3;
         }
     }
 
@@ -210,7 +225,7 @@ message ServerEvent {
     message Sender {
         message State {
             enum StateType {
-                WATING = 0;
+                WAITING = 0;
                 NO_SOURCE = 1;
                 ACTIVE = 2;
                 INACTIVE = 3;
