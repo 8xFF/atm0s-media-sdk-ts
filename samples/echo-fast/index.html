@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Echo fast</title>
+    </head>
+    <body>
+        <div id="app"></div>
+        <button id="connect">Connect</button>
+        <button id="disconnect">Disconnect</button>
+        <audio controls autoplay id="audio-main"></audio>
+        <video
+            controls
+            muted
+            autoplay
+            width="500"
+            height="500"
+            style="background-color: gray"
+            id="video-main"
+        ></video>
+        <script type="module" src="/src/samples/echo_fast.ts"></script>
+    </body>
+</html>

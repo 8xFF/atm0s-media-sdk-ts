@@ -14,7 +14,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc --p ./tsconfig-build.json && vite build",
+    "build": "tsc --p ./tsconfig-build.json && vite --config ./vite-build.config.ts build",
     "preview": "vite preview"
   },
   "devDependencies": {

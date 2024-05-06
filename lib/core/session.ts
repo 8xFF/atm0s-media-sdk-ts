@@ -149,4 +149,26 @@ export class Session extends EventEmitter {
     await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
     await this.dc.wait_connect();
   }
+
+  async join(info: JoinInfo, token: string) {
+    this.cfg.join = info;
+    this.cfg.token = token;
+    return this.dc.request_session({
+      join: {
+        info,
+        token,
+      },
+    });
+  }
+
+  async leave() {
+    this.cfg.join = undefined;
+    return this.dc.request_session({
+      leave: {},
+    });
+  }
+
+  disconnect() {
+    this.peer.close();
+  }
 }
