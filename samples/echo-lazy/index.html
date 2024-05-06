@@ -4,24 +4,55 @@
         <meta charset="UTF-8" />
         <link rel="icon" type="image/svg+xml" href="/vite.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Echo lazy</title>
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.10.5/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <title>Echo fast</title>
     </head>
-    <body>
-        <div id="app"></div>
-        <button id="connect">Connect</button>
-        <button id="join">Join room</button>
-        <button id="leave">Leave room</button>
-        <button id="disconnect">Disconnect</button>
-        <audio controls autoplay id="audio-main"></audio>
-        <video
-            controls
-            muted
-            autoplay
-            width="500"
-            height="500"
-            style="background-color: gray"
-            id="video-main"
-        ></video>
+    <body class="p-6">
+        <div class="p-4 w-full text-center">
+            This is echo sample, click connect then you will see left video is
+            from local, right video is echo from server.
+        </div>
+        <!-- This is for video -->
+        <div class="flex flex-col w-full lg:flex-row">
+            <div
+                class="grid p-4 flex-grow card bg-base-300 rounded-box place-items-center"
+            >
+                <video
+                    muted
+                    autoplay
+                    width="500"
+                    height="500"
+                    style="background-color: gray"
+                    id="video-preview"
+                ></video>
+            </div>
+            <div class="divider lg:divider-horizontal">=></div>
+            <div
+                class="grid p-4 flex-grow card bg-base-300 rounded-box place-items-center"
+            >
+                <audio autoplay id="audio-echo"></audio>
+                <video
+                    muted
+                    autoplay
+                    width="500"
+                    height="500"
+                    style="background-color: gray"
+                    id="video-echo"
+                ></video>
+            </div>
+        </div>
+        <!-- This is for control buttons -->
+        <div class="flex flex-row justify-center p-4 space-x-2 w-full">
+            <button id="connect" class="btn btn-success">Connect</button>
+            <button id="join" class="btn">Join room</button>
+            <button id="leave" class="btn">Leave room</button>
+            <button id="disconnect" class="btn btn-warning">Disconnect</button>
+        </div>
         <script type="module" src="/src/samples/echo_lazy.ts"></script>
     </body>
 </html>

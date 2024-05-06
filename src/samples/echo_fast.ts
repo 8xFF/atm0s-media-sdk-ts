@@ -5,6 +5,14 @@ import {
   SessionEvent,
 } from "../../lib/main";
 
+const video_preview = document.getElementById(
+  "video-preview",
+)! as HTMLVideoElement;
+const audio_echo = document.getElementById("audio-echo")! as HTMLAudioElement;
+const video_echo = document.getElementById("video-echo")! as HTMLVideoElement;
+const connect_btn = document.getElementById("connect")!;
+const disconnect_btn = document.getElementById("disconnect")!;
+
 async function connect(_e: any) {
   const session = new Session("http://localhost:3000", {
     token: "demo-token",
@@ -20,6 +28,7 @@ async function connect(_e: any) {
     audio: true,
     video: true,
   });
+  video_preview.srcObject = stream;
   let audio_send_track = session.sender(
     "audio_main",
     stream.getAudioTracks()[0],
@@ -33,10 +42,8 @@ async function connect(_e: any) {
   console.log(audio_send_track, video_send_track);
   let audio_recv_track = session.receiver("audio", 100);
   let video_recv_track = session.receiver("video", 100);
-  (document.getElementById("audio-main")! as HTMLAudioElement).srcObject =
-    audio_recv_track.stream;
-  (document.getElementById("video-main")! as HTMLVideoElement).srcObject =
-    video_recv_track.stream;
+  audio_echo.srcObject = audio_recv_track.stream;
+  video_echo.srcObject = video_recv_track.stream;
 
   session.on(SessionEvent.ROOM_TRACK_STARTED, (track: RoomTrackStarted) => {
     console.log("Track started", track);
@@ -51,17 +58,16 @@ async function connect(_e: any) {
     console.log("Track stopped", track);
   });
 
-  document.getElementById("disconnect")!.onclick = () => {
+  disconnect_btn.onclick = () => {
     stream.getTracks().map((t) => {
       t.stop();
     });
-    (document.getElementById("audio-main")! as HTMLAudioElement).srcObject =
-      null;
-    (document.getElementById("video-main")! as HTMLVideoElement).srcObject =
-      null;
+    video_preview.srcObject = null;
+    audio_echo.srcObject = null;
+    video_echo.srcObject = null;
     session.disconnect();
   };
   await session.connect();
 }
 
-document.getElementById("connect")!.onclick = connect;
+connect_btn.onclick = connect;

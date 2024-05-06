@@ -4,12 +4,19 @@
         <meta charset="UTF-8" />
         <link rel="icon" type="image/svg+xml" href="/vite.svg" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.10.5/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
         <title>Samples</title>
     </head>
-    <body>
-        <div id="app"></div>
-        <div><a href="/samples/echo-fast/">Echo join room fast</a></div>
-        <div><a href="/samples/echo-lazy/">Echo join room lazy</a></div>
-        <script type="module" src="/src/main.ts"></script>
+    <body class="p-6">
+        <div>Samples<div>
+        <div class="pl-6">
+            <div><a href="/samples/echo-fast/">Echo join room fast</a></div>
+            <div><a href="/samples/echo-lazy/">Echo join room lazy</a></div>
+        </div>
     </body>
 </html>

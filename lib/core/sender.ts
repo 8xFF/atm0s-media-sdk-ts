@@ -1,4 +1,4 @@
-import { Sender, Kind } from "../generated/protobuf/shared";
+import { Sender, Kind, BitrateControlMode } from "../generated/protobuf/shared";
 import { Datachannel } from "./data";
 import { MediaKind } from "./types";
 
@@ -24,6 +24,7 @@ export class TrackSender {
       state: {
         config: {
           priority: this.priority,
+          bitrate: BitrateControlMode.DYNAMIC_CONSUMERS, //TODO allow config
         },
       },
     };
