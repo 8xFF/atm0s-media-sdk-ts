@@ -42,22 +42,32 @@ export interface Request_Session_Disconnect {
 
 export interface Request_Sender {
   name: string;
-  switch?: Request_Sender_Switch | undefined;
+  attach?: Request_Sender_Attach | undefined;
+  detach?: Request_Sender_Detach | undefined;
   config?: Sender_Config | undefined;
 }
 
-export interface Request_Sender_Switch {
-  source?: Sender_Source | undefined;
+export interface Request_Sender_Attach {
+  source: Sender_Source | undefined;
+  config: Sender_Config | undefined;
+}
+
+export interface Request_Sender_Detach {
 }
 
 export interface Request_Receiver {
   name: string;
-  switch?: Request_Receiver_Switch | undefined;
+  attach?: Request_Receiver_Attach | undefined;
+  detach?: Request_Receiver_Detach | undefined;
   config?: Receiver_Config | undefined;
 }
 
-export interface Request_Receiver_Switch {
-  source?: Receiver_Source | undefined;
+export interface Request_Receiver_Attach {
+  source: Receiver_Source | undefined;
+  config: Receiver_Config | undefined;
+}
+
+export interface Request_Receiver_Detach {
 }
 
 export interface Response {
@@ -771,7 +781,7 @@ export const Request_Session_Disconnect = {
 };
 
 function createBaseRequest_Sender(): Request_Sender {
-  return { name: "", switch: undefined, config: undefined };
+  return { name: "", attach: undefined, detach: undefined, config: undefined };
 }
 
 export const Request_Sender = {
@@ -779,11 +789,14 @@ export const Request_Sender = {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
     }
-    if (message.switch !== undefined) {
-      Request_Sender_Switch.encode(message.switch, writer.uint32(18).fork()).ldelim();
+    if (message.attach !== undefined) {
+      Request_Sender_Attach.encode(message.attach, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.detach !== undefined) {
+      Request_Sender_Detach.encode(message.detach, writer.uint32(26).fork()).ldelim();
     }
     if (message.config !== undefined) {
-      Sender_Config.encode(message.config, writer.uint32(26).fork()).ldelim();
+      Sender_Config.encode(message.config, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -807,10 +820,17 @@ export const Request_Sender = {
             break;
           }
 
-          message.switch = Request_Sender_Switch.decode(reader, reader.uint32());
+          message.attach = Request_Sender_Attach.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
+            break;
+          }
+
+          message.detach = Request_Sender_Detach.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
             break;
           }
 
@@ -828,7 +848,8 @@ export const Request_Sender = {
   fromJSON(object: any): Request_Sender {
     return {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
-      switch: isSet(object.switch) ? Request_Sender_Switch.fromJSON(object.switch) : undefined,
+      attach: isSet(object.attach) ? Request_Sender_Attach.fromJSON(object.attach) : undefined,
+      detach: isSet(object.detach) ? Request_Sender_Detach.fromJSON(object.detach) : undefined,
       config: isSet(object.config) ? Sender_Config.fromJSON(object.config) : undefined,
     };
   },
@@ -838,8 +859,11 @@ export const Request_Sender = {
     if (message.name !== "") {
       obj.name = message.name;
     }
-    if (message.switch !== undefined) {
-      obj.switch = Request_Sender_Switch.toJSON(message.switch);
+    if (message.attach !== undefined) {
+      obj.attach = Request_Sender_Attach.toJSON(message.attach);
+    }
+    if (message.detach !== undefined) {
+      obj.detach = Request_Sender_Detach.toJSON(message.detach);
     }
     if (message.config !== undefined) {
       obj.config = Sender_Config.toJSON(message.config);
@@ -853,8 +877,11 @@ export const Request_Sender = {
   fromPartial<I extends Exact<DeepPartial<Request_Sender>, I>>(object: I): Request_Sender {
     const message = createBaseRequest_Sender();
     message.name = object.name ?? "";
-    message.switch = (object.switch !== undefined && object.switch !== null)
-      ? Request_Sender_Switch.fromPartial(object.switch)
+    message.attach = (object.attach !== undefined && object.attach !== null)
+      ? Request_Sender_Attach.fromPartial(object.attach)
+      : undefined;
+    message.detach = (object.detach !== undefined && object.detach !== null)
+      ? Request_Sender_Detach.fromPartial(object.detach)
       : undefined;
     message.config = (object.config !== undefined && object.config !== null)
       ? Sender_Config.fromPartial(object.config)
@@ -863,22 +890,25 @@ export const Request_Sender = {
   },
 };
 
-function createBaseRequest_Sender_Switch(): Request_Sender_Switch {
-  return { source: undefined };
+function createBaseRequest_Sender_Attach(): Request_Sender_Attach {
+  return { source: undefined, config: undefined };
 }
 
-export const Request_Sender_Switch = {
-  encode(message: Request_Sender_Switch, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const Request_Sender_Attach = {
+  encode(message: Request_Sender_Attach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.source !== undefined) {
       Sender_Source.encode(message.source, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.config !== undefined) {
+      Sender_Config.encode(message.config, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Sender_Switch {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Sender_Attach {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRequest_Sender_Switch();
+    const message = createBaseRequest_Sender_Attach();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -889,6 +919,13 @@ export const Request_Sender_Switch = {
 
           message.source = Sender_Source.decode(reader, reader.uint32());
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.config = Sender_Config.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -898,32 +935,84 @@ export const Request_Sender_Switch = {
     return message;
   },
 
-  fromJSON(object: any): Request_Sender_Switch {
-    return { source: isSet(object.source) ? Sender_Source.fromJSON(object.source) : undefined };
+  fromJSON(object: any): Request_Sender_Attach {
+    return {
+      source: isSet(object.source) ? Sender_Source.fromJSON(object.source) : undefined,
+      config: isSet(object.config) ? Sender_Config.fromJSON(object.config) : undefined,
+    };
   },
 
-  toJSON(message: Request_Sender_Switch): unknown {
+  toJSON(message: Request_Sender_Attach): unknown {
     const obj: any = {};
     if (message.source !== undefined) {
       obj.source = Sender_Source.toJSON(message.source);
     }
+    if (message.config !== undefined) {
+      obj.config = Sender_Config.toJSON(message.config);
+    }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Sender_Switch>, I>>(base?: I): Request_Sender_Switch {
-    return Request_Sender_Switch.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<Request_Sender_Attach>, I>>(base?: I): Request_Sender_Attach {
+    return Request_Sender_Attach.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Sender_Switch>, I>>(object: I): Request_Sender_Switch {
-    const message = createBaseRequest_Sender_Switch();
+  fromPartial<I extends Exact<DeepPartial<Request_Sender_Attach>, I>>(object: I): Request_Sender_Attach {
+    const message = createBaseRequest_Sender_Attach();
     message.source = (object.source !== undefined && object.source !== null)
       ? Sender_Source.fromPartial(object.source)
+      : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? Sender_Config.fromPartial(object.config)
       : undefined;
     return message;
   },
 };
 
+function createBaseRequest_Sender_Detach(): Request_Sender_Detach {
+  return {};
+}
+
+export const Request_Sender_Detach = {
+  encode(_: Request_Sender_Detach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Sender_Detach {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRequest_Sender_Detach();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): Request_Sender_Detach {
+    return {};
+  },
+
+  toJSON(_: Request_Sender_Detach): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Request_Sender_Detach>, I>>(base?: I): Request_Sender_Detach {
+    return Request_Sender_Detach.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Request_Sender_Detach>, I>>(_: I): Request_Sender_Detach {
+    const message = createBaseRequest_Sender_Detach();
+    return message;
+  },
+};
+
 function createBaseRequest_Receiver(): Request_Receiver {
-  return { name: "", switch: undefined, config: undefined };
+  return { name: "", attach: undefined, detach: undefined, config: undefined };
 }
 
 export const Request_Receiver = {
@@ -931,11 +1020,14 @@ export const Request_Receiver = {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
     }
-    if (message.switch !== undefined) {
-      Request_Receiver_Switch.encode(message.switch, writer.uint32(18).fork()).ldelim();
+    if (message.attach !== undefined) {
+      Request_Receiver_Attach.encode(message.attach, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.detach !== undefined) {
+      Request_Receiver_Detach.encode(message.detach, writer.uint32(26).fork()).ldelim();
     }
     if (message.config !== undefined) {
-      Receiver_Config.encode(message.config, writer.uint32(26).fork()).ldelim();
+      Receiver_Config.encode(message.config, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -959,10 +1051,17 @@ export const Request_Receiver = {
             break;
           }
 
-          message.switch = Request_Receiver_Switch.decode(reader, reader.uint32());
+          message.attach = Request_Receiver_Attach.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
+            break;
+          }
+
+          message.detach = Request_Receiver_Detach.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
             break;
           }
 
@@ -980,7 +1079,8 @@ export const Request_Receiver = {
   fromJSON(object: any): Request_Receiver {
     return {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
-      switch: isSet(object.switch) ? Request_Receiver_Switch.fromJSON(object.switch) : undefined,
+      attach: isSet(object.attach) ? Request_Receiver_Attach.fromJSON(object.attach) : undefined,
+      detach: isSet(object.detach) ? Request_Receiver_Detach.fromJSON(object.detach) : undefined,
       config: isSet(object.config) ? Receiver_Config.fromJSON(object.config) : undefined,
     };
   },
@@ -990,8 +1090,11 @@ export const Request_Receiver = {
     if (message.name !== "") {
       obj.name = message.name;
     }
-    if (message.switch !== undefined) {
-      obj.switch = Request_Receiver_Switch.toJSON(message.switch);
+    if (message.attach !== undefined) {
+      obj.attach = Request_Receiver_Attach.toJSON(message.attach);
+    }
+    if (message.detach !== undefined) {
+      obj.detach = Request_Receiver_Detach.toJSON(message.detach);
     }
     if (message.config !== undefined) {
       obj.config = Receiver_Config.toJSON(message.config);
@@ -1005,8 +1108,11 @@ export const Request_Receiver = {
   fromPartial<I extends Exact<DeepPartial<Request_Receiver>, I>>(object: I): Request_Receiver {
     const message = createBaseRequest_Receiver();
     message.name = object.name ?? "";
-    message.switch = (object.switch !== undefined && object.switch !== null)
-      ? Request_Receiver_Switch.fromPartial(object.switch)
+    message.attach = (object.attach !== undefined && object.attach !== null)
+      ? Request_Receiver_Attach.fromPartial(object.attach)
+      : undefined;
+    message.detach = (object.detach !== undefined && object.detach !== null)
+      ? Request_Receiver_Detach.fromPartial(object.detach)
       : undefined;
     message.config = (object.config !== undefined && object.config !== null)
       ? Receiver_Config.fromPartial(object.config)
@@ -1015,22 +1121,25 @@ export const Request_Receiver = {
   },
 };
 
-function createBaseRequest_Receiver_Switch(): Request_Receiver_Switch {
-  return { source: undefined };
+function createBaseRequest_Receiver_Attach(): Request_Receiver_Attach {
+  return { source: undefined, config: undefined };
 }
 
-export const Request_Receiver_Switch = {
-  encode(message: Request_Receiver_Switch, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const Request_Receiver_Attach = {
+  encode(message: Request_Receiver_Attach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.source !== undefined) {
       Receiver_Source.encode(message.source, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.config !== undefined) {
+      Receiver_Config.encode(message.config, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Receiver_Switch {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Receiver_Attach {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRequest_Receiver_Switch();
+    const message = createBaseRequest_Receiver_Attach();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1041,6 +1150,13 @@ export const Request_Receiver_Switch = {
 
           message.source = Receiver_Source.decode(reader, reader.uint32());
           continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.config = Receiver_Config.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -1050,26 +1166,78 @@ export const Request_Receiver_Switch = {
     return message;
   },
 
-  fromJSON(object: any): Request_Receiver_Switch {
-    return { source: isSet(object.source) ? Receiver_Source.fromJSON(object.source) : undefined };
+  fromJSON(object: any): Request_Receiver_Attach {
+    return {
+      source: isSet(object.source) ? Receiver_Source.fromJSON(object.source) : undefined,
+      config: isSet(object.config) ? Receiver_Config.fromJSON(object.config) : undefined,
+    };
   },
 
-  toJSON(message: Request_Receiver_Switch): unknown {
+  toJSON(message: Request_Receiver_Attach): unknown {
     const obj: any = {};
     if (message.source !== undefined) {
       obj.source = Receiver_Source.toJSON(message.source);
     }
+    if (message.config !== undefined) {
+      obj.config = Receiver_Config.toJSON(message.config);
+    }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Receiver_Switch>, I>>(base?: I): Request_Receiver_Switch {
-    return Request_Receiver_Switch.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<Request_Receiver_Attach>, I>>(base?: I): Request_Receiver_Attach {
+    return Request_Receiver_Attach.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Receiver_Switch>, I>>(object: I): Request_Receiver_Switch {
-    const message = createBaseRequest_Receiver_Switch();
+  fromPartial<I extends Exact<DeepPartial<Request_Receiver_Attach>, I>>(object: I): Request_Receiver_Attach {
+    const message = createBaseRequest_Receiver_Attach();
     message.source = (object.source !== undefined && object.source !== null)
       ? Receiver_Source.fromPartial(object.source)
       : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? Receiver_Config.fromPartial(object.config)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseRequest_Receiver_Detach(): Request_Receiver_Detach {
+  return {};
+}
+
+export const Request_Receiver_Detach = {
+  encode(_: Request_Receiver_Detach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Receiver_Detach {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRequest_Receiver_Detach();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): Request_Receiver_Detach {
+    return {};
+  },
+
+  toJSON(_: Request_Receiver_Detach): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Request_Receiver_Detach>, I>>(base?: I): Request_Receiver_Detach {
+    return Request_Receiver_Detach.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Request_Receiver_Detach>, I>>(_: I): Request_Receiver_Detach {
+    const message = createBaseRequest_Receiver_Detach();
     return message;
   },
 };

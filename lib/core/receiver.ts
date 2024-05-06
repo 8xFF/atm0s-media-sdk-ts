@@ -32,11 +32,22 @@ export class TrackReceiver {
     this.media_stream.addTrack(track);
   }
 
-  public async switch(source?: Receiver_Source) {
+  public async attach(source: Receiver_Source, config?: Receiver_Config) {
     await this.dc.wait_connect();
     await this.dc.request_receiver({
       name: this.track_name,
-      switch: { source },
+      attach: {
+        source,
+        config: config || { priority: 1, maxSpatial: 2, maxTemporal: 2 },
+      },
+    });
+  }
+
+  public async detach() {
+    await this.dc.wait_connect();
+    await this.dc.request_receiver({
+      name: this.track_name,
+      detach: {},
     });
   }
 

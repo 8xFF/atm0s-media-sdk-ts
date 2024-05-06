@@ -32,7 +32,7 @@ async function connect(_e: any) {
   console.log(audio_send_track, video_send_track);
   let audio_recv_track = session.receiver("audio", 100);
   let video_recv_track = session.receiver("video", 100);
-  (document.getElementById("audio-main")! as HTMLVideoElement).srcObject =
+  (document.getElementById("audio-main")! as HTMLAudioElement).srcObject =
     audio_recv_track.stream;
   (document.getElementById("video-main")! as HTMLVideoElement).srcObject =
     video_recv_track.stream;
@@ -40,9 +40,9 @@ async function connect(_e: any) {
   session.on(SessionEvent.ROOM_TRACK_STARTED, (track: RoomTrackStarted) => {
     console.log("Track started", track);
     if (track.track == "audio_main") {
-      audio_recv_track.switch(track);
+      audio_recv_track.attach(track).then(console.log).catch(console.error);
     } else {
-      video_recv_track.switch(track);
+      video_recv_track.attach(track).then(console.log).catch(console.error);
     }
   });
 

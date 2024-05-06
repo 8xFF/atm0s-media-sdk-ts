@@ -75,13 +75,15 @@ export class Session extends EventEmitter {
         const receiver = this.receivers[i];
         if (!receiver.has_track()) {
           console.log(
-            "[Session] found stream for receiver",
+            "[Session] found receiver for track",
             receiver.name,
-            event.streams[0],
+            event.track,
           );
           receiver.set_track(event.track);
+          return;
         }
       }
+      console.warn("[Session] not found receiver for track", event.track);
     };
   }
 
