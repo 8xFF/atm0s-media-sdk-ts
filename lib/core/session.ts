@@ -4,7 +4,10 @@ import { TrackReceiver } from "./receiver";
 import { TrackSender } from "./sender";
 import EventEmitter, { post_protobuf } from "../utils";
 import { Datachannel, DatachannelEvent } from "./data";
-import { ServerEvent_Room } from "../generated/protobuf/conn";
+import {
+  Request_Session_UpdateSdp,
+  ServerEvent_Room,
+} from "../generated/protobuf/conn";
 
 export interface JoinInfo {
   room: string;
@@ -56,6 +59,13 @@ export class Session extends EventEmitter {
         this.emit(SessionEvent.ROOM_TRACK_STOPPED, event.trackStopped);
       }
     });
+
+    //TODO add await to throtle for avoiding too much update in short time
+    this.peer.onnegotiationneeded = () => {
+      if (this.dc.connected)
+        this.sync_sdp().then(console.log).catch(console.error);
+    };
+
     this.peer.onconnectionstatechange = (_event) => {
       console.log(
         "[Session] RTCPeer connection state changed",
@@ -159,6 +169,28 @@ export class Session extends EventEmitter {
         token,
       },
     });
+  }
+
+  async sync_sdp() {
+    const local_desc = await this.peer.createOffer({
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: true,
+    });
+    const update_sdp = Request_Session_UpdateSdp.create({
+      tracks: {
+        receivers: this.receivers.map((r) => r.state),
+        senders: this.senders.map((r) => r.state),
+      },
+      sdp: local_desc.sdp,
+    });
+
+    console.log("Requesting update sdp", update_sdp);
+    const res = await this.dc.request_session({
+      sdp: update_sdp,
+    });
+    console.log("Request update sdp success", res);
+    await this.peer.setLocalDescription(local_desc);
+    await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp!.sdp });
   }
 
   async leave() {

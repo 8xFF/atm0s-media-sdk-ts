@@ -72,6 +72,10 @@ export class Datachannel extends EventEmitter {
     };
   }
 
+  public get connected() {
+    return this.dc.readyState == "open";
+  }
+
   public async wait_connect(): Promise<void> {
     if (this.dc.readyState == "open") {
       return Promise.resolve();

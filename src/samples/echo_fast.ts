@@ -1,4 +1,6 @@
 import {
+  RoomPeerJoined,
+  RoomPeerLeaved,
   RoomTrackStarted,
   RoomTrackStopped,
   Session,
@@ -12,6 +14,8 @@ const audio_echo = document.getElementById("audio-echo")! as HTMLAudioElement;
 const video_echo = document.getElementById("video-echo")! as HTMLVideoElement;
 const connect_btn = document.getElementById("connect")!;
 const disconnect_btn = document.getElementById("disconnect")!;
+const view_btn = document.getElementById("view")!;
+const unview_btn = document.getElementById("unview")!;
 
 async function connect(_e: any) {
   const session = new Session("http://localhost:3000", {
@@ -45,11 +49,24 @@ async function connect(_e: any) {
   audio_echo.srcObject = audio_recv_track.stream;
   video_echo.srcObject = video_recv_track.stream;
 
+  session.on(SessionEvent.ROOM_PEER_JOINED, (peer: RoomPeerJoined) => {
+    console.log("Peer joined", peer);
+  });
+
+  session.on(SessionEvent.ROOM_PEER_LEAVED, (peer: RoomPeerLeaved) => {
+    console.log("Peer leaved", peer);
+  });
+
+  let remote_audio_track: RoomTrackStarted | undefined = undefined;
+  let remote_video_track: RoomTrackStarted | undefined = undefined;
+
   session.on(SessionEvent.ROOM_TRACK_STARTED, (track: RoomTrackStarted) => {
     console.log("Track started", track);
     if (track.track == "audio_main") {
+      remote_audio_track = track;
       audio_recv_track.attach(track).then(console.log).catch(console.error);
     } else {
+      remote_video_track = track;
       video_recv_track.attach(track).then(console.log).catch(console.error);
     }
   });
@@ -57,6 +74,24 @@ async function connect(_e: any) {
   session.on(SessionEvent.ROOM_TRACK_STOPPED, (track: RoomTrackStopped) => {
     console.log("Track stopped", track);
   });
+
+  view_btn.onclick = () => {
+    if (remote_audio_track)
+      audio_recv_track
+        .attach(remote_audio_track)
+        .then(console.log)
+        .catch(console.error);
+    if (remote_video_track)
+      video_recv_track
+        .attach(remote_video_track)
+        .then(console.log)
+        .catch(console.error);
+  };
+
+  unview_btn.onclick = () => {
+    audio_recv_track.detach().then(console.log).catch(console.error);
+    video_recv_track.detach().then(console.log).catch(console.error);
+  };
 
   disconnect_btn.onclick = () => {
     stream.getTracks().map((t) => {
