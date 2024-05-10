@@ -8,6 +8,7 @@ import {
   Request_Session_UpdateSdp,
   ServerEvent_Room,
 } from "../generated/protobuf/conn";
+import { BitrateControlMode } from "../generated/protobuf/shared";
 
 export interface JoinInfo {
   room: string;
@@ -113,17 +114,28 @@ export class Session extends EventEmitter {
     return receiver;
   }
 
-  sender(track_name: string, track: MediaStreamTrack, priority: number) {
-    const transceiver = this.peer.addTransceiver(track, {
+  sender(
+    track_name: string,
+    track_or_kind: MediaStreamTrack | MediaKind,
+    priority: number,
+    bitrate?: BitrateControlMode,
+  ) {
+    const transceiver = this.peer.addTransceiver(track_or_kind, {
       direction: "sendonly",
     });
-    const kind = track.kind == "audio" ? "audio" : "video";
+    const kind =
+      track_or_kind instanceof MediaStreamTrack
+        ? track_or_kind.kind == "audio"
+          ? "audio"
+          : "video"
+        : track_or_kind;
     const sender = new TrackSender(
       this.dc,
+      transceiver,
       track_name,
       kind,
       priority,
-      transceiver,
+      bitrate,
     );
     this.senders.push(sender);
     return sender;
@@ -157,7 +169,7 @@ export class Session extends EventEmitter {
     this.conn_id = res.connId;
     await this.peer.setLocalDescription(local_desc);
     await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
-    await this.dc.wait_connect();
+    await this.dc.ready();
   }
 
   async join(info: JoinInfo, token: string) {

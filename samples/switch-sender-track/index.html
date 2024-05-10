@@ -10,7 +10,7 @@
             type="text/css"
         />
         <script src="https://cdn.tailwindcss.com"></script>
-        <title>Echo lazy</title>
+        <title>Switch sender track</title>
     </head>
     <body class="p-6">
         <div class="p-4 w-full text-center">
@@ -49,11 +49,14 @@
         <!-- This is for control buttons -->
         <div class="flex flex-row justify-center p-4 space-x-2 w-full">
             <button id="connect" class="btn btn-success">Connect</button>
-            <button id="share" class="btn">Share</button>
-            <button id="join" class="btn">Join room</button>
-            <button id="leave" class="btn">Leave room</button>
+            <select id="sources" class="btn">
+                <option value="">None</option>
+            </select>
             <button id="disconnect" class="btn btn-warning">Disconnect</button>
         </div>
-        <script type="module" src="/src/samples/echo_lazy.ts"></script>
+        <script
+            type="module"
+            src="/src/samples/switch_sender_track.ts"
+        ></script>
     </body>
 </html>
