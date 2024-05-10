@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            href="https://cdn.jsdelivr.net/npm/daisyui@4.10.5/dist/full.min.css"
+            rel="stylesheet"
+            type="text/css"
+        />
+        <script src="https://cdn.tailwindcss.com"></script>
+        <title>Echo fast</title>
+    </head>
+    <body class="p-6">
+        <div class="p-4 w-full text-center">
+            This is echo sample, click connect then you will see left video is
+            from local, right video is echo from server.
+        </div>
+        <!-- This is for source video -->
+        <div class="grid p-4 card bg-base-300 rounded-box place-items-center">
+            <video
+                muted
+                autoplay
+                width="500"
+                height="500"
+                style="background-color: gray"
+                id="video-preview"
+            ></video>
+        </div>
+        <!-- This is for control buttons -->
+        <div class="flex flex-row justify-center p-4 space-x-2 w-full">
+            <button id="connect" class="btn btn-success">Connect</button>
+            <button id="add_receiver" class="btn btn-info">Add receiver</button>
+            <button id="disconnect" class="btn btn-warning">Disconnect</button>
+        </div>
+        <!-- This is for receivers -->
+        <div class="grid p-4 grid-cols-3 gap-4" id="receivers"></div>
+        <script
+            type="module"
+            src="/src/samples/multi_track_receivers.ts"
+        ></script>
+    </body>
+</html>

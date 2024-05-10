@@ -67,3 +67,29 @@ export default class EventEmitter implements IEventEmitter {
     this.off(event, cb);
   }
 }
+
+export class ReadyWaiter {
+  ready = false;
+  waits: [() => any, (err: any) => any][] = [];
+
+  setReady = () => {
+    this.ready = true;
+    this.waits.map(([ready, _err]) => ready());
+    this.waits = [];
+  };
+
+  setError = (e: any) => {
+    this.waits.map(([_ready, err]) => err(e));
+    this.waits = [];
+  };
+
+  waitReady = () => {
+    if (this.ready) {
+      return Promise.resolve();
+    } else {
+      return new Promise<void>((resolve, reject) => {
+        this.waits.push([resolve, reject]);
+      });
+    }
+  };
+}

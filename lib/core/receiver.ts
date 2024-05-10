@@ -4,10 +4,12 @@ import {
   Receiver_Config,
   Receiver_Source,
 } from "../generated/protobuf/shared";
+import { ReadyWaiter } from "../utils";
 import { Datachannel } from "./data";
 import { MediaKind } from "./types";
 
 export class TrackReceiver {
+  waiter: ReadyWaiter = new ReadyWaiter();
   media_stream: MediaStream;
 
   constructor(
@@ -29,11 +31,17 @@ export class TrackReceiver {
     if (this.media_stream.getTracks().length > 0) {
       throw new Error("media_stream already set");
     }
+    this.waiter.setReady();
     this.media_stream.addTrack(track);
   }
 
+  public async ready() {
+    return this.waiter.waitReady();
+  }
+
   public async attach(source: Receiver_Source, config?: Receiver_Config) {
-    await this.dc.wait_connect();
+    await this.dc.ready();
+    await this.ready();
     await this.dc.request_receiver({
       name: this.track_name,
       attach: {
@@ -44,7 +52,8 @@ export class TrackReceiver {
   }
 
   public async detach() {
-    await this.dc.wait_connect();
+    await this.dc.ready();
+    await this.ready();
     await this.dc.request_receiver({
       name: this.track_name,
       detach: {},
@@ -52,7 +61,8 @@ export class TrackReceiver {
   }
 
   public async config(config: Receiver_Config) {
-    await this.dc.wait_connect();
+    await this.dc.ready();
+    await this.ready();
     await this.dc.request_receiver({
       name: this.track_name,
       config,
