@@ -1,14 +1,13 @@
 import { ConnectRequest, ConnectResponse } from "../generated/protobuf/gateway";
 import { MediaKind } from "./types";
 import { TrackReceiver } from "./receiver";
-import { TrackSender } from "./sender";
+import { TrackSender, TrackSenderConfig } from "./sender";
 import EventEmitter, { post_protobuf } from "../utils";
 import { Datachannel, DatachannelEvent } from "./data";
 import {
   Request_Session_UpdateSdp,
   ServerEvent_Room,
 } from "../generated/protobuf/conn";
-import { BitrateControlMode } from "../generated/protobuf/shared";
 
 export interface JoinInfo {
   room: string;
@@ -98,30 +97,31 @@ export class Session extends EventEmitter {
     };
   }
 
-  receiver(kind: MediaKind, priority: number): TrackReceiver {
+  receiver(kind: MediaKind): TrackReceiver {
     const track_name = kind + "_" + this.receivers.length;
     const transceiver = this.peer.addTransceiver(kind, {
       direction: "recvonly",
     });
-    const receiver = new TrackReceiver(
-      this.dc,
-      track_name,
-      kind,
-      priority,
-      transceiver,
-    );
+    const receiver = new TrackReceiver(this.dc, transceiver, track_name, kind);
     this.receivers.push(receiver);
+    console.log("Created receiver", track_name);
     return receiver;
   }
 
-  sender(
+  async sender(
     track_name: string,
     track_or_kind: MediaStreamTrack | MediaKind,
-    priority: number,
-    bitrate?: BitrateControlMode,
+    cfg: TrackSenderConfig,
   ) {
     const transceiver = this.peer.addTransceiver(track_or_kind, {
       direction: "sendonly",
+      sendEncodings: !!cfg.simulcast
+        ? [
+            { rid: "0", active: true, scaleResolutionDownBy: 4 },
+            { rid: "1", active: true, scaleResolutionDownBy: 2 },
+            { rid: "2", active: true },
+          ]
+        : undefined,
     });
     const kind =
       track_or_kind instanceof MediaStreamTrack
@@ -129,19 +129,14 @@ export class Session extends EventEmitter {
           ? "audio"
           : "video"
         : track_or_kind;
-    const sender = new TrackSender(
-      this.dc,
-      transceiver,
-      track_name,
-      kind,
-      priority,
-      bitrate,
-    );
+    const sender = new TrackSender(this.dc, transceiver, track_name, kind, cfg);
     this.senders.push(sender);
+    console.log("Created sender", track_name);
     return sender;
   }
 
   async connect() {
+    console.log("Prepare to connect");
     const local_desc = await this.peer.createOffer({
       offerToReceiveAudio: true,
       offerToReceiveVideo: true,
@@ -156,6 +151,7 @@ export class Session extends EventEmitter {
       },
       sdp: local_desc.sdp,
     });
+    console.log("Connecting");
     const res = await post_protobuf(
       ConnectRequest,
       ConnectResponse,
@@ -170,6 +166,7 @@ export class Session extends EventEmitter {
     await this.peer.setLocalDescription(local_desc);
     await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
     await this.dc.ready();
+    console.log("Connected");
   }
 
   async join(info: JoinInfo, token: string) {

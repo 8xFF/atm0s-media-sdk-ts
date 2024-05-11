@@ -36,16 +36,16 @@ async function connect(_e: any) {
   let audio_send_track = session.sender(
     "audio_main",
     stream.getAudioTracks()[0],
-    100,
+    { priority: 100 },
   );
   let video_send_track = session.sender(
     "video_main",
     stream.getVideoTracks()[0],
-    100,
+    { priority: 100 },
   );
   console.log(audio_send_track, video_send_track);
-  let audio_recv_track = session.receiver("audio", 100);
-  let video_recv_track = session.receiver("video", 100);
+  let audio_recv_track = session.receiver("audio");
+  let video_recv_track = session.receiver("video");
   audio_echo.srcObject = audio_recv_track.stream;
   video_echo.srcObject = video_recv_track.stream;
 

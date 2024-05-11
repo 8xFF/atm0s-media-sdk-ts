@@ -12,8 +12,13 @@ const video_preview = document.getElementById(
 )! as HTMLVideoElement;
 const audio_echo = document.getElementById("audio-echo")! as HTMLAudioElement;
 const video_echo = document.getElementById("video-echo")! as HTMLVideoElement;
+const max_spatial = document.getElementById(
+  "max-spatial",
+)! as HTMLSelectElement;
+const max_temporal = document.getElementById(
+  "max-temporal",
+)! as HTMLSelectElement;
 const connect_btn = document.getElementById("connect")!;
-const sources = document.getElementById("sources")! as HTMLSelectElement;
 const disconnect_btn = document.getElementById("disconnect")!;
 
 async function connect(_e: any) {
@@ -27,35 +32,21 @@ async function connect(_e: any) {
     },
   });
 
-  const audio_stream = await navigator.mediaDevices.getUserMedia({
+  const stream = await navigator.mediaDevices.getUserMedia({
     audio: true,
+    video: true,
   });
-  const devices = await navigator.mediaDevices.enumerateDevices();
-  sources.innerHTML = "";
-  const noneSelect = document.createElement("option");
-  noneSelect.value = "";
-  noneSelect.textContent = "None";
-  sources.appendChild(noneSelect);
-
-  devices.map((d) => {
-    if (d.kind === "videoinput") {
-      const noneSelect = document.createElement("option");
-      noneSelect.value = d.deviceId;
-      noneSelect.textContent = d.label;
-      sources.appendChild(noneSelect);
-      sources.appendChild(noneSelect);
-    }
-  });
-
-  video_preview.srcObject = audio_stream;
-  let audio_send_track = session.sender(
+  video_preview.srcObject = stream;
+  let audio_send_track = await session.sender(
     "audio_main",
-    audio_stream.getAudioTracks()[0],
+    stream.getAudioTracks()[0],
     { priority: 100 },
   );
-  let video_send_track = await session.sender("video_main", "video", {
-    priority: 100,
-  });
+  let video_send_track = await session.sender(
+    "video_main",
+    stream.getVideoTracks()[0],
+    { priority: 100, simulcast: true },
+  );
   console.log(audio_send_track, video_send_track);
   let audio_recv_track = session.receiver("audio");
   let video_recv_track = session.receiver("video");
@@ -75,50 +66,44 @@ async function connect(_e: any) {
     if (track.track == "audio_main") {
       audio_recv_track.attach(track).then(console.log).catch(console.error);
     } else {
-      video_recv_track.attach(track).then(console.log).catch(console.error);
+      video_recv_track
+        .attach(track, {
+          priority: 100,
+          maxSpatial: 0,
+          maxTemporal: 0,
+        })
+        .then(console.log)
+        .catch(console.error);
     }
   });
 
   session.on(SessionEvent.ROOM_TRACK_STOPPED, (track: RoomTrackStopped) => {
     console.log("Track stopped", track);
-    if (track.track == "audio_main") {
-      audio_recv_track.detach().then(console.log).catch(console.error);
-    } else {
-      video_recv_track.detach().then(console.log).catch(console.error);
-    }
   });
 
-  let video_stream: MediaStream | undefined = undefined;
-  sources.onchange = async () => {
-    const selected = sources.options[sources.selectedIndex];
-    console.log("Changed video to", selected.value, selected.textContent);
-    if (!!video_stream) {
-      await video_send_track.detach().then(console.log).catch(console.error);
-      video_stream.getTracks().map((t) => {
-        t.stop();
-      });
-      video_stream = undefined;
-    }
-    if (!selected.value) {
-      return;
-    }
-    video_stream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        deviceId: selected.value,
-      },
-    });
-    video_preview.srcObject = video_stream;
-    await video_send_track
-      .attach(video_stream.getVideoTracks()[0])
+  let change_quality = () => {
+    let spatial = parseInt(
+      max_spatial.options[max_spatial.selectedIndex].value || "2",
+    );
+    let temporal = parseInt(
+      max_temporal.options[max_temporal.selectedIndex].value || "2",
+    );
+
+    video_recv_track
+      .config({
+        priority: 100,
+        maxSpatial: spatial,
+        maxTemporal: temporal,
+      })
       .then(console.log)
       .catch(console.error);
   };
 
+  max_spatial.onchange = change_quality;
+  max_temporal.onchange = change_quality;
+
   disconnect_btn.onclick = () => {
-    audio_stream.getTracks().map((t) => {
-      t.stop();
-    });
-    video_stream?.getTracks().map((t) => {
+    stream.getTracks().map((t) => {
       t.stop();
     });
     video_preview.srcObject = null;

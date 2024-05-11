@@ -34,12 +34,12 @@ async function connect(_e: any) {
   let audio_send_track = session.sender(
     "audio_main",
     stream.getAudioTracks()[0],
-    100,
+    { priority: 100 },
   );
   let video_send_track = session.sender(
     "video_main",
     stream.getVideoTracks()[0],
-    100,
+    { priority: 100 },
   );
   console.log(audio_send_track, video_send_track);
 
@@ -81,7 +81,7 @@ async function connect(_e: any) {
     video.setAttribute("style", "background-color: gray;");
     video_receivers.appendChild(video);
 
-    const video_receiver = session.receiver("video", 100);
+    const video_receiver = session.receiver("video");
     video.srcObject = video_receiver.stream;
     await video_receiver.attach(remote_video_track);
   };

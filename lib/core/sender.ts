@@ -7,6 +7,12 @@ import {
 import { Datachannel } from "./data";
 import { MediaKind } from "./types";
 
+export interface TrackSenderConfig {
+  priority: number;
+  bitrate?: BitrateControlMode;
+  simulcast?: boolean;
+}
+
 export class TrackSender {
   sender_state: Sender_State;
 
@@ -15,14 +21,13 @@ export class TrackSender {
     private transceiver: RTCRtpTransceiver,
     private track_name: string,
     private kind: MediaKind,
-    priority: number,
-    bitrate?: BitrateControlMode,
+    cfg: TrackSenderConfig,
   ) {
     console.log("[TrackSender] ", track_name, dc);
     this.sender_state = {
       config: {
-        priority,
-        bitrate,
+        priority: cfg.priority,
+        bitrate: cfg.bitrate,
       },
       source: transceiver.sender.track
         ? {

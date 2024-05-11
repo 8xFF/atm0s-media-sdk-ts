@@ -11,13 +11,13 @@ import { MediaKind } from "./types";
 export class TrackReceiver {
   waiter: ReadyWaiter = new ReadyWaiter();
   media_stream: MediaStream;
+  cfg?: Receiver_Config;
 
   constructor(
     private dc: Datachannel,
+    _transceiver: RTCRtpTransceiver,
     private track_name: string,
     private kind: MediaKind,
-    private priority: number,
-    _transceiver: RTCRtpTransceiver,
   ) {
     this.media_stream = new MediaStream();
     console.log("[TrackReceiver] create ", track_name, dc);
@@ -42,6 +42,7 @@ export class TrackReceiver {
   public async attach(source: Receiver_Source, config?: Receiver_Config) {
     await this.dc.ready();
     await this.ready();
+    this.cfg = config;
     await this.dc.request_receiver({
       name: this.track_name,
       attach: {
@@ -54,6 +55,7 @@ export class TrackReceiver {
   public async detach() {
     await this.dc.ready();
     await this.ready();
+    delete this.cfg;
     await this.dc.request_receiver({
       name: this.track_name,
       detach: {},
@@ -82,11 +84,7 @@ export class TrackReceiver {
       name: this.name,
       kind: this.kind == "audio" ? Kind.AUDIO : Kind.VIDEO,
       state: {
-        config: {
-          priority: this.priority,
-          maxSpatial: 2,
-          maxTemporal: 2,
-        },
+        config: this.cfg || { priority: 1, maxSpatial: 2, maxTemporal: 2 },
       },
     };
   }
