@@ -1,5 +1,5 @@
 {
-  "extends": "@repo/typescript-config/nextjs.json",
+  "extends": "@atm0s-media-sdk/typescript-config/nextjs.json",
   "compilerOptions": {
     "plugins": [
       {
