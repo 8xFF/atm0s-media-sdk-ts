@@ -119,7 +119,7 @@ export default function EchoFast(): JSX.Element {
 
   return (
     <main>
-      <div>
+      <div className="p-6">
         <div className="p-4 w-full text-center">
           This is echo sample, click connect then you will see left video is
           from local, right video is echo from server.
