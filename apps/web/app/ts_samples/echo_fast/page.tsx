@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import {
+  BitrateControlMode,
+  Kind,
   RoomPeerJoined,
   RoomPeerLeaved,
   RoomTrackStarted,
@@ -53,10 +55,12 @@ export default function EchoFast(): JSX.Element {
         { priority: 100 },
       );
       console.log(audio_send_track, video_send_track);
-      let audio_recv_track = session.receiver("audio");
-      let video_recv_track = session.receiver("video");
+      let audio_recv_track = session.receiver(Kind.AUDIO);
+      let video_recv_track = session.receiver(Kind.VIDEO);
       audio_echo.srcObject = audio_recv_track.stream;
       video_echo.srcObject = video_recv_track.stream;
+
+      (window as any).video_recv_track = video_recv_track;
 
       session.on(SessionEvent.ROOM_PEER_JOINED, (peer: RoomPeerJoined) => {
         console.log("Peer joined", peer);

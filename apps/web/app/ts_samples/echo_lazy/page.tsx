@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import {
+  Kind,
   RoomPeerJoined,
   RoomPeerLeaved,
   RoomTrackStarted,
@@ -27,13 +28,13 @@ export default function EchoLazy(): JSX.Element {
     const leave_btn = document.getElementById("leave")!;
     const disconnect_btn = document.getElementById("disconnect")!;
 
-    async function connect(_e: any) {
+    async function connect() {
       const session = new Session("http://localhost:3000", {
         token: "demo-token",
       });
 
-      let audio_recv_track = session.receiver("audio");
-      let video_recv_track = session.receiver("video");
+      let audio_recv_track = session.receiver(Kind.AUDIO);
+      let video_recv_track = session.receiver(Kind.VIDEO);
       audio_echo.srcObject = audio_recv_track.stream;
       video_echo.srcObject = video_recv_track.stream;
 

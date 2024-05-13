@@ -1,13 +1,14 @@
 import { ConnectRequest, ConnectResponse } from "./generated/protobuf/gateway";
-import { MediaKind } from "./types";
 import { TrackReceiver } from "./receiver";
 import { TrackSender, TrackSenderConfig } from "./sender";
-import EventEmitter, { post_protobuf } from "./utils";
+import { EventEmitter, post_protobuf } from "./utils";
 import { Datachannel, DatachannelEvent } from "./data";
 import {
   Request_Session_UpdateSdp,
   ServerEvent_Room,
 } from "./generated/protobuf/conn";
+import { Kind } from "./generated/protobuf/shared";
+import { kind_to_string } from "./types";
 
 export interface JoinInfo {
   room: string;
@@ -31,17 +32,24 @@ export enum SessionEvent {
 }
 
 export class Session extends EventEmitter {
+  created_at: number;
   conn_id?: string;
   peer: RTCPeerConnection;
   dc: Datachannel;
   receivers: TrackReceiver[] = [];
   senders: TrackSender[] = [];
 
+  /// Prepaer state for flagging when ever this peer is created offer.
+  /// This flag is useful for avoiding tranceiver config is changed before it connect
+  prepareState: boolean = true;
+
   constructor(
     private gateway: string,
     private cfg: SessionConfig,
   ) {
     super();
+    this.created_at = new Date().getTime();
+    console.warn("Create session", this.created_at);
     this.peer = new RTCPeerConnection();
     this.dc = new Datachannel(this.peer.createDataChannel("data"));
     this.dc.on(DatachannelEvent.ROOM, (event: ServerEvent_Room) => {
@@ -97,46 +105,49 @@ export class Session extends EventEmitter {
     };
   }
 
-  receiver(kind: MediaKind): TrackReceiver {
-    const track_name = kind + "_" + this.receivers.length;
-    const transceiver = this.peer.addTransceiver(kind, {
-      direction: "recvonly",
-    });
-    const receiver = new TrackReceiver(this.dc, transceiver, track_name, kind);
+  receiver(kind: Kind): TrackReceiver {
+    const kind_str = kind_to_string(kind);
+    const track_name = kind_str + "_" + this.receivers.length;
+    const receiver = new TrackReceiver(this.dc, track_name, kind);
+    if (!this.prepareState) {
+      receiver.prepare(this.peer);
+    }
     this.receivers.push(receiver);
-    console.log("Created receiver", track_name);
+    console.log("Created receiver", kind, track_name);
     return receiver;
   }
 
-  async sender(
+  sender(
     track_name: string,
-    track_or_kind: MediaStreamTrack | MediaKind,
+    track_or_kind: MediaStreamTrack | Kind,
     cfg: TrackSenderConfig,
   ) {
-    const transceiver = this.peer.addTransceiver(track_or_kind, {
-      direction: "sendonly",
-      sendEncodings: !!cfg.simulcast
-        ? [
-            { rid: "0", active: true, scaleResolutionDownBy: 4 },
-            { rid: "1", active: true, scaleResolutionDownBy: 2 },
-            { rid: "2", active: true },
-          ]
-        : undefined,
-    });
-    const kind =
-      track_or_kind instanceof MediaStreamTrack
-        ? track_or_kind.kind == "audio"
-          ? "audio"
-          : "video"
-        : track_or_kind;
-    const sender = new TrackSender(this.dc, transceiver, track_name, kind, cfg);
+    const sender = new TrackSender(this.dc, track_name, track_or_kind, cfg);
+    if (!this.prepareState) {
+      sender.prepare(this.peer);
+    }
     this.senders.push(sender);
-    console.log("Created sender", track_name);
+    console.log("Created sender", sender.kind, track_name);
     return sender;
   }
 
   async connect(version?: string) {
-    console.log("Prepare to connect");
+    if (!this.prepareState) {
+      throw new Error("Not in prepare state");
+    }
+    this.prepareState = false;
+    console.warn("Prepare senders and receivers to connect");
+    //prepare for senders. We need to lazy prepare because some transceiver dont allow update before connected
+    for (let i = 0; i < this.senders.length; i++) {
+      console.log("Prepare sender ", this.senders[i]!.name);
+      this.senders[i]!.prepare(this.peer);
+    }
+    //prepare for receivers. We need to lazy prepare because some transceiver dont allow update before connected
+    for (let i = 0; i < this.receivers.length; i++) {
+      console.log("Prepare receiver ", this.receivers[i]!.name);
+      this.receivers[i]!.prepare(this.peer);
+    }
+    console.log("Prepare offer for connect");
     const local_desc = await this.peer.createOffer({
       offerToReceiveAudio: true,
       offerToReceiveVideo: true,
@@ -210,6 +221,7 @@ export class Session extends EventEmitter {
   }
 
   disconnect() {
+    console.warn("Disconnect session", this.created_at);
     this.peer.close();
   }
 }

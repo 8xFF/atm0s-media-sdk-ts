@@ -3,21 +3,22 @@ import {
   Kind,
   Receiver_Config,
   Receiver_Source,
+  Receiver_State,
 } from "./generated/protobuf/shared";
 import { ReadyWaiter } from "./utils";
 import { Datachannel } from "./data";
-import { MediaKind } from "./types";
+import { kind_to_string } from "./types";
 
 export class TrackReceiver {
+  transceiver?: RTCRtpTransceiver;
   waiter: ReadyWaiter = new ReadyWaiter();
   media_stream: MediaStream;
-  cfg?: Receiver_Config;
+  receiver_state: Receiver_State = { config: undefined, source: undefined };
 
   constructor(
     private dc: Datachannel,
-    _transceiver: RTCRtpTransceiver,
     private track_name: string,
-    private _kind: MediaKind,
+    private _kind: Kind,
   ) {
     this.media_stream = new MediaStream();
     console.log("[TrackReceiver] create ", track_name, dc);
@@ -35,6 +36,10 @@ export class TrackReceiver {
     if (this.media_stream.getTracks().length > 0) {
       throw new Error("media_stream already set");
     }
+
+    if (track.kind != kind_to_string(this._kind)) {
+      throw new Error("wrong track type");
+    }
     this.waiter.setReady();
     this.media_stream.addTrack(track);
   }
@@ -43,23 +48,51 @@ export class TrackReceiver {
     return this.waiter.waitReady();
   }
 
+  /// We need lazy prepare for avoding error when sender track is changed before it connect.
+  /// Config after init feature will be useful when complex application
+  prepare(peer: RTCPeerConnection) {
+    this.transceiver = peer.addTransceiver(kind_to_string(this._kind), {
+      direction: "recvonly",
+    });
+  }
+
   public async attach(source: Receiver_Source, config?: Receiver_Config) {
+    this.receiver_state.config = config || {
+      priority: 1,
+      maxSpatial: 2,
+      maxTemporal: 2,
+    };
+    this.receiver_state.source = source;
+
+    //if we in prepare state, we dont need to access to server, just update local
+    if (!this.transceiver) {
+      console.log("[TrackReceiver] attach on prepare state");
+      return;
+    }
+
     await this.dc.ready();
     await this.ready();
-    this.cfg = config;
     await this.dc.request_receiver({
       name: this.track_name,
       attach: {
-        source,
-        config: config || { priority: 1, maxSpatial: 2, maxTemporal: 2 },
+        source: this.receiver_state.source,
+        config: this.receiver_state.config,
       },
     });
   }
 
   public async detach() {
+    delete this.receiver_state.source;
+    delete this.receiver_state.config;
+
+    //if we in prepare state, we dont need to access to server, just update local
+    if (!this.transceiver) {
+      console.log("[TrackReceiver] detach on prepare state");
+      return;
+    }
+
     await this.dc.ready();
     await this.ready();
-    delete this.cfg;
     await this.dc.request_receiver({
       name: this.track_name,
       detach: {},
@@ -67,6 +100,14 @@ export class TrackReceiver {
   }
 
   public async config(config: Receiver_Config) {
+    this.receiver_state.config = config;
+
+    //if we in prepare state, we dont need to access to server, just update local
+    if (!this.transceiver) {
+      console.log("[TrackReceiver] config on prepare state");
+      return;
+    }
+
     await this.dc.ready();
     await this.ready();
     await this.dc.request_receiver({
@@ -86,10 +127,8 @@ export class TrackReceiver {
   get state(): Receiver {
     return {
       name: this.name,
-      kind: this.kind == "audio" ? Kind.AUDIO : Kind.VIDEO,
-      state: {
-        config: this.cfg || { priority: 1, maxSpatial: 2, maxTemporal: 2 },
-      },
+      kind: this.kind,
+      state: this.receiver_state,
     };
   }
 }

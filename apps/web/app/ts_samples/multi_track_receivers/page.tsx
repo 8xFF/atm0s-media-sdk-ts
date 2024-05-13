@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import {
+  Kind,
   RoomPeerJoined,
   RoomPeerLeaved,
   RoomTrackStarted,
@@ -86,7 +87,7 @@ export default function MultiTrackReceivers(): JSX.Element {
         video.setAttribute("style", "background-color: gray;");
         video_receivers.appendChild(video);
 
-        const video_receiver = session.receiver("video");
+        const video_receiver = session.receiver(Kind.VIDEO);
         video.srcObject = video_receiver.stream;
         await video_receiver.attach(remote_video_track);
       };

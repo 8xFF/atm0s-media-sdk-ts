@@ -36,7 +36,7 @@ export interface IEventEmitter {
   removeListener(event: string, cb: any): void;
 }
 
-export default class EventEmitter implements IEventEmitter {
+export class EventEmitter implements IEventEmitter {
   events: any = {};
 
   emit(event: string, ...args: any) {

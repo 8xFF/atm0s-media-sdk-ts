@@ -6,7 +6,18 @@
 
 /* eslint-disable */
 import * as _m0 from "protobufjs/minimal";
-import { Error, Receiver_Config, Receiver_Source, RoomJoin, Sender_Config, Sender_Source, Tracks } from "./shared";
+import {
+  Error,
+  Kind,
+  kindFromJSON,
+  kindToJSON,
+  Receiver_Config,
+  Receiver_Source,
+  RoomJoin,
+  Sender_Config,
+  Sender_Source,
+  Tracks,
+} from "./shared";
 
 export const protobufPackage = "conn";
 
@@ -188,18 +199,21 @@ export interface ServerEvent_Room_PeerLeaved {
 export interface ServerEvent_Room_TrackStarted {
   peer: string;
   track: string;
+  kind: Kind;
   metadata?: string | undefined;
 }
 
 export interface ServerEvent_Room_TrackUpdated {
   peer: string;
   track: string;
+  kind: Kind;
   metadata?: string | undefined;
 }
 
 export interface ServerEvent_Room_TrackStopped {
   peer: string;
   track: string;
+  kind: Kind;
 }
 
 export interface ServerEvent_Sender {
@@ -3019,7 +3033,7 @@ export const ServerEvent_Room_PeerLeaved = {
 };
 
 function createBaseServerEvent_Room_TrackStarted(): ServerEvent_Room_TrackStarted {
-  return { peer: "", track: "", metadata: "" };
+  return { peer: "", track: "", kind: 0, metadata: "" };
 }
 
 export const ServerEvent_Room_TrackStarted = {
@@ -3030,8 +3044,11 @@ export const ServerEvent_Room_TrackStarted = {
     if (message.track !== "") {
       writer.uint32(18).string(message.track);
     }
+    if (message.kind !== 0) {
+      writer.uint32(24).int32(message.kind);
+    }
     if (message.metadata !== undefined && message.metadata !== "") {
-      writer.uint32(26).string(message.metadata);
+      writer.uint32(34).string(message.metadata);
     }
     return writer;
   },
@@ -3058,7 +3075,14 @@ export const ServerEvent_Room_TrackStarted = {
           message.track = reader.string();
           continue;
         case 3:
-          if (tag !== 26) {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.kind = reader.int32() as any;
+          continue;
+        case 4:
+          if (tag !== 34) {
             break;
           }
 
@@ -3077,6 +3101,7 @@ export const ServerEvent_Room_TrackStarted = {
     return {
       peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
       track: isSet(object.track) ? globalThis.String(object.track) : "",
+      kind: isSet(object.kind) ? kindFromJSON(object.kind) : 0,
       metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
     };
   },
@@ -3088,6 +3113,9 @@ export const ServerEvent_Room_TrackStarted = {
     }
     if (message.track !== "") {
       obj.track = message.track;
+    }
+    if (message.kind !== 0) {
+      obj.kind = kindToJSON(message.kind);
     }
     if (message.metadata !== undefined && message.metadata !== "") {
       obj.metadata = message.metadata;
@@ -3104,13 +3132,14 @@ export const ServerEvent_Room_TrackStarted = {
     const message = createBaseServerEvent_Room_TrackStarted();
     message.peer = object.peer ?? "";
     message.track = object.track ?? "";
+    message.kind = object.kind ?? 0;
     message.metadata = object.metadata ?? "";
     return message;
   },
 };
 
 function createBaseServerEvent_Room_TrackUpdated(): ServerEvent_Room_TrackUpdated {
-  return { peer: "", track: "", metadata: "" };
+  return { peer: "", track: "", kind: 0, metadata: "" };
 }
 
 export const ServerEvent_Room_TrackUpdated = {
@@ -3121,8 +3150,11 @@ export const ServerEvent_Room_TrackUpdated = {
     if (message.track !== "") {
       writer.uint32(18).string(message.track);
     }
+    if (message.kind !== 0) {
+      writer.uint32(24).int32(message.kind);
+    }
     if (message.metadata !== undefined && message.metadata !== "") {
-      writer.uint32(26).string(message.metadata);
+      writer.uint32(34).string(message.metadata);
     }
     return writer;
   },
@@ -3149,7 +3181,14 @@ export const ServerEvent_Room_TrackUpdated = {
           message.track = reader.string();
           continue;
         case 3:
-          if (tag !== 26) {
+          if (tag !== 24) {
+            break;
+          }
+
+          message.kind = reader.int32() as any;
+          continue;
+        case 4:
+          if (tag !== 34) {
             break;
           }
 
@@ -3168,6 +3207,7 @@ export const ServerEvent_Room_TrackUpdated = {
     return {
       peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
       track: isSet(object.track) ? globalThis.String(object.track) : "",
+      kind: isSet(object.kind) ? kindFromJSON(object.kind) : 0,
       metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
     };
   },
@@ -3179,6 +3219,9 @@ export const ServerEvent_Room_TrackUpdated = {
     }
     if (message.track !== "") {
       obj.track = message.track;
+    }
+    if (message.kind !== 0) {
+      obj.kind = kindToJSON(message.kind);
     }
     if (message.metadata !== undefined && message.metadata !== "") {
       obj.metadata = message.metadata;
@@ -3195,13 +3238,14 @@ export const ServerEvent_Room_TrackUpdated = {
     const message = createBaseServerEvent_Room_TrackUpdated();
     message.peer = object.peer ?? "";
     message.track = object.track ?? "";
+    message.kind = object.kind ?? 0;
     message.metadata = object.metadata ?? "";
     return message;
   },
 };
 
 function createBaseServerEvent_Room_TrackStopped(): ServerEvent_Room_TrackStopped {
-  return { peer: "", track: "" };
+  return { peer: "", track: "", kind: 0 };
 }
 
 export const ServerEvent_Room_TrackStopped = {
@@ -3211,6 +3255,9 @@ export const ServerEvent_Room_TrackStopped = {
     }
     if (message.track !== "") {
       writer.uint32(18).string(message.track);
+    }
+    if (message.kind !== 0) {
+      writer.uint32(24).int32(message.kind);
     }
     return writer;
   },
@@ -3236,6 +3283,13 @@ export const ServerEvent_Room_TrackStopped = {
 
           message.track = reader.string();
           continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.kind = reader.int32() as any;
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3249,6 +3303,7 @@ export const ServerEvent_Room_TrackStopped = {
     return {
       peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
       track: isSet(object.track) ? globalThis.String(object.track) : "",
+      kind: isSet(object.kind) ? kindFromJSON(object.kind) : 0,
     };
   },
 
@@ -3259,6 +3314,9 @@ export const ServerEvent_Room_TrackStopped = {
     }
     if (message.track !== "") {
       obj.track = message.track;
+    }
+    if (message.kind !== 0) {
+      obj.kind = kindToJSON(message.kind);
     }
     return obj;
   },
@@ -3272,6 +3330,7 @@ export const ServerEvent_Room_TrackStopped = {
     const message = createBaseServerEvent_Room_TrackStopped();
     message.peer = object.peer ?? "";
     message.track = object.track ?? "";
+    message.kind = object.kind ?? 0;
     return message;
   },
 };

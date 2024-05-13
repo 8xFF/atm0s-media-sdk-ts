@@ -177,6 +177,10 @@ importers:
         version: 5.3.3
 
   packages/sdk-react-hooks:
+    dependencies:
+      '@atm0s-media-sdk/sdk-core':
+        specifier: workspace:*
+        version: link:../sdk-core
     devDependencies:
       '@atm0s-media-sdk/eslint-config':
         specifier: workspace:*

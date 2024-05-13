@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import {
+  Kind,
   RoomPeerJoined,
   RoomPeerLeaved,
   RoomTrackStarted,
@@ -62,12 +63,12 @@ export default function SwitchSenderTrack(): JSX.Element {
         audio_stream.getAudioTracks()[0]!,
         { priority: 100 },
       );
-      let video_send_track = await session.sender("video_main", "video", {
+      let video_send_track = session.sender("video_main", Kind.VIDEO, {
         priority: 100,
       });
       console.log(audio_send_track, video_send_track);
-      let audio_recv_track = session.receiver("audio");
-      let video_recv_track = session.receiver("video");
+      let audio_recv_track = session.receiver(Kind.AUDIO);
+      let video_recv_track = session.receiver(Kind.VIDEO);
       audio_echo.srcObject = audio_recv_track.stream;
       video_echo.srcObject = video_recv_track.stream;
 

@@ -2,13 +2,14 @@
   "name": "@atm0s-media-sdk/sdk-react-hooks",
   "version": "0.0.0",
   "exports": {
-    "./button": "./src/button.tsx",
-    "./card": "./src/card.tsx",
-    "./code": "./src/code.tsx"
+    "./lib": "./src/lib.tsx"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "generate:component": "turbo gen react-component"
+  },
+  "dependencies": {
+    "@atm0s-media-sdk/sdk-core": "workspace:*"
   },
   "devDependencies": {
     "@atm0s-media-sdk/eslint-config": "workspace:*",

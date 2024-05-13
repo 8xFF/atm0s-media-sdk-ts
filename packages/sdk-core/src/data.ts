@@ -10,7 +10,7 @@ import {
   Request_Receiver,
   Response_Receiver,
 } from "./generated/protobuf/conn";
-import EventEmitter, { ReadyWaiter } from "./utils";
+import { EventEmitter, ReadyWaiter } from "./utils";
 
 export enum DatachannelEvent {
   ROOM = "event.room",
@@ -23,7 +23,8 @@ export class Datachannel extends EventEmitter {
   waiter: ReadyWaiter = new ReadyWaiter();
   seq_id: number = 0;
   req_id: number = 0;
-  reqs: Map<number, (a: ProtoResponse) => void> = new Map();
+  reqs: Map<number, (_: ProtoResponse) => void> = new Map();
+  prepare_state = true;
 
   constructor(private dc: RTCDataChannel) {
     super();
@@ -114,6 +115,7 @@ export class Datachannel extends EventEmitter {
       seq,
       request,
     }).finish();
+    console.log("[Datachannel] send request", seq, request);
     this.dc.send(buf);
     const reqId = request.reqId;
     const res = await new Promise<ProtoResponse>((resolve, reject) => {
