@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import {
-  BitrateControlMode,
   Kind,
   RoomPeerJoined,
   RoomPeerLeaved,

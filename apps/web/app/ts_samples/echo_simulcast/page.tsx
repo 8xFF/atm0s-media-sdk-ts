@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import {
+  BitrateControlMode,
   Kind,
   RoomPeerJoined,
   RoomPeerLeaved,
@@ -27,6 +28,9 @@ export default function EchoSimulcast(): JSX.Element {
     )! as HTMLSelectElement;
     const max_temporal = document.getElementById(
       "max-temporal",
+    )! as HTMLSelectElement;
+    const bitrate_control = document.getElementById(
+      "bitrate-control",
     )! as HTMLSelectElement;
     const connect_btn = document.getElementById("connect")!;
     const disconnect_btn = document.getElementById("disconnect")!;
@@ -91,6 +95,19 @@ export default function EchoSimulcast(): JSX.Element {
         console.log("Track stopped", track);
       });
 
+      let change_bitrate_control = () => {
+        let mode: BitrateControlMode = parseInt(
+          bitrate_control.options[bitrate_control.selectedIndex]!.value || "0",
+        );
+        video_send_track
+          .config({
+            priority: 1,
+            bitrate: mode,
+          })
+          .then(console.log)
+          .catch(console.error);
+      };
+
       let change_quality = () => {
         let spatial = parseInt(
           max_spatial.options[max_spatial.selectedIndex]!.value || "2",
@@ -111,6 +128,7 @@ export default function EchoSimulcast(): JSX.Element {
 
       max_spatial.onchange = change_quality;
       max_temporal.onchange = change_quality;
+      bitrate_control.onchange = change_bitrate_control;
 
       disconnect_btn.onclick = () => {
         stream.getTracks().map((t) => {
@@ -131,7 +149,9 @@ export default function EchoSimulcast(): JSX.Element {
     <main>
       <div className="p-4 w-full text-center">
         This is echo sample, click connect then you will see left video is from
-        local, right video is echo from server.with simulcast
+        local, right video is echo from server with simulcast. We also can
+        adjust bitrate control mechanism between max-bitrate only and dynamic
+        with consumers feedback.
       </div>
       {/* This is for video */}
       <div className="flex flex-col w-full lg:flex-row">
@@ -177,6 +197,14 @@ export default function EchoSimulcast(): JSX.Element {
         <button id="connect" className="btn btn-success">
           Connect
         </button>
+        <select id="bitrate-control">
+          <option value={BitrateControlMode.DYNAMIC_CONSUMERS}>
+            Dynamic bitrate with consumers
+          </option>
+          <option value={BitrateControlMode.MAX_BITRATE}>
+            Max bitrate cap only
+          </option>
+        </select>
         <button id="disconnect" className="btn btn-warning">
           Disconnect
         </button>
