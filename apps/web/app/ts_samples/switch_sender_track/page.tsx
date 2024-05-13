@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import {
+  BitrateControlMode,
   Kind,
   RoomPeerJoined,
   RoomPeerLeaved,
@@ -61,10 +62,10 @@ export default function SwitchSenderTrack(): JSX.Element {
       let audio_send_track = session.sender(
         "audio_main",
         audio_stream.getAudioTracks()[0]!,
-        { priority: 100 },
       );
       let video_send_track = session.sender("video_main", Kind.VIDEO, {
         priority: 100,
+        bitrate: BitrateControlMode.DYNAMIC_CONSUMERS,
       });
       console.log(audio_send_track, video_send_track);
       let audio_recv_track = session.receiver(Kind.AUDIO);

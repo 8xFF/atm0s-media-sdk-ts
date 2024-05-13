@@ -9,6 +9,12 @@ import { ReadyWaiter } from "./utils";
 import { Datachannel } from "./data";
 import { kind_to_string } from "./types";
 
+const DEFAULT_CFG = {
+  priority: 1,
+  maxSpatial: 2,
+  maxTemporal: 2,
+};
+
 export class TrackReceiver {
   transceiver?: RTCRtpTransceiver;
   waiter: ReadyWaiter = new ReadyWaiter();
@@ -56,12 +62,11 @@ export class TrackReceiver {
     });
   }
 
-  public async attach(source: Receiver_Source, config?: Receiver_Config) {
-    this.receiver_state.config = config || {
-      priority: 1,
-      maxSpatial: 2,
-      maxTemporal: 2,
-    };
+  public async attach(
+    source: Receiver_Source,
+    config: Receiver_Config = DEFAULT_CFG,
+  ) {
+    this.receiver_state.config = config;
     this.receiver_state.source = source;
 
     //if we in prepare state, we dont need to access to server, just update local

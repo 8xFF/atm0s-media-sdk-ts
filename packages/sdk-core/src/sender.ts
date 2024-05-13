@@ -8,9 +8,15 @@ import {
 import { Datachannel } from "./data";
 import { kind_to_string, string_to_kind } from "./types";
 
+const DEFAULT_CFG = {
+  priority: 1,
+  bitrate: BitrateControlMode.DYNAMIC_CONSUMERS,
+  simulcast: false,
+};
+
 export interface TrackSenderConfig {
   priority: number;
-  bitrate?: BitrateControlMode;
+  bitrate: BitrateControlMode;
   simulcast?: boolean;
 }
 
@@ -25,7 +31,7 @@ export class TrackSender {
     private dc: Datachannel,
     private track_name: string,
     track_or_kind: MediaStreamTrack | Kind,
-    cfg: TrackSenderConfig,
+    cfg: TrackSenderConfig = DEFAULT_CFG,
   ) {
     console.log("[TrackSender] created", track_name, dc, track_or_kind);
     if (track_or_kind instanceof MediaStreamTrack) {

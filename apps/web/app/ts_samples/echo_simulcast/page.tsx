@@ -54,12 +54,15 @@ export default function EchoSimulcast(): JSX.Element {
       let audio_send_track = session.sender(
         "audio_main",
         stream.getAudioTracks()[0]!,
-        { priority: 100 },
       );
       let video_send_track = session.sender(
         "video_main",
         stream.getVideoTracks()[0]!,
-        { priority: 100, simulcast: true },
+        {
+          priority: 100,
+          bitrate: BitrateControlMode.DYNAMIC_CONSUMERS,
+          simulcast: true,
+        },
       );
       console.log(audio_send_track, video_send_track);
       let audio_recv_track = session.receiver(Kind.AUDIO);

@@ -23,7 +23,7 @@ export enum ContextEvent {
 
 export interface PublisherConfig {
   priority: number;
-  bitrate?: BitrateControlMode;
+  bitrate: BitrateControlMode;
   simulcast?: boolean;
 }
 
@@ -57,8 +57,8 @@ export class Context extends EventEmitter {
   constructor(
     gateway: string,
     cfg: SessionConfig,
-    private prepareAudioReceivers?: number,
-    private prepareVideoReceivers?: number,
+    private prepareAudioReceivers: number = 1,
+    private prepareVideoReceivers: number = 1,
   ) {
     super();
     this.session = new Session(gateway, cfg);
@@ -133,11 +133,7 @@ export class Context extends EventEmitter {
         : this.video_publisher.get(name);
 
     if (!publisher) {
-      let sender = this.session.sender(
-        name,
-        media_or_kind,
-        cfg || { priority: 1, bitrate: BitrateControlMode.DYNAMIC_CONSUMERS },
-      );
+      let sender = this.session.sender(name, media_or_kind, cfg);
       publisher = new Publisher(sender);
       if (get_kind(media_or_kind) == Kind.AUDIO) {
         this.audio_publisher.set(name, publisher);

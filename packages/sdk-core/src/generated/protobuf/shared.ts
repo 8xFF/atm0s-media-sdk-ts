@@ -43,19 +43,19 @@ export function kindToJSON(object: Kind): string {
 }
 
 export enum BitrateControlMode {
-  MAX_BITRATE = 0,
-  DYNAMIC_CONSUMERS = 1,
+  DYNAMIC_CONSUMERS = 0,
+  MAX_BITRATE = 1,
   UNRECOGNIZED = -1,
 }
 
 export function bitrateControlModeFromJSON(object: any): BitrateControlMode {
   switch (object) {
     case 0:
-    case "MAX_BITRATE":
-      return BitrateControlMode.MAX_BITRATE;
-    case 1:
     case "DYNAMIC_CONSUMERS":
       return BitrateControlMode.DYNAMIC_CONSUMERS;
+    case 1:
+    case "MAX_BITRATE":
+      return BitrateControlMode.MAX_BITRATE;
     case -1:
     case "UNRECOGNIZED":
     default:
@@ -65,10 +65,10 @@ export function bitrateControlModeFromJSON(object: any): BitrateControlMode {
 
 export function bitrateControlModeToJSON(object: BitrateControlMode): string {
   switch (object) {
-    case BitrateControlMode.MAX_BITRATE:
-      return "MAX_BITRATE";
     case BitrateControlMode.DYNAMIC_CONSUMERS:
       return "DYNAMIC_CONSUMERS";
+    case BitrateControlMode.MAX_BITRATE:
+      return "MAX_BITRATE";
     case BitrateControlMode.UNRECOGNIZED:
     default:
       return "UNRECOGNIZED";
@@ -113,7 +113,7 @@ export interface Sender_Source {
 
 export interface Sender_Config {
   priority: number;
-  bitrate?: BitrateControlMode | undefined;
+  bitrate: BitrateControlMode;
 }
 
 export interface Sender_State {
@@ -315,7 +315,7 @@ export const Receiver_Source = {
 };
 
 function createBaseReceiver_Config(): Receiver_Config {
-  return { priority: 0, maxSpatial: 0, maxTemporal: 0, minSpatial: 0, minTemporal: 0 };
+  return { priority: 0, maxSpatial: 0, maxTemporal: 0, minSpatial: undefined, minTemporal: undefined };
 }
 
 export const Receiver_Config = {
@@ -329,10 +329,10 @@ export const Receiver_Config = {
     if (message.maxTemporal !== 0) {
       writer.uint32(24).uint32(message.maxTemporal);
     }
-    if (message.minSpatial !== undefined && message.minSpatial !== 0) {
+    if (message.minSpatial !== undefined) {
       writer.uint32(32).uint32(message.minSpatial);
     }
-    if (message.minTemporal !== undefined && message.minTemporal !== 0) {
+    if (message.minTemporal !== undefined) {
       writer.uint32(40).uint32(message.minTemporal);
     }
     return writer;
@@ -394,8 +394,8 @@ export const Receiver_Config = {
       priority: isSet(object.priority) ? globalThis.Number(object.priority) : 0,
       maxSpatial: isSet(object.maxSpatial) ? globalThis.Number(object.maxSpatial) : 0,
       maxTemporal: isSet(object.maxTemporal) ? globalThis.Number(object.maxTemporal) : 0,
-      minSpatial: isSet(object.minSpatial) ? globalThis.Number(object.minSpatial) : 0,
-      minTemporal: isSet(object.minTemporal) ? globalThis.Number(object.minTemporal) : 0,
+      minSpatial: isSet(object.minSpatial) ? globalThis.Number(object.minSpatial) : undefined,
+      minTemporal: isSet(object.minTemporal) ? globalThis.Number(object.minTemporal) : undefined,
     };
   },
 
@@ -410,10 +410,10 @@ export const Receiver_Config = {
     if (message.maxTemporal !== 0) {
       obj.maxTemporal = Math.round(message.maxTemporal);
     }
-    if (message.minSpatial !== undefined && message.minSpatial !== 0) {
+    if (message.minSpatial !== undefined) {
       obj.minSpatial = Math.round(message.minSpatial);
     }
-    if (message.minTemporal !== undefined && message.minTemporal !== 0) {
+    if (message.minTemporal !== undefined) {
       obj.minTemporal = Math.round(message.minTemporal);
     }
     return obj;
@@ -427,8 +427,8 @@ export const Receiver_Config = {
     message.priority = object.priority ?? 0;
     message.maxSpatial = object.maxSpatial ?? 0;
     message.maxTemporal = object.maxTemporal ?? 0;
-    message.minSpatial = object.minSpatial ?? 0;
-    message.minTemporal = object.minTemporal ?? 0;
+    message.minSpatial = object.minSpatial ?? undefined;
+    message.minTemporal = object.minTemporal ?? undefined;
     return message;
   },
 };
@@ -603,7 +603,7 @@ export const Sender = {
 };
 
 function createBaseSender_Source(): Sender_Source {
-  return { id: "", screen: false, metadata: "" };
+  return { id: "", screen: false, metadata: undefined };
 }
 
 export const Sender_Source = {
@@ -614,7 +614,7 @@ export const Sender_Source = {
     if (message.screen !== false) {
       writer.uint32(16).bool(message.screen);
     }
-    if (message.metadata !== undefined && message.metadata !== "") {
+    if (message.metadata !== undefined) {
       writer.uint32(26).string(message.metadata);
     }
     return writer;
@@ -661,7 +661,7 @@ export const Sender_Source = {
     return {
       id: isSet(object.id) ? globalThis.String(object.id) : "",
       screen: isSet(object.screen) ? globalThis.Boolean(object.screen) : false,
-      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : undefined,
     };
   },
 
@@ -673,7 +673,7 @@ export const Sender_Source = {
     if (message.screen !== false) {
       obj.screen = message.screen;
     }
-    if (message.metadata !== undefined && message.metadata !== "") {
+    if (message.metadata !== undefined) {
       obj.metadata = message.metadata;
     }
     return obj;
@@ -686,7 +686,7 @@ export const Sender_Source = {
     const message = createBaseSender_Source();
     message.id = object.id ?? "";
     message.screen = object.screen ?? false;
-    message.metadata = object.metadata ?? "";
+    message.metadata = object.metadata ?? undefined;
     return message;
   },
 };
@@ -700,7 +700,7 @@ export const Sender_Config = {
     if (message.priority !== 0) {
       writer.uint32(8).uint32(message.priority);
     }
-    if (message.bitrate !== undefined && message.bitrate !== 0) {
+    if (message.bitrate !== 0) {
       writer.uint32(16).int32(message.bitrate);
     }
     return writer;
@@ -748,7 +748,7 @@ export const Sender_Config = {
     if (message.priority !== 0) {
       obj.priority = Math.round(message.priority);
     }
-    if (message.bitrate !== undefined && message.bitrate !== 0) {
+    if (message.bitrate !== 0) {
       obj.bitrate = bitrateControlModeToJSON(message.bitrate);
     }
     return obj;
@@ -1068,7 +1068,7 @@ export const RoomInfoSubscribe = {
 };
 
 function createBaseRoomJoin(): RoomJoin {
-  return { room: "", peer: "", publish: undefined, subscribe: undefined, metadata: "" };
+  return { room: "", peer: "", publish: undefined, subscribe: undefined, metadata: undefined };
 }
 
 export const RoomJoin = {
@@ -1085,7 +1085,7 @@ export const RoomJoin = {
     if (message.subscribe !== undefined) {
       RoomInfoSubscribe.encode(message.subscribe, writer.uint32(34).fork()).ldelim();
     }
-    if (message.metadata !== undefined && message.metadata !== "") {
+    if (message.metadata !== undefined) {
       writer.uint32(42).string(message.metadata);
     }
     return writer;
@@ -1148,7 +1148,7 @@ export const RoomJoin = {
       peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
       publish: isSet(object.publish) ? RoomInfoPublish.fromJSON(object.publish) : undefined,
       subscribe: isSet(object.subscribe) ? RoomInfoSubscribe.fromJSON(object.subscribe) : undefined,
-      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : "",
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : undefined,
     };
   },
 
@@ -1166,7 +1166,7 @@ export const RoomJoin = {
     if (message.subscribe !== undefined) {
       obj.subscribe = RoomInfoSubscribe.toJSON(message.subscribe);
     }
-    if (message.metadata !== undefined && message.metadata !== "") {
+    if (message.metadata !== undefined) {
       obj.metadata = message.metadata;
     }
     return obj;
@@ -1185,7 +1185,7 @@ export const RoomJoin = {
     message.subscribe = (object.subscribe !== undefined && object.subscribe !== null)
       ? RoomInfoSubscribe.fromPartial(object.subscribe)
       : undefined;
-    message.metadata = object.metadata ?? "";
+    message.metadata = object.metadata ?? undefined;
     return message;
   },
 };

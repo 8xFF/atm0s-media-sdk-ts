@@ -120,7 +120,7 @@ export class Session extends EventEmitter {
   sender(
     track_name: string,
     track_or_kind: MediaStreamTrack | Kind,
-    cfg: TrackSenderConfig,
+    cfg?: TrackSenderConfig,
   ) {
     const sender = new TrackSender(this.dc, track_name, track_or_kind, cfg);
     if (!this.prepareState) {
