@@ -9,6 +9,9 @@ class SessionWrap {
   connect = () => {
     return this.ctx.connect(VERSION);
   };
+  restartIce = () => {
+    return this.ctx.restartIce();
+  };
   join = async (info: any, token: string) => {
     await this.ctx.join(info, token);
   };

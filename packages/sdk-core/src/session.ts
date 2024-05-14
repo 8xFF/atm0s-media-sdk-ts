@@ -33,6 +33,7 @@ export enum SessionEvent {
 
 export class Session extends EventEmitter {
   created_at: number;
+  version?: string;
   conn_id?: string;
   peer: RTCPeerConnection;
   dc: Datachannel;
@@ -136,6 +137,7 @@ export class Session extends EventEmitter {
       throw new Error("Not in prepare state");
     }
     this.prepareState = false;
+    this.version = version;
     console.warn("Prepare senders and receivers to connect");
     //prepare for senders. We need to lazy prepare because some transceiver dont allow update before connected
     for (let i = 0; i < this.senders.length; i++) {
@@ -178,6 +180,39 @@ export class Session extends EventEmitter {
     await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
     await this.dc.ready();
     console.log("Connected");
+  }
+
+  async restartIce() {
+    //TODO detect disconnect state and call restart-ice
+    const local_desc = await this.peer.createOffer({
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: true,
+    });
+    const req = ConnectRequest.create({
+      version: this.version || "pure-ts@0.0.0", //TODO auto get from package.json
+      join: this.cfg.join,
+      features: {},
+      tracks: {
+        receivers: this.receivers.map((r) => r.state),
+        senders: this.senders.map((r) => r.state),
+      },
+      sdp: local_desc.sdp,
+    });
+    console.log("Sending restart-ice request");
+    const res = await post_protobuf(
+      ConnectRequest,
+      ConnectResponse,
+      this.gateway + "/webrtc/" + this.conn_id + "/restart-ice",
+      req,
+      {
+        Authorization: "Bearer " + this.cfg.token,
+        "Content-Type": "application/grpc",
+      },
+    );
+    this.conn_id = res.connId;
+    console.log("Apply restart-ice response");
+    await this.peer.setLocalDescription(local_desc);
+    await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
   }
 
   async join(info: JoinInfo, token: string) {

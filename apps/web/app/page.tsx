@@ -10,6 +10,9 @@ export default function Page(): JSX.Element {
           <Link href="/ts_samples/echo_fast">Echo fast</Link>
         </div>
         <div>
+          <Link href="/ts_samples/echo_restart_ice">Echo restart ice</Link>
+        </div>
+        <div>
           <Link href="/ts_samples/echo_lazy">Echo lazy</Link>
         </div>
         <div>

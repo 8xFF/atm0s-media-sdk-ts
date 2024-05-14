@@ -154,6 +154,10 @@ export class Context extends EventEmitter {
     return this.session.connect(version);
   }
 
+  restartIce() {
+    return this.session.restartIce();
+  }
+
   async join(info: any, token: string) {
     await this.session.join(info, token);
   }
