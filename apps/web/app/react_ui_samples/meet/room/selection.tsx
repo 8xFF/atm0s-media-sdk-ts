@@ -1,13 +1,5 @@
-// @refresh reset
-
 import { useSession } from "@atm0s-media-sdk/sdk-react-hooks/lib";
-import {
-  CameraPreview,
-  CameraSelection,
-  DevicesSelection,
-  MicrophonePreview,
-  MicrophoneSelection,
-} from "@atm0s-media-sdk/sdk-react-ui/lib";
+import { DevicesSelection } from "@atm0s-media-sdk/sdk-react-ui/lib";
 import { useCallback } from "react";
 
 interface Props {

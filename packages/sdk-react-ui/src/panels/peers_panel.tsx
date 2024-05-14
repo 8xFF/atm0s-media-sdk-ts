@@ -6,7 +6,7 @@ interface Props {}
 export function PeersPanel({}: Props) {
   const remote_peers = useRemotePeers();
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full grid grid-cols-3 grid-rows-3 gap-4">
       {remote_peers.map((p) => (
         <PeerSingle key={p.peer} peer={p} />
       ))}
