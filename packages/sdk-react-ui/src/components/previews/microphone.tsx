@@ -3,6 +3,8 @@ import { useDeviceStream } from "../../hooks";
 import { Atm0sMediaUIContext } from "../../provider";
 import { usePublisher } from "@atm0s-media-sdk/sdk-react-hooks/lib";
 import { Kind } from "@atm0s-media-sdk/sdk-core/lib";
+import MicIcon from "@mui/icons-material/Mic";
+import MicOffIcon from "@mui/icons-material/MicOff";
 
 interface MicrophonePreviewProps {
   source_name: string;
@@ -23,7 +25,7 @@ export function MicrophonePreview({ source_name }: MicrophonePreviewProps) {
   }, [stream, audioRef.current]);
 
   return (
-    <div>
+    <div className="preview microphone">
       <audio ref={audioRef} controls autoPlay muted />
     </div>
   );
@@ -90,9 +92,15 @@ export function MicrophoneSelection({
   }, []);
 
   return (
-    <div>
-      <button onClick={onToggle}>Toggle</button>
-      <select defaultValue={stream?.getTracks()[0]?.id} onChange={onChange}>
+    <div className="flex flex-row h-10">
+      <button className="btn btn-circle" onClick={onToggle}>
+        {stream ? <MicIcon /> : <MicOffIcon />}
+      </button>
+      <select
+        className="devices"
+        defaultValue={stream?.getTracks()[0]?.id}
+        onChange={onChange}
+      >
         {devices.map((d) => (
           <option key={d.id} value={d.id}>
             {d.label}

@@ -10,7 +10,7 @@ export class Context extends EventEmitter {
 
   async requestDevice(
     source_name: string,
-    kind: "audio" | "video" | "screen",
+    kind: "audio" | "video",
     deviceId?: string,
   ): Promise<MediaStream> {
     const old_stream = this.streams.get(source_name);
@@ -33,13 +33,6 @@ export class Context extends EventEmitter {
       }
       case "video": {
         let stream = await navigator.mediaDevices.getUserMedia({
-          video: deviceId2 ? { deviceId: deviceId2 } : true,
-        });
-        this.streams.set(source_name, stream);
-        break;
-      }
-      case "screen": {
-        let stream = await navigator.mediaDevices.getDisplayMedia({
           video: deviceId2 ? { deviceId: deviceId2 } : true,
         });
         this.streams.set(source_name, stream);

@@ -3,6 +3,8 @@ import { usePublisher } from "@atm0s-media-sdk/sdk-react-hooks/lib";
 import { useDeviceStream } from "../../hooks";
 import { Atm0sMediaUIContext } from "../../provider";
 import { BitrateControlMode, Kind } from "@atm0s-media-sdk/sdk-core/lib";
+import VideocamIcon from "@mui/icons-material/Videocam";
+import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 
 interface CameraPreviewProps {
   source_name: string;
@@ -23,8 +25,15 @@ export function CameraPreview({ source_name }: CameraPreviewProps) {
   }, [stream, videoRef.current]);
 
   return (
-    <div>
-      <video ref={videoRef} width={500} height={500} autoPlay muted />
+    <div className="w-full h-full">
+      <video
+        className="w-full h-full"
+        ref={videoRef}
+        width={500}
+        height={500}
+        autoPlay
+        muted
+      />
     </div>
   );
 }
@@ -97,9 +106,15 @@ export function CameraSelection({
   }, []);
 
   return (
-    <div>
-      <button onClick={onToggle}>Toggle</button>
-      <select defaultValue={stream?.getTracks()[0]?.id} onChange={onChange}>
+    <div className="flex flex-row h-10">
+      <button className="btn btn-circle" onClick={onToggle}>
+        {stream ? <VideocamIcon /> : <VideocamOffIcon />}
+      </button>
+      <select
+        className=""
+        defaultValue={stream?.getTracks()[0]?.id}
+        onChange={onChange}
+      >
         {devices.map((d) => (
           <option key={d.id} value={d.id}>
             {d.label}

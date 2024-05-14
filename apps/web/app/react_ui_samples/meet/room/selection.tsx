@@ -4,6 +4,7 @@ import { useSession } from "@atm0s-media-sdk/sdk-react-hooks/lib";
 import {
   CameraPreview,
   CameraSelection,
+  DevicesSelection,
   MicrophonePreview,
   MicrophoneSelection,
 } from "@atm0s-media-sdk/sdk-react-ui/lib";
@@ -22,12 +23,14 @@ export default function MeetSelection({ onConnected }: Props): JSX.Element {
   }, [session, onConnected]);
 
   return (
-    <div>
-      <CameraPreview source_name="video_main" />
-      <CameraSelection source_name="video_main" first_page />
-      <MicrophonePreview source_name="audio_main" />
-      <MicrophoneSelection source_name="audio_main" first_page />
-      <button onClick={connect}>Connect</button>
+    <div className="flex flex-col w-full h-full lg:flex-row">
+      <div className="flex-grow-1 h-full">
+        <DevicesSelection audio_name="audio_main" video_name="video_main" />
+      </div>
+      <div className="divider lg:divider-horizontal"></div>
+      <div className="grid place-content-center w-full h-full">
+        <button onClick={connect}>Connect</button>
+      </div>
     </div>
   );
 }

@@ -25,10 +25,5 @@ export function VideoSingle({ track }: Props) {
     }
   }, [consumer, videoRef.current]);
 
-  return (
-    <div>
-      {track.peer}/{track.track}
-      <video muted autoPlay width={400} height={400} ref={videoRef} />
-    </div>
-  );
+  return <video muted autoPlay width={400} height={400} ref={videoRef} />;
 }
