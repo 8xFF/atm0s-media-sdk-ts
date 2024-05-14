@@ -1,6 +1,16 @@
 "use client";
 
-import { Atm0sMediaProvider } from "@atm0s-media-sdk/sdk-react-hooks/lib";
+import dynamic from "next/dynamic";
+const Atm0sMediaProvider = dynamic(
+  () =>
+    import("@atm0s-media-sdk/sdk-react-hooks/lib").then(
+      (mod) => mod.Atm0sMediaProvider,
+    ),
+  {
+    ssr: false,
+  },
+);
+
 import { Atm0sMediaUIProvider } from "@atm0s-media-sdk/sdk-react-ui/lib";
 import MeetSelection from "./selection";
 import { useCallback, useMemo, useState } from "react";
