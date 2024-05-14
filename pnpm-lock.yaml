@@ -214,6 +214,13 @@ importers:
         version: 5.3.3
 
   packages/sdk-react-ui:
+    dependencies:
+      '@atm0s-media-sdk/sdk-core':
+        specifier: workspace:*
+        version: link:../sdk-core
+      '@atm0s-media-sdk/sdk-react-hooks':
+        specifier: workspace:*
+        version: link:../sdk-react-hooks
     devDependencies:
       '@atm0s-media-sdk/eslint-config':
         specifier: workspace:*

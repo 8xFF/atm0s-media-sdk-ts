@@ -20,9 +20,9 @@ class SessionWrap {
   };
 }
 
-export const useSession = () => {
+export function useSession() {
   const ctx = useContext(Atm0sMediaContext);
   return useMemo(() => {
     return new SessionWrap(ctx);
   }, [ctx]);
-};
+}

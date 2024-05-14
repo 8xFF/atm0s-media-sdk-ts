@@ -60,7 +60,7 @@ export class TrackSender {
   }
 
   get attached() {
-    return !!this.transceiver?.sender.track;
+    return !!this.track;
   }
 
   get state(): Sender {

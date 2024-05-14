@@ -1,4 +1,4 @@
-import { createContext, useEffect, useMemo } from "react";
+import { ReactNode, createContext, useEffect, useMemo } from "react";
 import { SessionConfig } from "@atm0s-media-sdk/sdk-core/lib";
 import { Context } from "./context";
 
@@ -9,23 +9,28 @@ interface Props {
   cfg: SessionConfig;
   prepareAudioReceivers?: number;
   prepareVideoReceivers?: number;
-  children?: any;
+  children: ReactNode;
 }
 
-export const Atm0sMediaProvider = ({
+export function Atm0sMediaProvider({
   children,
   gateway,
   cfg,
   prepareAudioReceivers,
   prepareVideoReceivers,
-}: Props) => {
-  const context = useMemo(
-    () =>
-      new Context(gateway, cfg, prepareAudioReceivers, prepareVideoReceivers),
-    [gateway, cfg],
-  );
+}: Props): JSX.Element {
+  const context = useMemo(() => {
+    console.log("create new context");
+    return new Context(
+      gateway,
+      cfg,
+      prepareAudioReceivers,
+      prepareVideoReceivers,
+    );
+  }, [gateway, cfg]);
   useEffect(() => {
     return () => {
+      console.log("destroy context");
       context.disconnect();
     };
   }, [context]);
@@ -35,4 +40,4 @@ export const Atm0sMediaProvider = ({
       {children}
     </Atm0sMediaContext.Provider>
   );
-};
+}
