@@ -13,12 +13,13 @@ const Atm0sMediaProvider = dynamic(
 
 import { Atm0sMediaUIProvider } from "@atm0s-media-sdk/sdk-react-ui/lib";
 import MeetSelection from "./selection";
+import { Suspense } from "react";
 import { useCallback, useMemo, useState } from "react";
 import MeetInRoom from "./room";
 import { useSearchParams } from "next/navigation";
 import { SelectedGateway } from "../../../components/GatewaySelector";
 
-export default function MeetPage(): JSX.Element {
+function MeetContent(): JSX.Element {
   const searchParams = useSearchParams();
   const cfg = useMemo(() => {
     return {
@@ -37,18 +38,26 @@ export default function MeetPage(): JSX.Element {
   }, [setInRoom]);
 
   return (
+    <Atm0sMediaProvider
+      gateway={SelectedGateway.url}
+      cfg={cfg}
+      prepareAudioReceivers={3}
+      prepareVideoReceivers={3}
+    >
+      <Atm0sMediaUIProvider>
+        {!inRoom && <MeetSelection onConnected={onConnected} />}
+        {inRoom && <MeetInRoom />}
+      </Atm0sMediaUIProvider>
+    </Atm0sMediaProvider>
+  );
+}
+
+export default function MeetPage(): JSX.Element {
+  return (
     <main className="w-full h-screen">
-      <Atm0sMediaProvider
-        gateway={SelectedGateway.url}
-        cfg={cfg}
-        prepareAudioReceivers={3}
-        prepareVideoReceivers={3}
-      >
-        <Atm0sMediaUIProvider>
-          {!inRoom && <MeetSelection onConnected={onConnected} />}
-          {inRoom && <MeetInRoom />}
-        </Atm0sMediaUIProvider>
-      </Atm0sMediaProvider>
+      <Suspense fallback={<span>Loading</span>}>
+        <MeetContent />
+      </Suspense>
     </main>
   );
 }
