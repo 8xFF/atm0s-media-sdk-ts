@@ -2,8 +2,18 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
+import dynamic from "next/dynamic";
+const Atm0sMediaProvider = dynamic(
+  () =>
+    import("@atm0s-media-sdk/sdk-react-hooks/lib").then(
+      (mod) => mod.Atm0sMediaProvider,
+    ),
+  {
+    ssr: false,
+  },
+);
+
 import {
-  Atm0sMediaProvider,
   useConsumer,
   usePublisher,
   useRemoteAudioTracks,
