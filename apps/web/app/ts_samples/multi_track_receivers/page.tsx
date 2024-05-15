@@ -11,6 +11,7 @@ import {
   Session,
   SessionEvent,
 } from "@atm0s-media-sdk/sdk-core/lib";
+import { SelectedGateway } from "../../components/GatewaySelector";
 
 export default function MultiTrackReceivers(): JSX.Element {
   useEffect(() => {
@@ -23,7 +24,7 @@ export default function MultiTrackReceivers(): JSX.Element {
     const add_receiver_btn = document.getElementById("add_receiver")!;
 
     async function connect(_e: any) {
-      const session = new Session("http://localhost:3000", {
+      const session = new Session(SelectedGateway.url, {
         token: "demo-token",
         join: {
           room: "demo",

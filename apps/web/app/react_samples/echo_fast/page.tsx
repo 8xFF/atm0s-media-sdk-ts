@@ -12,6 +12,7 @@ import {
   RemoteTrack,
 } from "@atm0s-media-sdk/sdk-react-hooks/lib";
 import { Kind } from "@atm0s-media-sdk/sdk-core/lib";
+import { SelectedGateway } from "../../components/GatewaySelector";
 
 function EchoViewer({ track }: { track: RemoteTrack }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -128,7 +129,7 @@ export default function EchoFast(): JSX.Element {
   return (
     <main>
       <Atm0sMediaProvider
-        gateway="http://localhost:3000"
+        gateway={SelectedGateway.url}
         cfg={{
           token: "demo",
           join: {

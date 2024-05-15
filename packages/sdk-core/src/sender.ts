@@ -80,8 +80,8 @@ export class TrackSender {
         direction: "sendonly",
         sendEncodings: this.simulcast
           ? [
-              { rid: "0", active: true, scaleResolutionDownBy: 4 },
-              { rid: "1", active: true, scaleResolutionDownBy: 2 },
+              { rid: "0", active: true },
+              { rid: "1", active: true },
               { rid: "2", active: true },
             ]
           : undefined,

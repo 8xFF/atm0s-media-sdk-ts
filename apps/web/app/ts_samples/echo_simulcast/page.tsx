@@ -11,6 +11,7 @@ import {
   Session,
   SessionEvent,
 } from "@atm0s-media-sdk/sdk-core/lib";
+import { SelectedGateway } from "../../components/GatewaySelector";
 
 export default function EchoSimulcast(): JSX.Element {
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function EchoSimulcast(): JSX.Element {
     const disconnect_btn = document.getElementById("disconnect")!;
 
     async function connect(_e: any) {
-      const session = new Session("http://localhost:3000", {
+      const session = new Session(SelectedGateway.url, {
         token: "demo-token",
         join: {
           room: "demo",

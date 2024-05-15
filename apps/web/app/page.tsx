@@ -1,9 +1,18 @@
 import Link from "next/link";
 import "./globals.css";
+import { Gateways } from "./constants";
 
 export default function Page(): JSX.Element {
   return (
     <main className="p-6">
+      <div>
+        Gateways:
+        <div className="p-2">
+          {Gateways.map((g) => (
+            <div>{g}</div>
+          ))}
+        </div>
+      </div>
       <div>Typescript sample</div>
       <div className="pl-3">
         <div>

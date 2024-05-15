@@ -6,6 +6,7 @@
 
 /* eslint-disable */
 import * as _m0 from "protobufjs/minimal";
+import { Request as Request1, ServerEvent as ServerEvent2 } from "./features";
 import {
   Error,
   Kind,
@@ -24,8 +25,10 @@ export const protobufPackage = "conn";
 export interface Request {
   reqId: number;
   session?: Request_Session | undefined;
+  room?: Request_Rooom | undefined;
   sender?: Request_Sender | undefined;
   receiver?: Request_Receiver | undefined;
+  features?: Request1 | undefined;
 }
 
 export interface Request_Session {
@@ -40,14 +43,29 @@ export interface Request_Session_RoomJoin {
   token: string;
 }
 
-export interface Request_Session_RoomLeave {}
+export interface Request_Session_RoomLeave {
+}
 
 export interface Request_Session_UpdateSdp {
   tracks: Tracks | undefined;
   sdp: string;
 }
 
-export interface Request_Session_Disconnect {}
+export interface Request_Session_Disconnect {
+}
+
+export interface Request_Rooom {
+  subscribe?: Request_Rooom_SubscribePeer | undefined;
+  unsubscribe?: Request_Rooom_UnsubscribePeer | undefined;
+}
+
+export interface Request_Rooom_SubscribePeer {
+  peer: string;
+}
+
+export interface Request_Rooom_UnsubscribePeer {
+  peer: string;
+}
 
 export interface Request_Sender {
   name: string;
@@ -61,7 +79,8 @@ export interface Request_Sender_Attach {
   config: Sender_Config | undefined;
 }
 
-export interface Request_Sender_Detach {}
+export interface Request_Sender_Detach {
+}
 
 export interface Request_Receiver {
   name: string;
@@ -75,14 +94,17 @@ export interface Request_Receiver_Attach {
   config: Receiver_Config | undefined;
 }
 
-export interface Request_Receiver_Detach {}
+export interface Request_Receiver_Detach {
+}
 
 export interface Response {
   reqId: number;
   error?: Error | undefined;
   session?: Response_Session | undefined;
+  room?: Response_Room | undefined;
   sender?: Response_Sender | undefined;
   receiver?: Response_Receiver | undefined;
+  features?: Request1 | undefined;
 }
 
 export interface Response_Session {
@@ -92,15 +114,29 @@ export interface Response_Session {
   disconnect?: Response_Session_Disconnect | undefined;
 }
 
-export interface Response_Session_RoomJoin {}
+export interface Response_Session_RoomJoin {
+}
 
-export interface Response_Session_RoomLeave {}
+export interface Response_Session_RoomLeave {
+}
 
 export interface Response_Session_UpdateSdp {
   sdp: string;
 }
 
-export interface Response_Session_Disconnect {}
+export interface Response_Session_Disconnect {
+}
+
+export interface Response_Room {
+  subscribe?: Response_Room_SubscribePeer | undefined;
+  unsubscribe?: Response_Room_UnsubscribePeer | undefined;
+}
+
+export interface Response_Room_SubscribePeer {
+}
+
+export interface Response_Room_UnsubscribePeer {
+}
 
 export interface Response_Sender {
   attach?: Response_Sender_Attach | undefined;
@@ -108,11 +144,14 @@ export interface Response_Sender {
   config?: Response_Sender_Config | undefined;
 }
 
-export interface Response_Sender_Attach {}
+export interface Response_Sender_Attach {
+}
 
-export interface Response_Sender_Detach {}
+export interface Response_Sender_Detach {
+}
 
-export interface Response_Sender_Config {}
+export interface Response_Sender_Config {
+}
 
 export interface Response_Receiver {
   attach?: Response_Receiver_Attach | undefined;
@@ -120,11 +159,14 @@ export interface Response_Receiver {
   config?: Response_Receiver_Config | undefined;
 }
 
-export interface Response_Receiver_Attach {}
+export interface Response_Receiver_Attach {
+}
 
-export interface Response_Receiver_Detach {}
+export interface Response_Receiver_Detach {
+}
 
-export interface Response_Receiver_Config {}
+export interface Response_Receiver_Config {
+}
 
 export interface ServerEvent {
   seq: number;
@@ -133,6 +175,7 @@ export interface ServerEvent {
   sender?: ServerEvent_Sender | undefined;
   receiver?: ServerEvent_Receiver | undefined;
   response?: Response | undefined;
+  features?: ServerEvent2 | undefined;
 }
 
 export interface ServerEvent_Session {
@@ -140,14 +183,15 @@ export interface ServerEvent_Session {
   joined?: ServerEvent_Session_JoinedRoom | undefined;
   leaved?: ServerEvent_Session_LeavedRoom | undefined;
   disconnected?: ServerEvent_Session_Disconnected | undefined;
+  goway?: ServerEvent_Session_GoAway | undefined;
 }
 
-export interface ServerEvent_Session_Connected {}
+export interface ServerEvent_Session_Connected {
+}
 
 export interface ServerEvent_Session_JoinedRoom {
   room: string;
   peer: string;
-  token: string;
 }
 
 export interface ServerEvent_Session_LeavedRoom {
@@ -157,6 +201,11 @@ export interface ServerEvent_Session_LeavedRoom {
 
 export interface ServerEvent_Session_Disconnected {
   reason: string;
+}
+
+export interface ServerEvent_Session_GoAway {
+  reason: string;
+  remainSeconds: number;
 }
 
 export interface ServerEvent_Room {
@@ -219,9 +268,7 @@ export enum ServerEvent_Sender_State_StateType {
   UNRECOGNIZED = -1,
 }
 
-export function serverEvent_Sender_State_StateTypeFromJSON(
-  object: any,
-): ServerEvent_Sender_State_StateType {
+export function serverEvent_Sender_State_StateTypeFromJSON(object: any): ServerEvent_Sender_State_StateType {
   switch (object) {
     case 0:
     case "WAITING":
@@ -242,9 +289,7 @@ export function serverEvent_Sender_State_StateTypeFromJSON(
   }
 }
 
-export function serverEvent_Sender_State_StateTypeToJSON(
-  object: ServerEvent_Sender_State_StateType,
-): string {
+export function serverEvent_Sender_State_StateTypeToJSON(object: ServerEvent_Sender_State_StateType): string {
   switch (object) {
     case ServerEvent_Sender_State_StateType.WAITING:
       return "WAITING";
@@ -274,13 +319,12 @@ export enum ServerEvent_Receiver_State_StateType {
   NO_SOURCE = 0,
   WAITING = 1,
   LIVE = 2,
-  INACTIVE = 3,
+  KEY_ONLY = 3,
+  INACTIVE = 4,
   UNRECOGNIZED = -1,
 }
 
-export function serverEvent_Receiver_State_StateTypeFromJSON(
-  object: any,
-): ServerEvent_Receiver_State_StateType {
+export function serverEvent_Receiver_State_StateTypeFromJSON(object: any): ServerEvent_Receiver_State_StateType {
   switch (object) {
     case 0:
     case "NO_SOURCE":
@@ -292,6 +336,9 @@ export function serverEvent_Receiver_State_StateTypeFromJSON(
     case "LIVE":
       return ServerEvent_Receiver_State_StateType.LIVE;
     case 3:
+    case "KEY_ONLY":
+      return ServerEvent_Receiver_State_StateType.KEY_ONLY;
+    case 4:
     case "INACTIVE":
       return ServerEvent_Receiver_State_StateType.INACTIVE;
     case -1:
@@ -301,9 +348,7 @@ export function serverEvent_Receiver_State_StateTypeFromJSON(
   }
 }
 
-export function serverEvent_Receiver_State_StateTypeToJSON(
-  object: ServerEvent_Receiver_State_StateType,
-): string {
+export function serverEvent_Receiver_State_StateTypeToJSON(object: ServerEvent_Receiver_State_StateType): string {
   switch (object) {
     case ServerEvent_Receiver_State_StateType.NO_SOURCE:
       return "NO_SOURCE";
@@ -311,6 +356,8 @@ export function serverEvent_Receiver_State_StateTypeToJSON(
       return "WAITING";
     case ServerEvent_Receiver_State_StateType.LIVE:
       return "LIVE";
+    case ServerEvent_Receiver_State_StateType.KEY_ONLY:
+      return "KEY_ONLY";
     case ServerEvent_Receiver_State_StateType.INACTIVE:
       return "INACTIVE";
     case ServerEvent_Receiver_State_StateType.UNRECOGNIZED:
@@ -343,43 +390,34 @@ export interface ClientEvent {
 }
 
 function createBaseRequest(): Request {
-  return {
-    reqId: 0,
-    session: undefined,
-    sender: undefined,
-    receiver: undefined,
-  };
+  return { reqId: 0, session: undefined, room: undefined, sender: undefined, receiver: undefined, features: undefined };
 }
 
 export const Request = {
-  encode(
-    message: Request,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Request, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.reqId !== 0) {
       writer.uint32(8).uint32(message.reqId);
     }
     if (message.session !== undefined) {
-      Request_Session.encode(
-        message.session,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      Request_Session.encode(message.session, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.room !== undefined) {
+      Request_Rooom.encode(message.room, writer.uint32(26).fork()).ldelim();
     }
     if (message.sender !== undefined) {
-      Request_Sender.encode(message.sender, writer.uint32(26).fork()).ldelim();
+      Request_Sender.encode(message.sender, writer.uint32(34).fork()).ldelim();
     }
     if (message.receiver !== undefined) {
-      Request_Receiver.encode(
-        message.receiver,
-        writer.uint32(34).fork(),
-      ).ldelim();
+      Request_Receiver.encode(message.receiver, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.features !== undefined) {
+      Request1.encode(message.features, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Request {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest();
     while (reader.pos < end) {
@@ -404,14 +442,28 @@ export const Request = {
             break;
           }
 
-          message.sender = Request_Sender.decode(reader, reader.uint32());
+          message.room = Request_Rooom.decode(reader, reader.uint32());
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
+          message.sender = Request_Sender.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
           message.receiver = Request_Receiver.decode(reader, reader.uint32());
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.features = Request1.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -425,15 +477,11 @@ export const Request = {
   fromJSON(object: any): Request {
     return {
       reqId: isSet(object.reqId) ? globalThis.Number(object.reqId) : 0,
-      session: isSet(object.session)
-        ? Request_Session.fromJSON(object.session)
-        : undefined,
-      sender: isSet(object.sender)
-        ? Request_Sender.fromJSON(object.sender)
-        : undefined,
-      receiver: isSet(object.receiver)
-        ? Request_Receiver.fromJSON(object.receiver)
-        : undefined,
+      session: isSet(object.session) ? Request_Session.fromJSON(object.session) : undefined,
+      room: isSet(object.room) ? Request_Rooom.fromJSON(object.room) : undefined,
+      sender: isSet(object.sender) ? Request_Sender.fromJSON(object.sender) : undefined,
+      receiver: isSet(object.receiver) ? Request_Receiver.fromJSON(object.receiver) : undefined,
+      features: isSet(object.features) ? Request1.fromJSON(object.features) : undefined,
     };
   },
 
@@ -445,11 +493,17 @@ export const Request = {
     if (message.session !== undefined) {
       obj.session = Request_Session.toJSON(message.session);
     }
+    if (message.room !== undefined) {
+      obj.room = Request_Rooom.toJSON(message.room);
+    }
     if (message.sender !== undefined) {
       obj.sender = Request_Sender.toJSON(message.sender);
     }
     if (message.receiver !== undefined) {
       obj.receiver = Request_Receiver.toJSON(message.receiver);
+    }
+    if (message.features !== undefined) {
+      obj.features = Request1.toJSON(message.features);
     }
     return obj;
   },
@@ -460,66 +514,48 @@ export const Request = {
   fromPartial<I extends Exact<DeepPartial<Request>, I>>(object: I): Request {
     const message = createBaseRequest();
     message.reqId = object.reqId ?? 0;
-    message.session =
-      object.session !== undefined && object.session !== null
-        ? Request_Session.fromPartial(object.session)
-        : undefined;
-    message.sender =
-      object.sender !== undefined && object.sender !== null
-        ? Request_Sender.fromPartial(object.sender)
-        : undefined;
-    message.receiver =
-      object.receiver !== undefined && object.receiver !== null
-        ? Request_Receiver.fromPartial(object.receiver)
-        : undefined;
+    message.session = (object.session !== undefined && object.session !== null)
+      ? Request_Session.fromPartial(object.session)
+      : undefined;
+    message.room = (object.room !== undefined && object.room !== null)
+      ? Request_Rooom.fromPartial(object.room)
+      : undefined;
+    message.sender = (object.sender !== undefined && object.sender !== null)
+      ? Request_Sender.fromPartial(object.sender)
+      : undefined;
+    message.receiver = (object.receiver !== undefined && object.receiver !== null)
+      ? Request_Receiver.fromPartial(object.receiver)
+      : undefined;
+    message.features = (object.features !== undefined && object.features !== null)
+      ? Request1.fromPartial(object.features)
+      : undefined;
     return message;
   },
 };
 
 function createBaseRequest_Session(): Request_Session {
-  return {
-    join: undefined,
-    leave: undefined,
-    sdp: undefined,
-    disconnect: undefined,
-  };
+  return { join: undefined, leave: undefined, sdp: undefined, disconnect: undefined };
 }
 
 export const Request_Session = {
-  encode(
-    message: Request_Session,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Request_Session, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.join !== undefined) {
-      Request_Session_RoomJoin.encode(
-        message.join,
-        writer.uint32(10).fork(),
-      ).ldelim();
+      Request_Session_RoomJoin.encode(message.join, writer.uint32(10).fork()).ldelim();
     }
     if (message.leave !== undefined) {
-      Request_Session_RoomLeave.encode(
-        message.leave,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      Request_Session_RoomLeave.encode(message.leave, writer.uint32(18).fork()).ldelim();
     }
     if (message.sdp !== undefined) {
-      Request_Session_UpdateSdp.encode(
-        message.sdp,
-        writer.uint32(26).fork(),
-      ).ldelim();
+      Request_Session_UpdateSdp.encode(message.sdp, writer.uint32(26).fork()).ldelim();
     }
     if (message.disconnect !== undefined) {
-      Request_Session_Disconnect.encode(
-        message.disconnect,
-        writer.uint32(34).fork(),
-      ).ldelim();
+      Request_Session_Disconnect.encode(message.disconnect, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Request_Session {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest_Session();
     while (reader.pos < end) {
@@ -530,40 +566,28 @@ export const Request_Session = {
             break;
           }
 
-          message.join = Request_Session_RoomJoin.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.join = Request_Session_RoomJoin.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.leave = Request_Session_RoomLeave.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.leave = Request_Session_RoomLeave.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.sdp = Request_Session_UpdateSdp.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.sdp = Request_Session_UpdateSdp.decode(reader, reader.uint32());
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
-          message.disconnect = Request_Session_Disconnect.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.disconnect = Request_Session_Disconnect.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -576,18 +600,10 @@ export const Request_Session = {
 
   fromJSON(object: any): Request_Session {
     return {
-      join: isSet(object.join)
-        ? Request_Session_RoomJoin.fromJSON(object.join)
-        : undefined,
-      leave: isSet(object.leave)
-        ? Request_Session_RoomLeave.fromJSON(object.leave)
-        : undefined,
-      sdp: isSet(object.sdp)
-        ? Request_Session_UpdateSdp.fromJSON(object.sdp)
-        : undefined,
-      disconnect: isSet(object.disconnect)
-        ? Request_Session_Disconnect.fromJSON(object.disconnect)
-        : undefined,
+      join: isSet(object.join) ? Request_Session_RoomJoin.fromJSON(object.join) : undefined,
+      leave: isSet(object.leave) ? Request_Session_RoomLeave.fromJSON(object.leave) : undefined,
+      sdp: isSet(object.sdp) ? Request_Session_UpdateSdp.fromJSON(object.sdp) : undefined,
+      disconnect: isSet(object.disconnect) ? Request_Session_Disconnect.fromJSON(object.disconnect) : undefined,
     };
   },
 
@@ -608,31 +624,23 @@ export const Request_Session = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Session>, I>>(
-    base?: I,
-  ): Request_Session {
+  create<I extends Exact<DeepPartial<Request_Session>, I>>(base?: I): Request_Session {
     return Request_Session.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Session>, I>>(
-    object: I,
-  ): Request_Session {
+  fromPartial<I extends Exact<DeepPartial<Request_Session>, I>>(object: I): Request_Session {
     const message = createBaseRequest_Session();
-    message.join =
-      object.join !== undefined && object.join !== null
-        ? Request_Session_RoomJoin.fromPartial(object.join)
-        : undefined;
-    message.leave =
-      object.leave !== undefined && object.leave !== null
-        ? Request_Session_RoomLeave.fromPartial(object.leave)
-        : undefined;
-    message.sdp =
-      object.sdp !== undefined && object.sdp !== null
-        ? Request_Session_UpdateSdp.fromPartial(object.sdp)
-        : undefined;
-    message.disconnect =
-      object.disconnect !== undefined && object.disconnect !== null
-        ? Request_Session_Disconnect.fromPartial(object.disconnect)
-        : undefined;
+    message.join = (object.join !== undefined && object.join !== null)
+      ? Request_Session_RoomJoin.fromPartial(object.join)
+      : undefined;
+    message.leave = (object.leave !== undefined && object.leave !== null)
+      ? Request_Session_RoomLeave.fromPartial(object.leave)
+      : undefined;
+    message.sdp = (object.sdp !== undefined && object.sdp !== null)
+      ? Request_Session_UpdateSdp.fromPartial(object.sdp)
+      : undefined;
+    message.disconnect = (object.disconnect !== undefined && object.disconnect !== null)
+      ? Request_Session_Disconnect.fromPartial(object.disconnect)
+      : undefined;
     return message;
   },
 };
@@ -642,10 +650,7 @@ function createBaseRequest_Session_RoomJoin(): Request_Session_RoomJoin {
 }
 
 export const Request_Session_RoomJoin = {
-  encode(
-    message: Request_Session_RoomJoin,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Request_Session_RoomJoin, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.info !== undefined) {
       RoomJoin.encode(message.info, writer.uint32(10).fork()).ldelim();
     }
@@ -655,12 +660,8 @@ export const Request_Session_RoomJoin = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Request_Session_RoomJoin {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Session_RoomJoin {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest_Session_RoomJoin();
     while (reader.pos < end) {
@@ -707,19 +708,12 @@ export const Request_Session_RoomJoin = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Session_RoomJoin>, I>>(
-    base?: I,
-  ): Request_Session_RoomJoin {
+  create<I extends Exact<DeepPartial<Request_Session_RoomJoin>, I>>(base?: I): Request_Session_RoomJoin {
     return Request_Session_RoomJoin.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Session_RoomJoin>, I>>(
-    object: I,
-  ): Request_Session_RoomJoin {
+  fromPartial<I extends Exact<DeepPartial<Request_Session_RoomJoin>, I>>(object: I): Request_Session_RoomJoin {
     const message = createBaseRequest_Session_RoomJoin();
-    message.info =
-      object.info !== undefined && object.info !== null
-        ? RoomJoin.fromPartial(object.info)
-        : undefined;
+    message.info = (object.info !== undefined && object.info !== null) ? RoomJoin.fromPartial(object.info) : undefined;
     message.token = object.token ?? "";
     return message;
   },
@@ -730,19 +724,12 @@ function createBaseRequest_Session_RoomLeave(): Request_Session_RoomLeave {
 }
 
 export const Request_Session_RoomLeave = {
-  encode(
-    _: Request_Session_RoomLeave,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Request_Session_RoomLeave, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Request_Session_RoomLeave {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Session_RoomLeave {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest_Session_RoomLeave();
     while (reader.pos < end) {
@@ -766,14 +753,10 @@ export const Request_Session_RoomLeave = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Session_RoomLeave>, I>>(
-    base?: I,
-  ): Request_Session_RoomLeave {
+  create<I extends Exact<DeepPartial<Request_Session_RoomLeave>, I>>(base?: I): Request_Session_RoomLeave {
     return Request_Session_RoomLeave.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Session_RoomLeave>, I>>(
-    _: I,
-  ): Request_Session_RoomLeave {
+  fromPartial<I extends Exact<DeepPartial<Request_Session_RoomLeave>, I>>(_: I): Request_Session_RoomLeave {
     const message = createBaseRequest_Session_RoomLeave();
     return message;
   },
@@ -784,10 +767,7 @@ function createBaseRequest_Session_UpdateSdp(): Request_Session_UpdateSdp {
 }
 
 export const Request_Session_UpdateSdp = {
-  encode(
-    message: Request_Session_UpdateSdp,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Request_Session_UpdateSdp, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.tracks !== undefined) {
       Tracks.encode(message.tracks, writer.uint32(10).fork()).ldelim();
     }
@@ -797,12 +777,8 @@ export const Request_Session_UpdateSdp = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Request_Session_UpdateSdp {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Session_UpdateSdp {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest_Session_UpdateSdp();
     while (reader.pos < end) {
@@ -849,19 +825,14 @@ export const Request_Session_UpdateSdp = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Session_UpdateSdp>, I>>(
-    base?: I,
-  ): Request_Session_UpdateSdp {
+  create<I extends Exact<DeepPartial<Request_Session_UpdateSdp>, I>>(base?: I): Request_Session_UpdateSdp {
     return Request_Session_UpdateSdp.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Session_UpdateSdp>, I>>(
-    object: I,
-  ): Request_Session_UpdateSdp {
+  fromPartial<I extends Exact<DeepPartial<Request_Session_UpdateSdp>, I>>(object: I): Request_Session_UpdateSdp {
     const message = createBaseRequest_Session_UpdateSdp();
-    message.tracks =
-      object.tracks !== undefined && object.tracks !== null
-        ? Tracks.fromPartial(object.tracks)
-        : undefined;
+    message.tracks = (object.tracks !== undefined && object.tracks !== null)
+      ? Tracks.fromPartial(object.tracks)
+      : undefined;
     message.sdp = object.sdp ?? "";
     return message;
   },
@@ -872,19 +843,12 @@ function createBaseRequest_Session_Disconnect(): Request_Session_Disconnect {
 }
 
 export const Request_Session_Disconnect = {
-  encode(
-    _: Request_Session_Disconnect,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Request_Session_Disconnect, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Request_Session_Disconnect {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Session_Disconnect {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest_Session_Disconnect();
     while (reader.pos < end) {
@@ -908,15 +872,205 @@ export const Request_Session_Disconnect = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Session_Disconnect>, I>>(
-    base?: I,
-  ): Request_Session_Disconnect {
+  create<I extends Exact<DeepPartial<Request_Session_Disconnect>, I>>(base?: I): Request_Session_Disconnect {
     return Request_Session_Disconnect.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Session_Disconnect>, I>>(
-    _: I,
-  ): Request_Session_Disconnect {
+  fromPartial<I extends Exact<DeepPartial<Request_Session_Disconnect>, I>>(_: I): Request_Session_Disconnect {
     const message = createBaseRequest_Session_Disconnect();
+    return message;
+  },
+};
+
+function createBaseRequest_Rooom(): Request_Rooom {
+  return { subscribe: undefined, unsubscribe: undefined };
+}
+
+export const Request_Rooom = {
+  encode(message: Request_Rooom, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.subscribe !== undefined) {
+      Request_Rooom_SubscribePeer.encode(message.subscribe, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.unsubscribe !== undefined) {
+      Request_Rooom_UnsubscribePeer.encode(message.unsubscribe, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Rooom {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRequest_Rooom();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.subscribe = Request_Rooom_SubscribePeer.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.unsubscribe = Request_Rooom_UnsubscribePeer.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Request_Rooom {
+    return {
+      subscribe: isSet(object.subscribe) ? Request_Rooom_SubscribePeer.fromJSON(object.subscribe) : undefined,
+      unsubscribe: isSet(object.unsubscribe) ? Request_Rooom_UnsubscribePeer.fromJSON(object.unsubscribe) : undefined,
+    };
+  },
+
+  toJSON(message: Request_Rooom): unknown {
+    const obj: any = {};
+    if (message.subscribe !== undefined) {
+      obj.subscribe = Request_Rooom_SubscribePeer.toJSON(message.subscribe);
+    }
+    if (message.unsubscribe !== undefined) {
+      obj.unsubscribe = Request_Rooom_UnsubscribePeer.toJSON(message.unsubscribe);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Request_Rooom>, I>>(base?: I): Request_Rooom {
+    return Request_Rooom.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Request_Rooom>, I>>(object: I): Request_Rooom {
+    const message = createBaseRequest_Rooom();
+    message.subscribe = (object.subscribe !== undefined && object.subscribe !== null)
+      ? Request_Rooom_SubscribePeer.fromPartial(object.subscribe)
+      : undefined;
+    message.unsubscribe = (object.unsubscribe !== undefined && object.unsubscribe !== null)
+      ? Request_Rooom_UnsubscribePeer.fromPartial(object.unsubscribe)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseRequest_Rooom_SubscribePeer(): Request_Rooom_SubscribePeer {
+  return { peer: "" };
+}
+
+export const Request_Rooom_SubscribePeer = {
+  encode(message: Request_Rooom_SubscribePeer, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.peer !== "") {
+      writer.uint32(10).string(message.peer);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Rooom_SubscribePeer {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRequest_Rooom_SubscribePeer();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.peer = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Request_Rooom_SubscribePeer {
+    return { peer: isSet(object.peer) ? globalThis.String(object.peer) : "" };
+  },
+
+  toJSON(message: Request_Rooom_SubscribePeer): unknown {
+    const obj: any = {};
+    if (message.peer !== "") {
+      obj.peer = message.peer;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Request_Rooom_SubscribePeer>, I>>(base?: I): Request_Rooom_SubscribePeer {
+    return Request_Rooom_SubscribePeer.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Request_Rooom_SubscribePeer>, I>>(object: I): Request_Rooom_SubscribePeer {
+    const message = createBaseRequest_Rooom_SubscribePeer();
+    message.peer = object.peer ?? "";
+    return message;
+  },
+};
+
+function createBaseRequest_Rooom_UnsubscribePeer(): Request_Rooom_UnsubscribePeer {
+  return { peer: "" };
+}
+
+export const Request_Rooom_UnsubscribePeer = {
+  encode(message: Request_Rooom_UnsubscribePeer, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.peer !== "") {
+      writer.uint32(10).string(message.peer);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Rooom_UnsubscribePeer {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRequest_Rooom_UnsubscribePeer();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.peer = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Request_Rooom_UnsubscribePeer {
+    return { peer: isSet(object.peer) ? globalThis.String(object.peer) : "" };
+  },
+
+  toJSON(message: Request_Rooom_UnsubscribePeer): unknown {
+    const obj: any = {};
+    if (message.peer !== "") {
+      obj.peer = message.peer;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Request_Rooom_UnsubscribePeer>, I>>(base?: I): Request_Rooom_UnsubscribePeer {
+    return Request_Rooom_UnsubscribePeer.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Request_Rooom_UnsubscribePeer>, I>>(
+    object: I,
+  ): Request_Rooom_UnsubscribePeer {
+    const message = createBaseRequest_Rooom_UnsubscribePeer();
+    message.peer = object.peer ?? "";
     return message;
   },
 };
@@ -926,24 +1080,15 @@ function createBaseRequest_Sender(): Request_Sender {
 }
 
 export const Request_Sender = {
-  encode(
-    message: Request_Sender,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Request_Sender, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
     }
     if (message.attach !== undefined) {
-      Request_Sender_Attach.encode(
-        message.attach,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      Request_Sender_Attach.encode(message.attach, writer.uint32(18).fork()).ldelim();
     }
     if (message.detach !== undefined) {
-      Request_Sender_Detach.encode(
-        message.detach,
-        writer.uint32(26).fork(),
-      ).ldelim();
+      Request_Sender_Detach.encode(message.detach, writer.uint32(26).fork()).ldelim();
     }
     if (message.config !== undefined) {
       Sender_Config.encode(message.config, writer.uint32(34).fork()).ldelim();
@@ -952,8 +1097,7 @@ export const Request_Sender = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Request_Sender {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest_Sender();
     while (reader.pos < end) {
@@ -971,20 +1115,14 @@ export const Request_Sender = {
             break;
           }
 
-          message.attach = Request_Sender_Attach.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.attach = Request_Sender_Attach.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.detach = Request_Sender_Detach.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.detach = Request_Sender_Detach.decode(reader, reader.uint32());
           continue;
         case 4:
           if (tag !== 34) {
@@ -1005,15 +1143,9 @@ export const Request_Sender = {
   fromJSON(object: any): Request_Sender {
     return {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
-      attach: isSet(object.attach)
-        ? Request_Sender_Attach.fromJSON(object.attach)
-        : undefined,
-      detach: isSet(object.detach)
-        ? Request_Sender_Detach.fromJSON(object.detach)
-        : undefined,
-      config: isSet(object.config)
-        ? Sender_Config.fromJSON(object.config)
-        : undefined,
+      attach: isSet(object.attach) ? Request_Sender_Attach.fromJSON(object.attach) : undefined,
+      detach: isSet(object.detach) ? Request_Sender_Detach.fromJSON(object.detach) : undefined,
+      config: isSet(object.config) ? Sender_Config.fromJSON(object.config) : undefined,
     };
   },
 
@@ -1034,28 +1166,21 @@ export const Request_Sender = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Sender>, I>>(
-    base?: I,
-  ): Request_Sender {
+  create<I extends Exact<DeepPartial<Request_Sender>, I>>(base?: I): Request_Sender {
     return Request_Sender.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Sender>, I>>(
-    object: I,
-  ): Request_Sender {
+  fromPartial<I extends Exact<DeepPartial<Request_Sender>, I>>(object: I): Request_Sender {
     const message = createBaseRequest_Sender();
     message.name = object.name ?? "";
-    message.attach =
-      object.attach !== undefined && object.attach !== null
-        ? Request_Sender_Attach.fromPartial(object.attach)
-        : undefined;
-    message.detach =
-      object.detach !== undefined && object.detach !== null
-        ? Request_Sender_Detach.fromPartial(object.detach)
-        : undefined;
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? Sender_Config.fromPartial(object.config)
-        : undefined;
+    message.attach = (object.attach !== undefined && object.attach !== null)
+      ? Request_Sender_Attach.fromPartial(object.attach)
+      : undefined;
+    message.detach = (object.detach !== undefined && object.detach !== null)
+      ? Request_Sender_Detach.fromPartial(object.detach)
+      : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? Sender_Config.fromPartial(object.config)
+      : undefined;
     return message;
   },
 };
@@ -1065,10 +1190,7 @@ function createBaseRequest_Sender_Attach(): Request_Sender_Attach {
 }
 
 export const Request_Sender_Attach = {
-  encode(
-    message: Request_Sender_Attach,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Request_Sender_Attach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.source !== undefined) {
       Sender_Source.encode(message.source, writer.uint32(10).fork()).ldelim();
     }
@@ -1078,12 +1200,8 @@ export const Request_Sender_Attach = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Request_Sender_Attach {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Sender_Attach {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest_Sender_Attach();
     while (reader.pos < end) {
@@ -1114,12 +1232,8 @@ export const Request_Sender_Attach = {
 
   fromJSON(object: any): Request_Sender_Attach {
     return {
-      source: isSet(object.source)
-        ? Sender_Source.fromJSON(object.source)
-        : undefined,
-      config: isSet(object.config)
-        ? Sender_Config.fromJSON(object.config)
-        : undefined,
+      source: isSet(object.source) ? Sender_Source.fromJSON(object.source) : undefined,
+      config: isSet(object.config) ? Sender_Config.fromJSON(object.config) : undefined,
     };
   },
 
@@ -1134,23 +1248,17 @@ export const Request_Sender_Attach = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Sender_Attach>, I>>(
-    base?: I,
-  ): Request_Sender_Attach {
+  create<I extends Exact<DeepPartial<Request_Sender_Attach>, I>>(base?: I): Request_Sender_Attach {
     return Request_Sender_Attach.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Sender_Attach>, I>>(
-    object: I,
-  ): Request_Sender_Attach {
+  fromPartial<I extends Exact<DeepPartial<Request_Sender_Attach>, I>>(object: I): Request_Sender_Attach {
     const message = createBaseRequest_Sender_Attach();
-    message.source =
-      object.source !== undefined && object.source !== null
-        ? Sender_Source.fromPartial(object.source)
-        : undefined;
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? Sender_Config.fromPartial(object.config)
-        : undefined;
+    message.source = (object.source !== undefined && object.source !== null)
+      ? Sender_Source.fromPartial(object.source)
+      : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? Sender_Config.fromPartial(object.config)
+      : undefined;
     return message;
   },
 };
@@ -1160,19 +1268,12 @@ function createBaseRequest_Sender_Detach(): Request_Sender_Detach {
 }
 
 export const Request_Sender_Detach = {
-  encode(
-    _: Request_Sender_Detach,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Request_Sender_Detach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Request_Sender_Detach {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Sender_Detach {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest_Sender_Detach();
     while (reader.pos < end) {
@@ -1196,14 +1297,10 @@ export const Request_Sender_Detach = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Sender_Detach>, I>>(
-    base?: I,
-  ): Request_Sender_Detach {
+  create<I extends Exact<DeepPartial<Request_Sender_Detach>, I>>(base?: I): Request_Sender_Detach {
     return Request_Sender_Detach.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Sender_Detach>, I>>(
-    _: I,
-  ): Request_Sender_Detach {
+  fromPartial<I extends Exact<DeepPartial<Request_Sender_Detach>, I>>(_: I): Request_Sender_Detach {
     const message = createBaseRequest_Sender_Detach();
     return message;
   },
@@ -1214,24 +1311,15 @@ function createBaseRequest_Receiver(): Request_Receiver {
 }
 
 export const Request_Receiver = {
-  encode(
-    message: Request_Receiver,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Request_Receiver, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
     }
     if (message.attach !== undefined) {
-      Request_Receiver_Attach.encode(
-        message.attach,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      Request_Receiver_Attach.encode(message.attach, writer.uint32(18).fork()).ldelim();
     }
     if (message.detach !== undefined) {
-      Request_Receiver_Detach.encode(
-        message.detach,
-        writer.uint32(26).fork(),
-      ).ldelim();
+      Request_Receiver_Detach.encode(message.detach, writer.uint32(26).fork()).ldelim();
     }
     if (message.config !== undefined) {
       Receiver_Config.encode(message.config, writer.uint32(34).fork()).ldelim();
@@ -1240,8 +1328,7 @@ export const Request_Receiver = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Request_Receiver {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest_Receiver();
     while (reader.pos < end) {
@@ -1259,20 +1346,14 @@ export const Request_Receiver = {
             break;
           }
 
-          message.attach = Request_Receiver_Attach.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.attach = Request_Receiver_Attach.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.detach = Request_Receiver_Detach.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.detach = Request_Receiver_Detach.decode(reader, reader.uint32());
           continue;
         case 4:
           if (tag !== 34) {
@@ -1293,15 +1374,9 @@ export const Request_Receiver = {
   fromJSON(object: any): Request_Receiver {
     return {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
-      attach: isSet(object.attach)
-        ? Request_Receiver_Attach.fromJSON(object.attach)
-        : undefined,
-      detach: isSet(object.detach)
-        ? Request_Receiver_Detach.fromJSON(object.detach)
-        : undefined,
-      config: isSet(object.config)
-        ? Receiver_Config.fromJSON(object.config)
-        : undefined,
+      attach: isSet(object.attach) ? Request_Receiver_Attach.fromJSON(object.attach) : undefined,
+      detach: isSet(object.detach) ? Request_Receiver_Detach.fromJSON(object.detach) : undefined,
+      config: isSet(object.config) ? Receiver_Config.fromJSON(object.config) : undefined,
     };
   },
 
@@ -1322,28 +1397,21 @@ export const Request_Receiver = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Receiver>, I>>(
-    base?: I,
-  ): Request_Receiver {
+  create<I extends Exact<DeepPartial<Request_Receiver>, I>>(base?: I): Request_Receiver {
     return Request_Receiver.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Receiver>, I>>(
-    object: I,
-  ): Request_Receiver {
+  fromPartial<I extends Exact<DeepPartial<Request_Receiver>, I>>(object: I): Request_Receiver {
     const message = createBaseRequest_Receiver();
     message.name = object.name ?? "";
-    message.attach =
-      object.attach !== undefined && object.attach !== null
-        ? Request_Receiver_Attach.fromPartial(object.attach)
-        : undefined;
-    message.detach =
-      object.detach !== undefined && object.detach !== null
-        ? Request_Receiver_Detach.fromPartial(object.detach)
-        : undefined;
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? Receiver_Config.fromPartial(object.config)
-        : undefined;
+    message.attach = (object.attach !== undefined && object.attach !== null)
+      ? Request_Receiver_Attach.fromPartial(object.attach)
+      : undefined;
+    message.detach = (object.detach !== undefined && object.detach !== null)
+      ? Request_Receiver_Detach.fromPartial(object.detach)
+      : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? Receiver_Config.fromPartial(object.config)
+      : undefined;
     return message;
   },
 };
@@ -1353,10 +1421,7 @@ function createBaseRequest_Receiver_Attach(): Request_Receiver_Attach {
 }
 
 export const Request_Receiver_Attach = {
-  encode(
-    message: Request_Receiver_Attach,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Request_Receiver_Attach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.source !== undefined) {
       Receiver_Source.encode(message.source, writer.uint32(10).fork()).ldelim();
     }
@@ -1366,12 +1431,8 @@ export const Request_Receiver_Attach = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Request_Receiver_Attach {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Receiver_Attach {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest_Receiver_Attach();
     while (reader.pos < end) {
@@ -1402,12 +1463,8 @@ export const Request_Receiver_Attach = {
 
   fromJSON(object: any): Request_Receiver_Attach {
     return {
-      source: isSet(object.source)
-        ? Receiver_Source.fromJSON(object.source)
-        : undefined,
-      config: isSet(object.config)
-        ? Receiver_Config.fromJSON(object.config)
-        : undefined,
+      source: isSet(object.source) ? Receiver_Source.fromJSON(object.source) : undefined,
+      config: isSet(object.config) ? Receiver_Config.fromJSON(object.config) : undefined,
     };
   },
 
@@ -1422,23 +1479,17 @@ export const Request_Receiver_Attach = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Receiver_Attach>, I>>(
-    base?: I,
-  ): Request_Receiver_Attach {
+  create<I extends Exact<DeepPartial<Request_Receiver_Attach>, I>>(base?: I): Request_Receiver_Attach {
     return Request_Receiver_Attach.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Receiver_Attach>, I>>(
-    object: I,
-  ): Request_Receiver_Attach {
+  fromPartial<I extends Exact<DeepPartial<Request_Receiver_Attach>, I>>(object: I): Request_Receiver_Attach {
     const message = createBaseRequest_Receiver_Attach();
-    message.source =
-      object.source !== undefined && object.source !== null
-        ? Receiver_Source.fromPartial(object.source)
-        : undefined;
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? Receiver_Config.fromPartial(object.config)
-        : undefined;
+    message.source = (object.source !== undefined && object.source !== null)
+      ? Receiver_Source.fromPartial(object.source)
+      : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? Receiver_Config.fromPartial(object.config)
+      : undefined;
     return message;
   },
 };
@@ -1448,19 +1499,12 @@ function createBaseRequest_Receiver_Detach(): Request_Receiver_Detach {
 }
 
 export const Request_Receiver_Detach = {
-  encode(
-    _: Request_Receiver_Detach,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Request_Receiver_Detach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Request_Receiver_Detach {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Receiver_Detach {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseRequest_Receiver_Detach();
     while (reader.pos < end) {
@@ -1484,14 +1528,10 @@ export const Request_Receiver_Detach = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Receiver_Detach>, I>>(
-    base?: I,
-  ): Request_Receiver_Detach {
+  create<I extends Exact<DeepPartial<Request_Receiver_Detach>, I>>(base?: I): Request_Receiver_Detach {
     return Request_Receiver_Detach.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Receiver_Detach>, I>>(
-    _: I,
-  ): Request_Receiver_Detach {
+  fromPartial<I extends Exact<DeepPartial<Request_Receiver_Detach>, I>>(_: I): Request_Receiver_Detach {
     const message = createBaseRequest_Receiver_Detach();
     return message;
   },
@@ -1502,16 +1542,15 @@ function createBaseResponse(): Response {
     reqId: 0,
     error: undefined,
     session: undefined,
+    room: undefined,
     sender: undefined,
     receiver: undefined,
+    features: undefined,
   };
 }
 
 export const Response = {
-  encode(
-    message: Response,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Response, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.reqId !== 0) {
       writer.uint32(8).uint32(message.reqId);
     }
@@ -1519,26 +1558,25 @@ export const Response = {
       Error.encode(message.error, writer.uint32(18).fork()).ldelim();
     }
     if (message.session !== undefined) {
-      Response_Session.encode(
-        message.session,
-        writer.uint32(26).fork(),
-      ).ldelim();
+      Response_Session.encode(message.session, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.room !== undefined) {
+      Response_Room.encode(message.room, writer.uint32(34).fork()).ldelim();
     }
     if (message.sender !== undefined) {
-      Response_Sender.encode(message.sender, writer.uint32(34).fork()).ldelim();
+      Response_Sender.encode(message.sender, writer.uint32(42).fork()).ldelim();
     }
     if (message.receiver !== undefined) {
-      Response_Receiver.encode(
-        message.receiver,
-        writer.uint32(42).fork(),
-      ).ldelim();
+      Response_Receiver.encode(message.receiver, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.features !== undefined) {
+      Request1.encode(message.features, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Response {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse();
     while (reader.pos < end) {
@@ -1570,14 +1608,28 @@ export const Response = {
             break;
           }
 
-          message.sender = Response_Sender.decode(reader, reader.uint32());
+          message.room = Response_Room.decode(reader, reader.uint32());
           continue;
         case 5:
           if (tag !== 42) {
             break;
           }
 
+          message.sender = Response_Sender.decode(reader, reader.uint32());
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
           message.receiver = Response_Receiver.decode(reader, reader.uint32());
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.features = Request1.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1592,15 +1644,11 @@ export const Response = {
     return {
       reqId: isSet(object.reqId) ? globalThis.Number(object.reqId) : 0,
       error: isSet(object.error) ? Error.fromJSON(object.error) : undefined,
-      session: isSet(object.session)
-        ? Response_Session.fromJSON(object.session)
-        : undefined,
-      sender: isSet(object.sender)
-        ? Response_Sender.fromJSON(object.sender)
-        : undefined,
-      receiver: isSet(object.receiver)
-        ? Response_Receiver.fromJSON(object.receiver)
-        : undefined,
+      session: isSet(object.session) ? Response_Session.fromJSON(object.session) : undefined,
+      room: isSet(object.room) ? Response_Room.fromJSON(object.room) : undefined,
+      sender: isSet(object.sender) ? Response_Sender.fromJSON(object.sender) : undefined,
+      receiver: isSet(object.receiver) ? Response_Receiver.fromJSON(object.receiver) : undefined,
+      features: isSet(object.features) ? Request1.fromJSON(object.features) : undefined,
     };
   },
 
@@ -1615,11 +1663,17 @@ export const Response = {
     if (message.session !== undefined) {
       obj.session = Response_Session.toJSON(message.session);
     }
+    if (message.room !== undefined) {
+      obj.room = Response_Room.toJSON(message.room);
+    }
     if (message.sender !== undefined) {
       obj.sender = Response_Sender.toJSON(message.sender);
     }
     if (message.receiver !== undefined) {
       obj.receiver = Response_Receiver.toJSON(message.receiver);
+    }
+    if (message.features !== undefined) {
+      obj.features = Request1.toJSON(message.features);
     }
     return obj;
   },
@@ -1630,70 +1684,49 @@ export const Response = {
   fromPartial<I extends Exact<DeepPartial<Response>, I>>(object: I): Response {
     const message = createBaseResponse();
     message.reqId = object.reqId ?? 0;
-    message.error =
-      object.error !== undefined && object.error !== null
-        ? Error.fromPartial(object.error)
-        : undefined;
-    message.session =
-      object.session !== undefined && object.session !== null
-        ? Response_Session.fromPartial(object.session)
-        : undefined;
-    message.sender =
-      object.sender !== undefined && object.sender !== null
-        ? Response_Sender.fromPartial(object.sender)
-        : undefined;
-    message.receiver =
-      object.receiver !== undefined && object.receiver !== null
-        ? Response_Receiver.fromPartial(object.receiver)
-        : undefined;
+    message.error = (object.error !== undefined && object.error !== null) ? Error.fromPartial(object.error) : undefined;
+    message.session = (object.session !== undefined && object.session !== null)
+      ? Response_Session.fromPartial(object.session)
+      : undefined;
+    message.room = (object.room !== undefined && object.room !== null)
+      ? Response_Room.fromPartial(object.room)
+      : undefined;
+    message.sender = (object.sender !== undefined && object.sender !== null)
+      ? Response_Sender.fromPartial(object.sender)
+      : undefined;
+    message.receiver = (object.receiver !== undefined && object.receiver !== null)
+      ? Response_Receiver.fromPartial(object.receiver)
+      : undefined;
+    message.features = (object.features !== undefined && object.features !== null)
+      ? Request1.fromPartial(object.features)
+      : undefined;
     return message;
   },
 };
 
 function createBaseResponse_Session(): Response_Session {
-  return {
-    join: undefined,
-    leave: undefined,
-    sdp: undefined,
-    disconnect: undefined,
-  };
+  return { join: undefined, leave: undefined, sdp: undefined, disconnect: undefined };
 }
 
 export const Response_Session = {
-  encode(
-    message: Response_Session,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Response_Session, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.join !== undefined) {
-      Response_Session_RoomJoin.encode(
-        message.join,
-        writer.uint32(10).fork(),
-      ).ldelim();
+      Response_Session_RoomJoin.encode(message.join, writer.uint32(10).fork()).ldelim();
     }
     if (message.leave !== undefined) {
-      Response_Session_RoomLeave.encode(
-        message.leave,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      Response_Session_RoomLeave.encode(message.leave, writer.uint32(18).fork()).ldelim();
     }
     if (message.sdp !== undefined) {
-      Response_Session_UpdateSdp.encode(
-        message.sdp,
-        writer.uint32(26).fork(),
-      ).ldelim();
+      Response_Session_UpdateSdp.encode(message.sdp, writer.uint32(26).fork()).ldelim();
     }
     if (message.disconnect !== undefined) {
-      Response_Session_Disconnect.encode(
-        message.disconnect,
-        writer.uint32(34).fork(),
-      ).ldelim();
+      Response_Session_Disconnect.encode(message.disconnect, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Response_Session {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Session();
     while (reader.pos < end) {
@@ -1704,40 +1737,28 @@ export const Response_Session = {
             break;
           }
 
-          message.join = Response_Session_RoomJoin.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.join = Response_Session_RoomJoin.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.leave = Response_Session_RoomLeave.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.leave = Response_Session_RoomLeave.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.sdp = Response_Session_UpdateSdp.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.sdp = Response_Session_UpdateSdp.decode(reader, reader.uint32());
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
-          message.disconnect = Response_Session_Disconnect.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.disconnect = Response_Session_Disconnect.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1750,18 +1771,10 @@ export const Response_Session = {
 
   fromJSON(object: any): Response_Session {
     return {
-      join: isSet(object.join)
-        ? Response_Session_RoomJoin.fromJSON(object.join)
-        : undefined,
-      leave: isSet(object.leave)
-        ? Response_Session_RoomLeave.fromJSON(object.leave)
-        : undefined,
-      sdp: isSet(object.sdp)
-        ? Response_Session_UpdateSdp.fromJSON(object.sdp)
-        : undefined,
-      disconnect: isSet(object.disconnect)
-        ? Response_Session_Disconnect.fromJSON(object.disconnect)
-        : undefined,
+      join: isSet(object.join) ? Response_Session_RoomJoin.fromJSON(object.join) : undefined,
+      leave: isSet(object.leave) ? Response_Session_RoomLeave.fromJSON(object.leave) : undefined,
+      sdp: isSet(object.sdp) ? Response_Session_UpdateSdp.fromJSON(object.sdp) : undefined,
+      disconnect: isSet(object.disconnect) ? Response_Session_Disconnect.fromJSON(object.disconnect) : undefined,
     };
   },
 
@@ -1782,31 +1795,23 @@ export const Response_Session = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Session>, I>>(
-    base?: I,
-  ): Response_Session {
+  create<I extends Exact<DeepPartial<Response_Session>, I>>(base?: I): Response_Session {
     return Response_Session.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Session>, I>>(
-    object: I,
-  ): Response_Session {
+  fromPartial<I extends Exact<DeepPartial<Response_Session>, I>>(object: I): Response_Session {
     const message = createBaseResponse_Session();
-    message.join =
-      object.join !== undefined && object.join !== null
-        ? Response_Session_RoomJoin.fromPartial(object.join)
-        : undefined;
-    message.leave =
-      object.leave !== undefined && object.leave !== null
-        ? Response_Session_RoomLeave.fromPartial(object.leave)
-        : undefined;
-    message.sdp =
-      object.sdp !== undefined && object.sdp !== null
-        ? Response_Session_UpdateSdp.fromPartial(object.sdp)
-        : undefined;
-    message.disconnect =
-      object.disconnect !== undefined && object.disconnect !== null
-        ? Response_Session_Disconnect.fromPartial(object.disconnect)
-        : undefined;
+    message.join = (object.join !== undefined && object.join !== null)
+      ? Response_Session_RoomJoin.fromPartial(object.join)
+      : undefined;
+    message.leave = (object.leave !== undefined && object.leave !== null)
+      ? Response_Session_RoomLeave.fromPartial(object.leave)
+      : undefined;
+    message.sdp = (object.sdp !== undefined && object.sdp !== null)
+      ? Response_Session_UpdateSdp.fromPartial(object.sdp)
+      : undefined;
+    message.disconnect = (object.disconnect !== undefined && object.disconnect !== null)
+      ? Response_Session_Disconnect.fromPartial(object.disconnect)
+      : undefined;
     return message;
   },
 };
@@ -1816,19 +1821,12 @@ function createBaseResponse_Session_RoomJoin(): Response_Session_RoomJoin {
 }
 
 export const Response_Session_RoomJoin = {
-  encode(
-    _: Response_Session_RoomJoin,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Response_Session_RoomJoin, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Response_Session_RoomJoin {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Session_RoomJoin {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Session_RoomJoin();
     while (reader.pos < end) {
@@ -1852,14 +1850,10 @@ export const Response_Session_RoomJoin = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Session_RoomJoin>, I>>(
-    base?: I,
-  ): Response_Session_RoomJoin {
+  create<I extends Exact<DeepPartial<Response_Session_RoomJoin>, I>>(base?: I): Response_Session_RoomJoin {
     return Response_Session_RoomJoin.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Session_RoomJoin>, I>>(
-    _: I,
-  ): Response_Session_RoomJoin {
+  fromPartial<I extends Exact<DeepPartial<Response_Session_RoomJoin>, I>>(_: I): Response_Session_RoomJoin {
     const message = createBaseResponse_Session_RoomJoin();
     return message;
   },
@@ -1870,19 +1864,12 @@ function createBaseResponse_Session_RoomLeave(): Response_Session_RoomLeave {
 }
 
 export const Response_Session_RoomLeave = {
-  encode(
-    _: Response_Session_RoomLeave,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Response_Session_RoomLeave, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Response_Session_RoomLeave {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Session_RoomLeave {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Session_RoomLeave();
     while (reader.pos < end) {
@@ -1906,14 +1893,10 @@ export const Response_Session_RoomLeave = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Session_RoomLeave>, I>>(
-    base?: I,
-  ): Response_Session_RoomLeave {
+  create<I extends Exact<DeepPartial<Response_Session_RoomLeave>, I>>(base?: I): Response_Session_RoomLeave {
     return Response_Session_RoomLeave.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Session_RoomLeave>, I>>(
-    _: I,
-  ): Response_Session_RoomLeave {
+  fromPartial<I extends Exact<DeepPartial<Response_Session_RoomLeave>, I>>(_: I): Response_Session_RoomLeave {
     const message = createBaseResponse_Session_RoomLeave();
     return message;
   },
@@ -1924,22 +1907,15 @@ function createBaseResponse_Session_UpdateSdp(): Response_Session_UpdateSdp {
 }
 
 export const Response_Session_UpdateSdp = {
-  encode(
-    message: Response_Session_UpdateSdp,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Response_Session_UpdateSdp, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.sdp !== "") {
       writer.uint32(10).string(message.sdp);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Response_Session_UpdateSdp {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Session_UpdateSdp {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Session_UpdateSdp();
     while (reader.pos < end) {
@@ -1973,14 +1949,10 @@ export const Response_Session_UpdateSdp = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Session_UpdateSdp>, I>>(
-    base?: I,
-  ): Response_Session_UpdateSdp {
+  create<I extends Exact<DeepPartial<Response_Session_UpdateSdp>, I>>(base?: I): Response_Session_UpdateSdp {
     return Response_Session_UpdateSdp.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Session_UpdateSdp>, I>>(
-    object: I,
-  ): Response_Session_UpdateSdp {
+  fromPartial<I extends Exact<DeepPartial<Response_Session_UpdateSdp>, I>>(object: I): Response_Session_UpdateSdp {
     const message = createBaseResponse_Session_UpdateSdp();
     message.sdp = object.sdp ?? "";
     return message;
@@ -1992,19 +1964,12 @@ function createBaseResponse_Session_Disconnect(): Response_Session_Disconnect {
 }
 
 export const Response_Session_Disconnect = {
-  encode(
-    _: Response_Session_Disconnect,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Response_Session_Disconnect, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Response_Session_Disconnect {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Session_Disconnect {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Session_Disconnect();
     while (reader.pos < end) {
@@ -2028,15 +1993,175 @@ export const Response_Session_Disconnect = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Session_Disconnect>, I>>(
-    base?: I,
-  ): Response_Session_Disconnect {
+  create<I extends Exact<DeepPartial<Response_Session_Disconnect>, I>>(base?: I): Response_Session_Disconnect {
     return Response_Session_Disconnect.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Session_Disconnect>, I>>(
-    _: I,
-  ): Response_Session_Disconnect {
+  fromPartial<I extends Exact<DeepPartial<Response_Session_Disconnect>, I>>(_: I): Response_Session_Disconnect {
     const message = createBaseResponse_Session_Disconnect();
+    return message;
+  },
+};
+
+function createBaseResponse_Room(): Response_Room {
+  return { subscribe: undefined, unsubscribe: undefined };
+}
+
+export const Response_Room = {
+  encode(message: Response_Room, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.subscribe !== undefined) {
+      Response_Room_SubscribePeer.encode(message.subscribe, writer.uint32(10).fork()).ldelim();
+    }
+    if (message.unsubscribe !== undefined) {
+      Response_Room_UnsubscribePeer.encode(message.unsubscribe, writer.uint32(18).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Room {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseResponse_Room();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.subscribe = Response_Room_SubscribePeer.decode(reader, reader.uint32());
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.unsubscribe = Response_Room_UnsubscribePeer.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Response_Room {
+    return {
+      subscribe: isSet(object.subscribe) ? Response_Room_SubscribePeer.fromJSON(object.subscribe) : undefined,
+      unsubscribe: isSet(object.unsubscribe) ? Response_Room_UnsubscribePeer.fromJSON(object.unsubscribe) : undefined,
+    };
+  },
+
+  toJSON(message: Response_Room): unknown {
+    const obj: any = {};
+    if (message.subscribe !== undefined) {
+      obj.subscribe = Response_Room_SubscribePeer.toJSON(message.subscribe);
+    }
+    if (message.unsubscribe !== undefined) {
+      obj.unsubscribe = Response_Room_UnsubscribePeer.toJSON(message.unsubscribe);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Response_Room>, I>>(base?: I): Response_Room {
+    return Response_Room.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Response_Room>, I>>(object: I): Response_Room {
+    const message = createBaseResponse_Room();
+    message.subscribe = (object.subscribe !== undefined && object.subscribe !== null)
+      ? Response_Room_SubscribePeer.fromPartial(object.subscribe)
+      : undefined;
+    message.unsubscribe = (object.unsubscribe !== undefined && object.unsubscribe !== null)
+      ? Response_Room_UnsubscribePeer.fromPartial(object.unsubscribe)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseResponse_Room_SubscribePeer(): Response_Room_SubscribePeer {
+  return {};
+}
+
+export const Response_Room_SubscribePeer = {
+  encode(_: Response_Room_SubscribePeer, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Room_SubscribePeer {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseResponse_Room_SubscribePeer();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): Response_Room_SubscribePeer {
+    return {};
+  },
+
+  toJSON(_: Response_Room_SubscribePeer): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Response_Room_SubscribePeer>, I>>(base?: I): Response_Room_SubscribePeer {
+    return Response_Room_SubscribePeer.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Response_Room_SubscribePeer>, I>>(_: I): Response_Room_SubscribePeer {
+    const message = createBaseResponse_Room_SubscribePeer();
+    return message;
+  },
+};
+
+function createBaseResponse_Room_UnsubscribePeer(): Response_Room_UnsubscribePeer {
+  return {};
+}
+
+export const Response_Room_UnsubscribePeer = {
+  encode(_: Response_Room_UnsubscribePeer, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Room_UnsubscribePeer {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseResponse_Room_UnsubscribePeer();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): Response_Room_UnsubscribePeer {
+    return {};
+  },
+
+  toJSON(_: Response_Room_UnsubscribePeer): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Response_Room_UnsubscribePeer>, I>>(base?: I): Response_Room_UnsubscribePeer {
+    return Response_Room_UnsubscribePeer.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Response_Room_UnsubscribePeer>, I>>(_: I): Response_Room_UnsubscribePeer {
+    const message = createBaseResponse_Room_UnsubscribePeer();
     return message;
   },
 };
@@ -2046,34 +2171,21 @@ function createBaseResponse_Sender(): Response_Sender {
 }
 
 export const Response_Sender = {
-  encode(
-    message: Response_Sender,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Response_Sender, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.attach !== undefined) {
-      Response_Sender_Attach.encode(
-        message.attach,
-        writer.uint32(10).fork(),
-      ).ldelim();
+      Response_Sender_Attach.encode(message.attach, writer.uint32(10).fork()).ldelim();
     }
     if (message.detach !== undefined) {
-      Response_Sender_Detach.encode(
-        message.detach,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      Response_Sender_Detach.encode(message.detach, writer.uint32(18).fork()).ldelim();
     }
     if (message.config !== undefined) {
-      Response_Sender_Config.encode(
-        message.config,
-        writer.uint32(26).fork(),
-      ).ldelim();
+      Response_Sender_Config.encode(message.config, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Response_Sender {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Sender();
     while (reader.pos < end) {
@@ -2084,30 +2196,21 @@ export const Response_Sender = {
             break;
           }
 
-          message.attach = Response_Sender_Attach.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.attach = Response_Sender_Attach.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.detach = Response_Sender_Detach.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.detach = Response_Sender_Detach.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.config = Response_Sender_Config.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.config = Response_Sender_Config.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -2120,15 +2223,9 @@ export const Response_Sender = {
 
   fromJSON(object: any): Response_Sender {
     return {
-      attach: isSet(object.attach)
-        ? Response_Sender_Attach.fromJSON(object.attach)
-        : undefined,
-      detach: isSet(object.detach)
-        ? Response_Sender_Detach.fromJSON(object.detach)
-        : undefined,
-      config: isSet(object.config)
-        ? Response_Sender_Config.fromJSON(object.config)
-        : undefined,
+      attach: isSet(object.attach) ? Response_Sender_Attach.fromJSON(object.attach) : undefined,
+      detach: isSet(object.detach) ? Response_Sender_Detach.fromJSON(object.detach) : undefined,
+      config: isSet(object.config) ? Response_Sender_Config.fromJSON(object.config) : undefined,
     };
   },
 
@@ -2146,27 +2243,20 @@ export const Response_Sender = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Sender>, I>>(
-    base?: I,
-  ): Response_Sender {
+  create<I extends Exact<DeepPartial<Response_Sender>, I>>(base?: I): Response_Sender {
     return Response_Sender.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Sender>, I>>(
-    object: I,
-  ): Response_Sender {
+  fromPartial<I extends Exact<DeepPartial<Response_Sender>, I>>(object: I): Response_Sender {
     const message = createBaseResponse_Sender();
-    message.attach =
-      object.attach !== undefined && object.attach !== null
-        ? Response_Sender_Attach.fromPartial(object.attach)
-        : undefined;
-    message.detach =
-      object.detach !== undefined && object.detach !== null
-        ? Response_Sender_Detach.fromPartial(object.detach)
-        : undefined;
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? Response_Sender_Config.fromPartial(object.config)
-        : undefined;
+    message.attach = (object.attach !== undefined && object.attach !== null)
+      ? Response_Sender_Attach.fromPartial(object.attach)
+      : undefined;
+    message.detach = (object.detach !== undefined && object.detach !== null)
+      ? Response_Sender_Detach.fromPartial(object.detach)
+      : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? Response_Sender_Config.fromPartial(object.config)
+      : undefined;
     return message;
   },
 };
@@ -2176,19 +2266,12 @@ function createBaseResponse_Sender_Attach(): Response_Sender_Attach {
 }
 
 export const Response_Sender_Attach = {
-  encode(
-    _: Response_Sender_Attach,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Response_Sender_Attach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Response_Sender_Attach {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Sender_Attach {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Sender_Attach();
     while (reader.pos < end) {
@@ -2212,14 +2295,10 @@ export const Response_Sender_Attach = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Sender_Attach>, I>>(
-    base?: I,
-  ): Response_Sender_Attach {
+  create<I extends Exact<DeepPartial<Response_Sender_Attach>, I>>(base?: I): Response_Sender_Attach {
     return Response_Sender_Attach.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Sender_Attach>, I>>(
-    _: I,
-  ): Response_Sender_Attach {
+  fromPartial<I extends Exact<DeepPartial<Response_Sender_Attach>, I>>(_: I): Response_Sender_Attach {
     const message = createBaseResponse_Sender_Attach();
     return message;
   },
@@ -2230,19 +2309,12 @@ function createBaseResponse_Sender_Detach(): Response_Sender_Detach {
 }
 
 export const Response_Sender_Detach = {
-  encode(
-    _: Response_Sender_Detach,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Response_Sender_Detach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Response_Sender_Detach {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Sender_Detach {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Sender_Detach();
     while (reader.pos < end) {
@@ -2266,14 +2338,10 @@ export const Response_Sender_Detach = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Sender_Detach>, I>>(
-    base?: I,
-  ): Response_Sender_Detach {
+  create<I extends Exact<DeepPartial<Response_Sender_Detach>, I>>(base?: I): Response_Sender_Detach {
     return Response_Sender_Detach.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Sender_Detach>, I>>(
-    _: I,
-  ): Response_Sender_Detach {
+  fromPartial<I extends Exact<DeepPartial<Response_Sender_Detach>, I>>(_: I): Response_Sender_Detach {
     const message = createBaseResponse_Sender_Detach();
     return message;
   },
@@ -2284,19 +2352,12 @@ function createBaseResponse_Sender_Config(): Response_Sender_Config {
 }
 
 export const Response_Sender_Config = {
-  encode(
-    _: Response_Sender_Config,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Response_Sender_Config, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Response_Sender_Config {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Sender_Config {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Sender_Config();
     while (reader.pos < end) {
@@ -2320,14 +2381,10 @@ export const Response_Sender_Config = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Sender_Config>, I>>(
-    base?: I,
-  ): Response_Sender_Config {
+  create<I extends Exact<DeepPartial<Response_Sender_Config>, I>>(base?: I): Response_Sender_Config {
     return Response_Sender_Config.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Sender_Config>, I>>(
-    _: I,
-  ): Response_Sender_Config {
+  fromPartial<I extends Exact<DeepPartial<Response_Sender_Config>, I>>(_: I): Response_Sender_Config {
     const message = createBaseResponse_Sender_Config();
     return message;
   },
@@ -2338,34 +2395,21 @@ function createBaseResponse_Receiver(): Response_Receiver {
 }
 
 export const Response_Receiver = {
-  encode(
-    message: Response_Receiver,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: Response_Receiver, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.attach !== undefined) {
-      Response_Receiver_Attach.encode(
-        message.attach,
-        writer.uint32(10).fork(),
-      ).ldelim();
+      Response_Receiver_Attach.encode(message.attach, writer.uint32(10).fork()).ldelim();
     }
     if (message.detach !== undefined) {
-      Response_Receiver_Detach.encode(
-        message.detach,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      Response_Receiver_Detach.encode(message.detach, writer.uint32(18).fork()).ldelim();
     }
     if (message.config !== undefined) {
-      Response_Receiver_Config.encode(
-        message.config,
-        writer.uint32(26).fork(),
-      ).ldelim();
+      Response_Receiver_Config.encode(message.config, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): Response_Receiver {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Receiver();
     while (reader.pos < end) {
@@ -2376,30 +2420,21 @@ export const Response_Receiver = {
             break;
           }
 
-          message.attach = Response_Receiver_Attach.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.attach = Response_Receiver_Attach.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.detach = Response_Receiver_Detach.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.detach = Response_Receiver_Detach.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.config = Response_Receiver_Config.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.config = Response_Receiver_Config.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -2412,15 +2447,9 @@ export const Response_Receiver = {
 
   fromJSON(object: any): Response_Receiver {
     return {
-      attach: isSet(object.attach)
-        ? Response_Receiver_Attach.fromJSON(object.attach)
-        : undefined,
-      detach: isSet(object.detach)
-        ? Response_Receiver_Detach.fromJSON(object.detach)
-        : undefined,
-      config: isSet(object.config)
-        ? Response_Receiver_Config.fromJSON(object.config)
-        : undefined,
+      attach: isSet(object.attach) ? Response_Receiver_Attach.fromJSON(object.attach) : undefined,
+      detach: isSet(object.detach) ? Response_Receiver_Detach.fromJSON(object.detach) : undefined,
+      config: isSet(object.config) ? Response_Receiver_Config.fromJSON(object.config) : undefined,
     };
   },
 
@@ -2438,27 +2467,20 @@ export const Response_Receiver = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Receiver>, I>>(
-    base?: I,
-  ): Response_Receiver {
+  create<I extends Exact<DeepPartial<Response_Receiver>, I>>(base?: I): Response_Receiver {
     return Response_Receiver.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Receiver>, I>>(
-    object: I,
-  ): Response_Receiver {
+  fromPartial<I extends Exact<DeepPartial<Response_Receiver>, I>>(object: I): Response_Receiver {
     const message = createBaseResponse_Receiver();
-    message.attach =
-      object.attach !== undefined && object.attach !== null
-        ? Response_Receiver_Attach.fromPartial(object.attach)
-        : undefined;
-    message.detach =
-      object.detach !== undefined && object.detach !== null
-        ? Response_Receiver_Detach.fromPartial(object.detach)
-        : undefined;
-    message.config =
-      object.config !== undefined && object.config !== null
-        ? Response_Receiver_Config.fromPartial(object.config)
-        : undefined;
+    message.attach = (object.attach !== undefined && object.attach !== null)
+      ? Response_Receiver_Attach.fromPartial(object.attach)
+      : undefined;
+    message.detach = (object.detach !== undefined && object.detach !== null)
+      ? Response_Receiver_Detach.fromPartial(object.detach)
+      : undefined;
+    message.config = (object.config !== undefined && object.config !== null)
+      ? Response_Receiver_Config.fromPartial(object.config)
+      : undefined;
     return message;
   },
 };
@@ -2468,19 +2490,12 @@ function createBaseResponse_Receiver_Attach(): Response_Receiver_Attach {
 }
 
 export const Response_Receiver_Attach = {
-  encode(
-    _: Response_Receiver_Attach,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Response_Receiver_Attach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Response_Receiver_Attach {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Receiver_Attach {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Receiver_Attach();
     while (reader.pos < end) {
@@ -2504,14 +2519,10 @@ export const Response_Receiver_Attach = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Receiver_Attach>, I>>(
-    base?: I,
-  ): Response_Receiver_Attach {
+  create<I extends Exact<DeepPartial<Response_Receiver_Attach>, I>>(base?: I): Response_Receiver_Attach {
     return Response_Receiver_Attach.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Receiver_Attach>, I>>(
-    _: I,
-  ): Response_Receiver_Attach {
+  fromPartial<I extends Exact<DeepPartial<Response_Receiver_Attach>, I>>(_: I): Response_Receiver_Attach {
     const message = createBaseResponse_Receiver_Attach();
     return message;
   },
@@ -2522,19 +2533,12 @@ function createBaseResponse_Receiver_Detach(): Response_Receiver_Detach {
 }
 
 export const Response_Receiver_Detach = {
-  encode(
-    _: Response_Receiver_Detach,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Response_Receiver_Detach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Response_Receiver_Detach {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Receiver_Detach {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Receiver_Detach();
     while (reader.pos < end) {
@@ -2558,14 +2562,10 @@ export const Response_Receiver_Detach = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Receiver_Detach>, I>>(
-    base?: I,
-  ): Response_Receiver_Detach {
+  create<I extends Exact<DeepPartial<Response_Receiver_Detach>, I>>(base?: I): Response_Receiver_Detach {
     return Response_Receiver_Detach.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Receiver_Detach>, I>>(
-    _: I,
-  ): Response_Receiver_Detach {
+  fromPartial<I extends Exact<DeepPartial<Response_Receiver_Detach>, I>>(_: I): Response_Receiver_Detach {
     const message = createBaseResponse_Receiver_Detach();
     return message;
   },
@@ -2576,19 +2576,12 @@ function createBaseResponse_Receiver_Config(): Response_Receiver_Config {
 }
 
 export const Response_Receiver_Config = {
-  encode(
-    _: Response_Receiver_Config,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: Response_Receiver_Config, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): Response_Receiver_Config {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Receiver_Config {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseResponse_Receiver_Config();
     while (reader.pos < end) {
@@ -2612,14 +2605,10 @@ export const Response_Receiver_Config = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Receiver_Config>, I>>(
-    base?: I,
-  ): Response_Receiver_Config {
+  create<I extends Exact<DeepPartial<Response_Receiver_Config>, I>>(base?: I): Response_Receiver_Config {
     return Response_Receiver_Config.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Receiver_Config>, I>>(
-    _: I,
-  ): Response_Receiver_Config {
+  fromPartial<I extends Exact<DeepPartial<Response_Receiver_Config>, I>>(_: I): Response_Receiver_Config {
     const message = createBaseResponse_Receiver_Config();
     return message;
   },
@@ -2633,47 +2622,38 @@ function createBaseServerEvent(): ServerEvent {
     sender: undefined,
     receiver: undefined,
     response: undefined,
+    features: undefined,
   };
 }
 
 export const ServerEvent = {
-  encode(
-    message: ServerEvent,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.seq !== 0) {
       writer.uint32(8).uint32(message.seq);
     }
     if (message.session !== undefined) {
-      ServerEvent_Session.encode(
-        message.session,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      ServerEvent_Session.encode(message.session, writer.uint32(18).fork()).ldelim();
     }
     if (message.room !== undefined) {
       ServerEvent_Room.encode(message.room, writer.uint32(26).fork()).ldelim();
     }
     if (message.sender !== undefined) {
-      ServerEvent_Sender.encode(
-        message.sender,
-        writer.uint32(34).fork(),
-      ).ldelim();
+      ServerEvent_Sender.encode(message.sender, writer.uint32(34).fork()).ldelim();
     }
     if (message.receiver !== undefined) {
-      ServerEvent_Receiver.encode(
-        message.receiver,
-        writer.uint32(42).fork(),
-      ).ldelim();
+      ServerEvent_Receiver.encode(message.receiver, writer.uint32(42).fork()).ldelim();
     }
     if (message.response !== undefined) {
       Response.encode(message.response, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.features !== undefined) {
+      ServerEvent2.encode(message.features, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent();
     while (reader.pos < end) {
@@ -2712,10 +2692,7 @@ export const ServerEvent = {
             break;
           }
 
-          message.receiver = ServerEvent_Receiver.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.receiver = ServerEvent_Receiver.decode(reader, reader.uint32());
           continue;
         case 6:
           if (tag !== 50) {
@@ -2723,6 +2700,13 @@ export const ServerEvent = {
           }
 
           message.response = Response.decode(reader, reader.uint32());
+          continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.features = ServerEvent2.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -2736,21 +2720,12 @@ export const ServerEvent = {
   fromJSON(object: any): ServerEvent {
     return {
       seq: isSet(object.seq) ? globalThis.Number(object.seq) : 0,
-      session: isSet(object.session)
-        ? ServerEvent_Session.fromJSON(object.session)
-        : undefined,
-      room: isSet(object.room)
-        ? ServerEvent_Room.fromJSON(object.room)
-        : undefined,
-      sender: isSet(object.sender)
-        ? ServerEvent_Sender.fromJSON(object.sender)
-        : undefined,
-      receiver: isSet(object.receiver)
-        ? ServerEvent_Receiver.fromJSON(object.receiver)
-        : undefined,
-      response: isSet(object.response)
-        ? Response.fromJSON(object.response)
-        : undefined,
+      session: isSet(object.session) ? ServerEvent_Session.fromJSON(object.session) : undefined,
+      room: isSet(object.room) ? ServerEvent_Room.fromJSON(object.room) : undefined,
+      sender: isSet(object.sender) ? ServerEvent_Sender.fromJSON(object.sender) : undefined,
+      receiver: isSet(object.receiver) ? ServerEvent_Receiver.fromJSON(object.receiver) : undefined,
+      response: isSet(object.response) ? Response.fromJSON(object.response) : undefined,
+      features: isSet(object.features) ? ServerEvent2.fromJSON(object.features) : undefined,
     };
   },
 
@@ -2774,85 +2749,66 @@ export const ServerEvent = {
     if (message.response !== undefined) {
       obj.response = Response.toJSON(message.response);
     }
+    if (message.features !== undefined) {
+      obj.features = ServerEvent2.toJSON(message.features);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<ServerEvent>, I>>(base?: I): ServerEvent {
     return ServerEvent.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent>, I>>(
-    object: I,
-  ): ServerEvent {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent>, I>>(object: I): ServerEvent {
     const message = createBaseServerEvent();
     message.seq = object.seq ?? 0;
-    message.session =
-      object.session !== undefined && object.session !== null
-        ? ServerEvent_Session.fromPartial(object.session)
-        : undefined;
-    message.room =
-      object.room !== undefined && object.room !== null
-        ? ServerEvent_Room.fromPartial(object.room)
-        : undefined;
-    message.sender =
-      object.sender !== undefined && object.sender !== null
-        ? ServerEvent_Sender.fromPartial(object.sender)
-        : undefined;
-    message.receiver =
-      object.receiver !== undefined && object.receiver !== null
-        ? ServerEvent_Receiver.fromPartial(object.receiver)
-        : undefined;
-    message.response =
-      object.response !== undefined && object.response !== null
-        ? Response.fromPartial(object.response)
-        : undefined;
+    message.session = (object.session !== undefined && object.session !== null)
+      ? ServerEvent_Session.fromPartial(object.session)
+      : undefined;
+    message.room = (object.room !== undefined && object.room !== null)
+      ? ServerEvent_Room.fromPartial(object.room)
+      : undefined;
+    message.sender = (object.sender !== undefined && object.sender !== null)
+      ? ServerEvent_Sender.fromPartial(object.sender)
+      : undefined;
+    message.receiver = (object.receiver !== undefined && object.receiver !== null)
+      ? ServerEvent_Receiver.fromPartial(object.receiver)
+      : undefined;
+    message.response = (object.response !== undefined && object.response !== null)
+      ? Response.fromPartial(object.response)
+      : undefined;
+    message.features = (object.features !== undefined && object.features !== null)
+      ? ServerEvent2.fromPartial(object.features)
+      : undefined;
     return message;
   },
 };
 
 function createBaseServerEvent_Session(): ServerEvent_Session {
-  return {
-    connected: undefined,
-    joined: undefined,
-    leaved: undefined,
-    disconnected: undefined,
-  };
+  return { connected: undefined, joined: undefined, leaved: undefined, disconnected: undefined, goway: undefined };
 }
 
 export const ServerEvent_Session = {
-  encode(
-    message: ServerEvent_Session,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Session, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.connected !== undefined) {
-      ServerEvent_Session_Connected.encode(
-        message.connected,
-        writer.uint32(10).fork(),
-      ).ldelim();
+      ServerEvent_Session_Connected.encode(message.connected, writer.uint32(10).fork()).ldelim();
     }
     if (message.joined !== undefined) {
-      ServerEvent_Session_JoinedRoom.encode(
-        message.joined,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      ServerEvent_Session_JoinedRoom.encode(message.joined, writer.uint32(18).fork()).ldelim();
     }
     if (message.leaved !== undefined) {
-      ServerEvent_Session_LeavedRoom.encode(
-        message.leaved,
-        writer.uint32(26).fork(),
-      ).ldelim();
+      ServerEvent_Session_LeavedRoom.encode(message.leaved, writer.uint32(26).fork()).ldelim();
     }
     if (message.disconnected !== undefined) {
-      ServerEvent_Session_Disconnected.encode(
-        message.disconnected,
-        writer.uint32(34).fork(),
-      ).ldelim();
+      ServerEvent_Session_Disconnected.encode(message.disconnected, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.goway !== undefined) {
+      ServerEvent_Session_GoAway.encode(message.goway, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Session {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Session();
     while (reader.pos < end) {
@@ -2863,40 +2819,35 @@ export const ServerEvent_Session = {
             break;
           }
 
-          message.connected = ServerEvent_Session_Connected.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.connected = ServerEvent_Session_Connected.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.joined = ServerEvent_Session_JoinedRoom.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.joined = ServerEvent_Session_JoinedRoom.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.leaved = ServerEvent_Session_LeavedRoom.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.leaved = ServerEvent_Session_LeavedRoom.decode(reader, reader.uint32());
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
-          message.disconnected = ServerEvent_Session_Disconnected.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.disconnected = ServerEvent_Session_Disconnected.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.goway = ServerEvent_Session_GoAway.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -2909,18 +2860,13 @@ export const ServerEvent_Session = {
 
   fromJSON(object: any): ServerEvent_Session {
     return {
-      connected: isSet(object.connected)
-        ? ServerEvent_Session_Connected.fromJSON(object.connected)
-        : undefined,
-      joined: isSet(object.joined)
-        ? ServerEvent_Session_JoinedRoom.fromJSON(object.joined)
-        : undefined,
-      leaved: isSet(object.leaved)
-        ? ServerEvent_Session_LeavedRoom.fromJSON(object.leaved)
-        : undefined,
+      connected: isSet(object.connected) ? ServerEvent_Session_Connected.fromJSON(object.connected) : undefined,
+      joined: isSet(object.joined) ? ServerEvent_Session_JoinedRoom.fromJSON(object.joined) : undefined,
+      leaved: isSet(object.leaved) ? ServerEvent_Session_LeavedRoom.fromJSON(object.leaved) : undefined,
       disconnected: isSet(object.disconnected)
         ? ServerEvent_Session_Disconnected.fromJSON(object.disconnected)
         : undefined,
+      goway: isSet(object.goway) ? ServerEvent_Session_GoAway.fromJSON(object.goway) : undefined,
     };
   },
 
@@ -2936,38 +2882,34 @@ export const ServerEvent_Session = {
       obj.leaved = ServerEvent_Session_LeavedRoom.toJSON(message.leaved);
     }
     if (message.disconnected !== undefined) {
-      obj.disconnected = ServerEvent_Session_Disconnected.toJSON(
-        message.disconnected,
-      );
+      obj.disconnected = ServerEvent_Session_Disconnected.toJSON(message.disconnected);
+    }
+    if (message.goway !== undefined) {
+      obj.goway = ServerEvent_Session_GoAway.toJSON(message.goway);
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Session>, I>>(
-    base?: I,
-  ): ServerEvent_Session {
+  create<I extends Exact<DeepPartial<ServerEvent_Session>, I>>(base?: I): ServerEvent_Session {
     return ServerEvent_Session.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_Session>, I>>(
-    object: I,
-  ): ServerEvent_Session {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Session>, I>>(object: I): ServerEvent_Session {
     const message = createBaseServerEvent_Session();
-    message.connected =
-      object.connected !== undefined && object.connected !== null
-        ? ServerEvent_Session_Connected.fromPartial(object.connected)
-        : undefined;
-    message.joined =
-      object.joined !== undefined && object.joined !== null
-        ? ServerEvent_Session_JoinedRoom.fromPartial(object.joined)
-        : undefined;
-    message.leaved =
-      object.leaved !== undefined && object.leaved !== null
-        ? ServerEvent_Session_LeavedRoom.fromPartial(object.leaved)
-        : undefined;
-    message.disconnected =
-      object.disconnected !== undefined && object.disconnected !== null
-        ? ServerEvent_Session_Disconnected.fromPartial(object.disconnected)
-        : undefined;
+    message.connected = (object.connected !== undefined && object.connected !== null)
+      ? ServerEvent_Session_Connected.fromPartial(object.connected)
+      : undefined;
+    message.joined = (object.joined !== undefined && object.joined !== null)
+      ? ServerEvent_Session_JoinedRoom.fromPartial(object.joined)
+      : undefined;
+    message.leaved = (object.leaved !== undefined && object.leaved !== null)
+      ? ServerEvent_Session_LeavedRoom.fromPartial(object.leaved)
+      : undefined;
+    message.disconnected = (object.disconnected !== undefined && object.disconnected !== null)
+      ? ServerEvent_Session_Disconnected.fromPartial(object.disconnected)
+      : undefined;
+    message.goway = (object.goway !== undefined && object.goway !== null)
+      ? ServerEvent_Session_GoAway.fromPartial(object.goway)
+      : undefined;
     return message;
   },
 };
@@ -2977,19 +2919,12 @@ function createBaseServerEvent_Session_Connected(): ServerEvent_Session_Connecte
 }
 
 export const ServerEvent_Session_Connected = {
-  encode(
-    _: ServerEvent_Session_Connected,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(_: ServerEvent_Session_Connected, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Session_Connected {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Session_Connected {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Session_Connected();
     while (reader.pos < end) {
@@ -3013,46 +2948,32 @@ export const ServerEvent_Session_Connected = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Session_Connected>, I>>(
-    base?: I,
-  ): ServerEvent_Session_Connected {
+  create<I extends Exact<DeepPartial<ServerEvent_Session_Connected>, I>>(base?: I): ServerEvent_Session_Connected {
     return ServerEvent_Session_Connected.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_Session_Connected>, I>>(
-    _: I,
-  ): ServerEvent_Session_Connected {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Session_Connected>, I>>(_: I): ServerEvent_Session_Connected {
     const message = createBaseServerEvent_Session_Connected();
     return message;
   },
 };
 
 function createBaseServerEvent_Session_JoinedRoom(): ServerEvent_Session_JoinedRoom {
-  return { room: "", peer: "", token: "" };
+  return { room: "", peer: "" };
 }
 
 export const ServerEvent_Session_JoinedRoom = {
-  encode(
-    message: ServerEvent_Session_JoinedRoom,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Session_JoinedRoom, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.room !== "") {
       writer.uint32(10).string(message.room);
     }
     if (message.peer !== "") {
       writer.uint32(18).string(message.peer);
     }
-    if (message.token !== "") {
-      writer.uint32(26).string(message.token);
-    }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Session_JoinedRoom {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Session_JoinedRoom {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Session_JoinedRoom();
     while (reader.pos < end) {
@@ -3072,13 +2993,6 @@ export const ServerEvent_Session_JoinedRoom = {
 
           message.peer = reader.string();
           continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.token = reader.string();
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3092,7 +3006,6 @@ export const ServerEvent_Session_JoinedRoom = {
     return {
       room: isSet(object.room) ? globalThis.String(object.room) : "",
       peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
-      token: isSet(object.token) ? globalThis.String(object.token) : "",
     };
   },
 
@@ -3104,15 +3017,10 @@ export const ServerEvent_Session_JoinedRoom = {
     if (message.peer !== "") {
       obj.peer = message.peer;
     }
-    if (message.token !== "") {
-      obj.token = message.token;
-    }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Session_JoinedRoom>, I>>(
-    base?: I,
-  ): ServerEvent_Session_JoinedRoom {
+  create<I extends Exact<DeepPartial<ServerEvent_Session_JoinedRoom>, I>>(base?: I): ServerEvent_Session_JoinedRoom {
     return ServerEvent_Session_JoinedRoom.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ServerEvent_Session_JoinedRoom>, I>>(
@@ -3121,7 +3029,6 @@ export const ServerEvent_Session_JoinedRoom = {
     const message = createBaseServerEvent_Session_JoinedRoom();
     message.room = object.room ?? "";
     message.peer = object.peer ?? "";
-    message.token = object.token ?? "";
     return message;
   },
 };
@@ -3131,10 +3038,7 @@ function createBaseServerEvent_Session_LeavedRoom(): ServerEvent_Session_LeavedR
 }
 
 export const ServerEvent_Session_LeavedRoom = {
-  encode(
-    message: ServerEvent_Session_LeavedRoom,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Session_LeavedRoom, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.room !== "") {
       writer.uint32(10).string(message.room);
     }
@@ -3144,12 +3048,8 @@ export const ServerEvent_Session_LeavedRoom = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Session_LeavedRoom {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Session_LeavedRoom {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Session_LeavedRoom();
     while (reader.pos < end) {
@@ -3196,9 +3096,7 @@ export const ServerEvent_Session_LeavedRoom = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Session_LeavedRoom>, I>>(
-    base?: I,
-  ): ServerEvent_Session_LeavedRoom {
+  create<I extends Exact<DeepPartial<ServerEvent_Session_LeavedRoom>, I>>(base?: I): ServerEvent_Session_LeavedRoom {
     return ServerEvent_Session_LeavedRoom.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ServerEvent_Session_LeavedRoom>, I>>(
@@ -3216,22 +3114,15 @@ function createBaseServerEvent_Session_Disconnected(): ServerEvent_Session_Disco
 }
 
 export const ServerEvent_Session_Disconnected = {
-  encode(
-    message: ServerEvent_Session_Disconnected,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Session_Disconnected, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.reason !== "") {
       writer.uint32(10).string(message.reason);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Session_Disconnected {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Session_Disconnected {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Session_Disconnected();
     while (reader.pos < end) {
@@ -3254,9 +3145,7 @@ export const ServerEvent_Session_Disconnected = {
   },
 
   fromJSON(object: any): ServerEvent_Session_Disconnected {
-    return {
-      reason: isSet(object.reason) ? globalThis.String(object.reason) : "",
-    };
+    return { reason: isSet(object.reason) ? globalThis.String(object.reason) : "" };
   },
 
   toJSON(message: ServerEvent_Session_Disconnected): unknown {
@@ -3272,11 +3161,85 @@ export const ServerEvent_Session_Disconnected = {
   ): ServerEvent_Session_Disconnected {
     return ServerEvent_Session_Disconnected.fromPartial(base ?? ({} as any));
   },
-  fromPartial<
-    I extends Exact<DeepPartial<ServerEvent_Session_Disconnected>, I>,
-  >(object: I): ServerEvent_Session_Disconnected {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Session_Disconnected>, I>>(
+    object: I,
+  ): ServerEvent_Session_Disconnected {
     const message = createBaseServerEvent_Session_Disconnected();
     message.reason = object.reason ?? "";
+    return message;
+  },
+};
+
+function createBaseServerEvent_Session_GoAway(): ServerEvent_Session_GoAway {
+  return { reason: "", remainSeconds: 0 };
+}
+
+export const ServerEvent_Session_GoAway = {
+  encode(message: ServerEvent_Session_GoAway, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.reason !== "") {
+      writer.uint32(10).string(message.reason);
+    }
+    if (message.remainSeconds !== 0) {
+      writer.uint32(16).uint32(message.remainSeconds);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Session_GoAway {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerEvent_Session_GoAway();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.reason = reader.string();
+          continue;
+        case 2:
+          if (tag !== 16) {
+            break;
+          }
+
+          message.remainSeconds = reader.uint32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerEvent_Session_GoAway {
+    return {
+      reason: isSet(object.reason) ? globalThis.String(object.reason) : "",
+      remainSeconds: isSet(object.remainSeconds) ? globalThis.Number(object.remainSeconds) : 0,
+    };
+  },
+
+  toJSON(message: ServerEvent_Session_GoAway): unknown {
+    const obj: any = {};
+    if (message.reason !== "") {
+      obj.reason = message.reason;
+    }
+    if (message.remainSeconds !== 0) {
+      obj.remainSeconds = Math.round(message.remainSeconds);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerEvent_Session_GoAway>, I>>(base?: I): ServerEvent_Session_GoAway {
+    return ServerEvent_Session_GoAway.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Session_GoAway>, I>>(object: I): ServerEvent_Session_GoAway {
+    const message = createBaseServerEvent_Session_GoAway();
+    message.reason = object.reason ?? "";
+    message.remainSeconds = object.remainSeconds ?? 0;
     return message;
   },
 };
@@ -3293,52 +3256,30 @@ function createBaseServerEvent_Room(): ServerEvent_Room {
 }
 
 export const ServerEvent_Room = {
-  encode(
-    message: ServerEvent_Room,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Room, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.peerJoined !== undefined) {
-      ServerEvent_Room_PeerJoined.encode(
-        message.peerJoined,
-        writer.uint32(10).fork(),
-      ).ldelim();
+      ServerEvent_Room_PeerJoined.encode(message.peerJoined, writer.uint32(10).fork()).ldelim();
     }
     if (message.peerUpdated !== undefined) {
-      ServerEvent_Room_PeerUpdated.encode(
-        message.peerUpdated,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      ServerEvent_Room_PeerUpdated.encode(message.peerUpdated, writer.uint32(18).fork()).ldelim();
     }
     if (message.peerLeaved !== undefined) {
-      ServerEvent_Room_PeerLeaved.encode(
-        message.peerLeaved,
-        writer.uint32(26).fork(),
-      ).ldelim();
+      ServerEvent_Room_PeerLeaved.encode(message.peerLeaved, writer.uint32(26).fork()).ldelim();
     }
     if (message.trackStarted !== undefined) {
-      ServerEvent_Room_TrackStarted.encode(
-        message.trackStarted,
-        writer.uint32(34).fork(),
-      ).ldelim();
+      ServerEvent_Room_TrackStarted.encode(message.trackStarted, writer.uint32(34).fork()).ldelim();
     }
     if (message.trackUpdated !== undefined) {
-      ServerEvent_Room_TrackUpdated.encode(
-        message.trackUpdated,
-        writer.uint32(42).fork(),
-      ).ldelim();
+      ServerEvent_Room_TrackUpdated.encode(message.trackUpdated, writer.uint32(42).fork()).ldelim();
     }
     if (message.trackStopped !== undefined) {
-      ServerEvent_Room_TrackStopped.encode(
-        message.trackStopped,
-        writer.uint32(50).fork(),
-      ).ldelim();
+      ServerEvent_Room_TrackStopped.encode(message.trackStopped, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Room {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Room();
     while (reader.pos < end) {
@@ -3349,60 +3290,42 @@ export const ServerEvent_Room = {
             break;
           }
 
-          message.peerJoined = ServerEvent_Room_PeerJoined.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.peerJoined = ServerEvent_Room_PeerJoined.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.peerUpdated = ServerEvent_Room_PeerUpdated.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.peerUpdated = ServerEvent_Room_PeerUpdated.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.peerLeaved = ServerEvent_Room_PeerLeaved.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.peerLeaved = ServerEvent_Room_PeerLeaved.decode(reader, reader.uint32());
           continue;
         case 4:
           if (tag !== 34) {
             break;
           }
 
-          message.trackStarted = ServerEvent_Room_TrackStarted.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.trackStarted = ServerEvent_Room_TrackStarted.decode(reader, reader.uint32());
           continue;
         case 5:
           if (tag !== 42) {
             break;
           }
 
-          message.trackUpdated = ServerEvent_Room_TrackUpdated.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.trackUpdated = ServerEvent_Room_TrackUpdated.decode(reader, reader.uint32());
           continue;
         case 6:
           if (tag !== 50) {
             break;
           }
 
-          message.trackStopped = ServerEvent_Room_TrackStopped.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.trackStopped = ServerEvent_Room_TrackStopped.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -3415,15 +3338,9 @@ export const ServerEvent_Room = {
 
   fromJSON(object: any): ServerEvent_Room {
     return {
-      peerJoined: isSet(object.peerJoined)
-        ? ServerEvent_Room_PeerJoined.fromJSON(object.peerJoined)
-        : undefined,
-      peerUpdated: isSet(object.peerUpdated)
-        ? ServerEvent_Room_PeerUpdated.fromJSON(object.peerUpdated)
-        : undefined,
-      peerLeaved: isSet(object.peerLeaved)
-        ? ServerEvent_Room_PeerLeaved.fromJSON(object.peerLeaved)
-        : undefined,
+      peerJoined: isSet(object.peerJoined) ? ServerEvent_Room_PeerJoined.fromJSON(object.peerJoined) : undefined,
+      peerUpdated: isSet(object.peerUpdated) ? ServerEvent_Room_PeerUpdated.fromJSON(object.peerUpdated) : undefined,
+      peerLeaved: isSet(object.peerLeaved) ? ServerEvent_Room_PeerLeaved.fromJSON(object.peerLeaved) : undefined,
       trackStarted: isSet(object.trackStarted)
         ? ServerEvent_Room_TrackStarted.fromJSON(object.trackStarted)
         : undefined,
@@ -3442,64 +3359,46 @@ export const ServerEvent_Room = {
       obj.peerJoined = ServerEvent_Room_PeerJoined.toJSON(message.peerJoined);
     }
     if (message.peerUpdated !== undefined) {
-      obj.peerUpdated = ServerEvent_Room_PeerUpdated.toJSON(
-        message.peerUpdated,
-      );
+      obj.peerUpdated = ServerEvent_Room_PeerUpdated.toJSON(message.peerUpdated);
     }
     if (message.peerLeaved !== undefined) {
       obj.peerLeaved = ServerEvent_Room_PeerLeaved.toJSON(message.peerLeaved);
     }
     if (message.trackStarted !== undefined) {
-      obj.trackStarted = ServerEvent_Room_TrackStarted.toJSON(
-        message.trackStarted,
-      );
+      obj.trackStarted = ServerEvent_Room_TrackStarted.toJSON(message.trackStarted);
     }
     if (message.trackUpdated !== undefined) {
-      obj.trackUpdated = ServerEvent_Room_TrackUpdated.toJSON(
-        message.trackUpdated,
-      );
+      obj.trackUpdated = ServerEvent_Room_TrackUpdated.toJSON(message.trackUpdated);
     }
     if (message.trackStopped !== undefined) {
-      obj.trackStopped = ServerEvent_Room_TrackStopped.toJSON(
-        message.trackStopped,
-      );
+      obj.trackStopped = ServerEvent_Room_TrackStopped.toJSON(message.trackStopped);
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Room>, I>>(
-    base?: I,
-  ): ServerEvent_Room {
+  create<I extends Exact<DeepPartial<ServerEvent_Room>, I>>(base?: I): ServerEvent_Room {
     return ServerEvent_Room.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_Room>, I>>(
-    object: I,
-  ): ServerEvent_Room {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Room>, I>>(object: I): ServerEvent_Room {
     const message = createBaseServerEvent_Room();
-    message.peerJoined =
-      object.peerJoined !== undefined && object.peerJoined !== null
-        ? ServerEvent_Room_PeerJoined.fromPartial(object.peerJoined)
-        : undefined;
-    message.peerUpdated =
-      object.peerUpdated !== undefined && object.peerUpdated !== null
-        ? ServerEvent_Room_PeerUpdated.fromPartial(object.peerUpdated)
-        : undefined;
-    message.peerLeaved =
-      object.peerLeaved !== undefined && object.peerLeaved !== null
-        ? ServerEvent_Room_PeerLeaved.fromPartial(object.peerLeaved)
-        : undefined;
-    message.trackStarted =
-      object.trackStarted !== undefined && object.trackStarted !== null
-        ? ServerEvent_Room_TrackStarted.fromPartial(object.trackStarted)
-        : undefined;
-    message.trackUpdated =
-      object.trackUpdated !== undefined && object.trackUpdated !== null
-        ? ServerEvent_Room_TrackUpdated.fromPartial(object.trackUpdated)
-        : undefined;
-    message.trackStopped =
-      object.trackStopped !== undefined && object.trackStopped !== null
-        ? ServerEvent_Room_TrackStopped.fromPartial(object.trackStopped)
-        : undefined;
+    message.peerJoined = (object.peerJoined !== undefined && object.peerJoined !== null)
+      ? ServerEvent_Room_PeerJoined.fromPartial(object.peerJoined)
+      : undefined;
+    message.peerUpdated = (object.peerUpdated !== undefined && object.peerUpdated !== null)
+      ? ServerEvent_Room_PeerUpdated.fromPartial(object.peerUpdated)
+      : undefined;
+    message.peerLeaved = (object.peerLeaved !== undefined && object.peerLeaved !== null)
+      ? ServerEvent_Room_PeerLeaved.fromPartial(object.peerLeaved)
+      : undefined;
+    message.trackStarted = (object.trackStarted !== undefined && object.trackStarted !== null)
+      ? ServerEvent_Room_TrackStarted.fromPartial(object.trackStarted)
+      : undefined;
+    message.trackUpdated = (object.trackUpdated !== undefined && object.trackUpdated !== null)
+      ? ServerEvent_Room_TrackUpdated.fromPartial(object.trackUpdated)
+      : undefined;
+    message.trackStopped = (object.trackStopped !== undefined && object.trackStopped !== null)
+      ? ServerEvent_Room_TrackStopped.fromPartial(object.trackStopped)
+      : undefined;
     return message;
   },
 };
@@ -3509,10 +3408,7 @@ function createBaseServerEvent_Room_PeerJoined(): ServerEvent_Room_PeerJoined {
 }
 
 export const ServerEvent_Room_PeerJoined = {
-  encode(
-    message: ServerEvent_Room_PeerJoined,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Room_PeerJoined, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.peer !== "") {
       writer.uint32(10).string(message.peer);
     }
@@ -3522,12 +3418,8 @@ export const ServerEvent_Room_PeerJoined = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Room_PeerJoined {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Room_PeerJoined {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Room_PeerJoined();
     while (reader.pos < end) {
@@ -3559,9 +3451,7 @@ export const ServerEvent_Room_PeerJoined = {
   fromJSON(object: any): ServerEvent_Room_PeerJoined {
     return {
       peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
-      metadata: isSet(object.metadata)
-        ? globalThis.String(object.metadata)
-        : undefined,
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : undefined,
     };
   },
 
@@ -3576,14 +3466,10 @@ export const ServerEvent_Room_PeerJoined = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Room_PeerJoined>, I>>(
-    base?: I,
-  ): ServerEvent_Room_PeerJoined {
+  create<I extends Exact<DeepPartial<ServerEvent_Room_PeerJoined>, I>>(base?: I): ServerEvent_Room_PeerJoined {
     return ServerEvent_Room_PeerJoined.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_Room_PeerJoined>, I>>(
-    object: I,
-  ): ServerEvent_Room_PeerJoined {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Room_PeerJoined>, I>>(object: I): ServerEvent_Room_PeerJoined {
     const message = createBaseServerEvent_Room_PeerJoined();
     message.peer = object.peer ?? "";
     message.metadata = object.metadata ?? undefined;
@@ -3596,10 +3482,7 @@ function createBaseServerEvent_Room_PeerUpdated(): ServerEvent_Room_PeerUpdated 
 }
 
 export const ServerEvent_Room_PeerUpdated = {
-  encode(
-    message: ServerEvent_Room_PeerUpdated,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Room_PeerUpdated, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.peer !== "") {
       writer.uint32(10).string(message.peer);
     }
@@ -3609,12 +3492,8 @@ export const ServerEvent_Room_PeerUpdated = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Room_PeerUpdated {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Room_PeerUpdated {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Room_PeerUpdated();
     while (reader.pos < end) {
@@ -3646,9 +3525,7 @@ export const ServerEvent_Room_PeerUpdated = {
   fromJSON(object: any): ServerEvent_Room_PeerUpdated {
     return {
       peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
-      metadata: isSet(object.metadata)
-        ? globalThis.String(object.metadata)
-        : undefined,
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : undefined,
     };
   },
 
@@ -3663,14 +3540,10 @@ export const ServerEvent_Room_PeerUpdated = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Room_PeerUpdated>, I>>(
-    base?: I,
-  ): ServerEvent_Room_PeerUpdated {
+  create<I extends Exact<DeepPartial<ServerEvent_Room_PeerUpdated>, I>>(base?: I): ServerEvent_Room_PeerUpdated {
     return ServerEvent_Room_PeerUpdated.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_Room_PeerUpdated>, I>>(
-    object: I,
-  ): ServerEvent_Room_PeerUpdated {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Room_PeerUpdated>, I>>(object: I): ServerEvent_Room_PeerUpdated {
     const message = createBaseServerEvent_Room_PeerUpdated();
     message.peer = object.peer ?? "";
     message.metadata = object.metadata ?? undefined;
@@ -3683,22 +3556,15 @@ function createBaseServerEvent_Room_PeerLeaved(): ServerEvent_Room_PeerLeaved {
 }
 
 export const ServerEvent_Room_PeerLeaved = {
-  encode(
-    message: ServerEvent_Room_PeerLeaved,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Room_PeerLeaved, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.peer !== "") {
       writer.uint32(10).string(message.peer);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Room_PeerLeaved {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Room_PeerLeaved {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Room_PeerLeaved();
     while (reader.pos < end) {
@@ -3732,14 +3598,10 @@ export const ServerEvent_Room_PeerLeaved = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Room_PeerLeaved>, I>>(
-    base?: I,
-  ): ServerEvent_Room_PeerLeaved {
+  create<I extends Exact<DeepPartial<ServerEvent_Room_PeerLeaved>, I>>(base?: I): ServerEvent_Room_PeerLeaved {
     return ServerEvent_Room_PeerLeaved.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_Room_PeerLeaved>, I>>(
-    object: I,
-  ): ServerEvent_Room_PeerLeaved {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Room_PeerLeaved>, I>>(object: I): ServerEvent_Room_PeerLeaved {
     const message = createBaseServerEvent_Room_PeerLeaved();
     message.peer = object.peer ?? "";
     return message;
@@ -3751,10 +3613,7 @@ function createBaseServerEvent_Room_TrackStarted(): ServerEvent_Room_TrackStarte
 }
 
 export const ServerEvent_Room_TrackStarted = {
-  encode(
-    message: ServerEvent_Room_TrackStarted,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Room_TrackStarted, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.peer !== "") {
       writer.uint32(10).string(message.peer);
     }
@@ -3770,12 +3629,8 @@ export const ServerEvent_Room_TrackStarted = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Room_TrackStarted {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Room_TrackStarted {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Room_TrackStarted();
     while (reader.pos < end) {
@@ -3823,9 +3678,7 @@ export const ServerEvent_Room_TrackStarted = {
       peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
       track: isSet(object.track) ? globalThis.String(object.track) : "",
       kind: isSet(object.kind) ? kindFromJSON(object.kind) : 0,
-      metadata: isSet(object.metadata)
-        ? globalThis.String(object.metadata)
-        : undefined,
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : undefined,
     };
   },
 
@@ -3846,9 +3699,7 @@ export const ServerEvent_Room_TrackStarted = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Room_TrackStarted>, I>>(
-    base?: I,
-  ): ServerEvent_Room_TrackStarted {
+  create<I extends Exact<DeepPartial<ServerEvent_Room_TrackStarted>, I>>(base?: I): ServerEvent_Room_TrackStarted {
     return ServerEvent_Room_TrackStarted.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ServerEvent_Room_TrackStarted>, I>>(
@@ -3868,10 +3719,7 @@ function createBaseServerEvent_Room_TrackUpdated(): ServerEvent_Room_TrackUpdate
 }
 
 export const ServerEvent_Room_TrackUpdated = {
-  encode(
-    message: ServerEvent_Room_TrackUpdated,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Room_TrackUpdated, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.peer !== "") {
       writer.uint32(10).string(message.peer);
     }
@@ -3887,12 +3735,8 @@ export const ServerEvent_Room_TrackUpdated = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Room_TrackUpdated {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Room_TrackUpdated {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Room_TrackUpdated();
     while (reader.pos < end) {
@@ -3940,9 +3784,7 @@ export const ServerEvent_Room_TrackUpdated = {
       peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
       track: isSet(object.track) ? globalThis.String(object.track) : "",
       kind: isSet(object.kind) ? kindFromJSON(object.kind) : 0,
-      metadata: isSet(object.metadata)
-        ? globalThis.String(object.metadata)
-        : undefined,
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : undefined,
     };
   },
 
@@ -3963,9 +3805,7 @@ export const ServerEvent_Room_TrackUpdated = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Room_TrackUpdated>, I>>(
-    base?: I,
-  ): ServerEvent_Room_TrackUpdated {
+  create<I extends Exact<DeepPartial<ServerEvent_Room_TrackUpdated>, I>>(base?: I): ServerEvent_Room_TrackUpdated {
     return ServerEvent_Room_TrackUpdated.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ServerEvent_Room_TrackUpdated>, I>>(
@@ -3985,10 +3825,7 @@ function createBaseServerEvent_Room_TrackStopped(): ServerEvent_Room_TrackStoppe
 }
 
 export const ServerEvent_Room_TrackStopped = {
-  encode(
-    message: ServerEvent_Room_TrackStopped,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Room_TrackStopped, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.peer !== "") {
       writer.uint32(10).string(message.peer);
     }
@@ -4001,12 +3838,8 @@ export const ServerEvent_Room_TrackStopped = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Room_TrackStopped {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Room_TrackStopped {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Room_TrackStopped();
     while (reader.pos < end) {
@@ -4064,9 +3897,7 @@ export const ServerEvent_Room_TrackStopped = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Room_TrackStopped>, I>>(
-    base?: I,
-  ): ServerEvent_Room_TrackStopped {
+  create<I extends Exact<DeepPartial<ServerEvent_Room_TrackStopped>, I>>(base?: I): ServerEvent_Room_TrackStopped {
     return ServerEvent_Room_TrackStopped.fromPartial(base ?? ({} as any));
   },
   fromPartial<I extends Exact<DeepPartial<ServerEvent_Room_TrackStopped>, I>>(
@@ -4085,25 +3916,18 @@ function createBaseServerEvent_Sender(): ServerEvent_Sender {
 }
 
 export const ServerEvent_Sender = {
-  encode(
-    message: ServerEvent_Sender,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Sender, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
     }
     if (message.state !== undefined) {
-      ServerEvent_Sender_State.encode(
-        message.state,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      ServerEvent_Sender_State.encode(message.state, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Sender {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Sender();
     while (reader.pos < end) {
@@ -4121,10 +3945,7 @@ export const ServerEvent_Sender = {
             break;
           }
 
-          message.state = ServerEvent_Sender_State.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.state = ServerEvent_Sender_State.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -4138,9 +3959,7 @@ export const ServerEvent_Sender = {
   fromJSON(object: any): ServerEvent_Sender {
     return {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
-      state: isSet(object.state)
-        ? ServerEvent_Sender_State.fromJSON(object.state)
-        : undefined,
+      state: isSet(object.state) ? ServerEvent_Sender_State.fromJSON(object.state) : undefined,
     };
   },
 
@@ -4155,20 +3974,15 @@ export const ServerEvent_Sender = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Sender>, I>>(
-    base?: I,
-  ): ServerEvent_Sender {
+  create<I extends Exact<DeepPartial<ServerEvent_Sender>, I>>(base?: I): ServerEvent_Sender {
     return ServerEvent_Sender.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_Sender>, I>>(
-    object: I,
-  ): ServerEvent_Sender {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Sender>, I>>(object: I): ServerEvent_Sender {
     const message = createBaseServerEvent_Sender();
     message.name = object.name ?? "";
-    message.state =
-      object.state !== undefined && object.state !== null
-        ? ServerEvent_Sender_State.fromPartial(object.state)
-        : undefined;
+    message.state = (object.state !== undefined && object.state !== null)
+      ? ServerEvent_Sender_State.fromPartial(object.state)
+      : undefined;
     return message;
   },
 };
@@ -4178,22 +3992,15 @@ function createBaseServerEvent_Sender_State(): ServerEvent_Sender_State {
 }
 
 export const ServerEvent_Sender_State = {
-  encode(
-    message: ServerEvent_Sender_State,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Sender_State, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.state !== 0) {
       writer.uint32(8).int32(message.state);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Sender_State {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Sender_State {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Sender_State();
     while (reader.pos < end) {
@@ -4216,11 +4023,7 @@ export const ServerEvent_Sender_State = {
   },
 
   fromJSON(object: any): ServerEvent_Sender_State {
-    return {
-      state: isSet(object.state)
-        ? serverEvent_Sender_State_StateTypeFromJSON(object.state)
-        : 0,
-    };
+    return { state: isSet(object.state) ? serverEvent_Sender_State_StateTypeFromJSON(object.state) : 0 };
   },
 
   toJSON(message: ServerEvent_Sender_State): unknown {
@@ -4231,14 +4034,10 @@ export const ServerEvent_Sender_State = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Sender_State>, I>>(
-    base?: I,
-  ): ServerEvent_Sender_State {
+  create<I extends Exact<DeepPartial<ServerEvent_Sender_State>, I>>(base?: I): ServerEvent_Sender_State {
     return ServerEvent_Sender_State.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_Sender_State>, I>>(
-    object: I,
-  ): ServerEvent_Sender_State {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Sender_State>, I>>(object: I): ServerEvent_Sender_State {
     const message = createBaseServerEvent_Sender_State();
     message.state = object.state ?? 0;
     return message;
@@ -4250,34 +4049,21 @@ function createBaseServerEvent_Receiver(): ServerEvent_Receiver {
 }
 
 export const ServerEvent_Receiver = {
-  encode(
-    message: ServerEvent_Receiver,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Receiver, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.name !== "") {
       writer.uint32(10).string(message.name);
     }
     if (message.state !== undefined) {
-      ServerEvent_Receiver_State.encode(
-        message.state,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      ServerEvent_Receiver_State.encode(message.state, writer.uint32(18).fork()).ldelim();
     }
     if (message.stats !== undefined) {
-      ServerEvent_Receiver_Stats.encode(
-        message.stats,
-        writer.uint32(26).fork(),
-      ).ldelim();
+      ServerEvent_Receiver_Stats.encode(message.stats, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Receiver {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Receiver {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Receiver();
     while (reader.pos < end) {
@@ -4295,20 +4081,14 @@ export const ServerEvent_Receiver = {
             break;
           }
 
-          message.state = ServerEvent_Receiver_State.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.state = ServerEvent_Receiver_State.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
             break;
           }
 
-          message.stats = ServerEvent_Receiver_Stats.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.stats = ServerEvent_Receiver_Stats.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -4322,12 +4102,8 @@ export const ServerEvent_Receiver = {
   fromJSON(object: any): ServerEvent_Receiver {
     return {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
-      state: isSet(object.state)
-        ? ServerEvent_Receiver_State.fromJSON(object.state)
-        : undefined,
-      stats: isSet(object.stats)
-        ? ServerEvent_Receiver_Stats.fromJSON(object.stats)
-        : undefined,
+      state: isSet(object.state) ? ServerEvent_Receiver_State.fromJSON(object.state) : undefined,
+      stats: isSet(object.stats) ? ServerEvent_Receiver_Stats.fromJSON(object.stats) : undefined,
     };
   },
 
@@ -4345,24 +4121,18 @@ export const ServerEvent_Receiver = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Receiver>, I>>(
-    base?: I,
-  ): ServerEvent_Receiver {
+  create<I extends Exact<DeepPartial<ServerEvent_Receiver>, I>>(base?: I): ServerEvent_Receiver {
     return ServerEvent_Receiver.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_Receiver>, I>>(
-    object: I,
-  ): ServerEvent_Receiver {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Receiver>, I>>(object: I): ServerEvent_Receiver {
     const message = createBaseServerEvent_Receiver();
     message.name = object.name ?? "";
-    message.state =
-      object.state !== undefined && object.state !== null
-        ? ServerEvent_Receiver_State.fromPartial(object.state)
-        : undefined;
-    message.stats =
-      object.stats !== undefined && object.stats !== null
-        ? ServerEvent_Receiver_Stats.fromPartial(object.stats)
-        : undefined;
+    message.state = (object.state !== undefined && object.state !== null)
+      ? ServerEvent_Receiver_State.fromPartial(object.state)
+      : undefined;
+    message.stats = (object.stats !== undefined && object.stats !== null)
+      ? ServerEvent_Receiver_Stats.fromPartial(object.stats)
+      : undefined;
     return message;
   },
 };
@@ -4372,22 +4142,15 @@ function createBaseServerEvent_Receiver_State(): ServerEvent_Receiver_State {
 }
 
 export const ServerEvent_Receiver_State = {
-  encode(
-    message: ServerEvent_Receiver_State,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Receiver_State, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.state !== 0) {
       writer.uint32(8).int32(message.state);
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Receiver_State {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Receiver_State {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Receiver_State();
     while (reader.pos < end) {
@@ -4410,11 +4173,7 @@ export const ServerEvent_Receiver_State = {
   },
 
   fromJSON(object: any): ServerEvent_Receiver_State {
-    return {
-      state: isSet(object.state)
-        ? serverEvent_Receiver_State_StateTypeFromJSON(object.state)
-        : 0,
-    };
+    return { state: isSet(object.state) ? serverEvent_Receiver_State_StateTypeFromJSON(object.state) : 0 };
   },
 
   toJSON(message: ServerEvent_Receiver_State): unknown {
@@ -4425,14 +4184,10 @@ export const ServerEvent_Receiver_State = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Receiver_State>, I>>(
-    base?: I,
-  ): ServerEvent_Receiver_State {
+  create<I extends Exact<DeepPartial<ServerEvent_Receiver_State>, I>>(base?: I): ServerEvent_Receiver_State {
     return ServerEvent_Receiver_State.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_Receiver_State>, I>>(
-    object: I,
-  ): ServerEvent_Receiver_State {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Receiver_State>, I>>(object: I): ServerEvent_Receiver_State {
     const message = createBaseServerEvent_Receiver_State();
     message.state = object.state ?? 0;
     return message;
@@ -4444,31 +4199,18 @@ function createBaseServerEvent_Receiver_Stats(): ServerEvent_Receiver_Stats {
 }
 
 export const ServerEvent_Receiver_Stats = {
-  encode(
-    message: ServerEvent_Receiver_Stats,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Receiver_Stats, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.source !== undefined) {
-      ServerEvent_Receiver_Stats_Source.encode(
-        message.source,
-        writer.uint32(10).fork(),
-      ).ldelim();
+      ServerEvent_Receiver_Stats_Source.encode(message.source, writer.uint32(10).fork()).ldelim();
     }
     if (message.transmit !== undefined) {
-      ServerEvent_Receiver_Stats_Transmit.encode(
-        message.transmit,
-        writer.uint32(18).fork(),
-      ).ldelim();
+      ServerEvent_Receiver_Stats_Transmit.encode(message.transmit, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Receiver_Stats {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Receiver_Stats {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Receiver_Stats();
     while (reader.pos < end) {
@@ -4479,20 +4221,14 @@ export const ServerEvent_Receiver_Stats = {
             break;
           }
 
-          message.source = ServerEvent_Receiver_Stats_Source.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.source = ServerEvent_Receiver_Stats_Source.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.transmit = ServerEvent_Receiver_Stats_Transmit.decode(
-            reader,
-            reader.uint32(),
-          );
+          message.transmit = ServerEvent_Receiver_Stats_Transmit.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -4505,12 +4241,8 @@ export const ServerEvent_Receiver_Stats = {
 
   fromJSON(object: any): ServerEvent_Receiver_Stats {
     return {
-      source: isSet(object.source)
-        ? ServerEvent_Receiver_Stats_Source.fromJSON(object.source)
-        : undefined,
-      transmit: isSet(object.transmit)
-        ? ServerEvent_Receiver_Stats_Transmit.fromJSON(object.transmit)
-        : undefined,
+      source: isSet(object.source) ? ServerEvent_Receiver_Stats_Source.fromJSON(object.source) : undefined,
+      transmit: isSet(object.transmit) ? ServerEvent_Receiver_Stats_Transmit.fromJSON(object.transmit) : undefined,
     };
   },
 
@@ -4520,30 +4252,22 @@ export const ServerEvent_Receiver_Stats = {
       obj.source = ServerEvent_Receiver_Stats_Source.toJSON(message.source);
     }
     if (message.transmit !== undefined) {
-      obj.transmit = ServerEvent_Receiver_Stats_Transmit.toJSON(
-        message.transmit,
-      );
+      obj.transmit = ServerEvent_Receiver_Stats_Transmit.toJSON(message.transmit);
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_Receiver_Stats>, I>>(
-    base?: I,
-  ): ServerEvent_Receiver_Stats {
+  create<I extends Exact<DeepPartial<ServerEvent_Receiver_Stats>, I>>(base?: I): ServerEvent_Receiver_Stats {
     return ServerEvent_Receiver_Stats.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_Receiver_Stats>, I>>(
-    object: I,
-  ): ServerEvent_Receiver_Stats {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Receiver_Stats>, I>>(object: I): ServerEvent_Receiver_Stats {
     const message = createBaseServerEvent_Receiver_Stats();
-    message.source =
-      object.source !== undefined && object.source !== null
-        ? ServerEvent_Receiver_Stats_Source.fromPartial(object.source)
-        : undefined;
-    message.transmit =
-      object.transmit !== undefined && object.transmit !== null
-        ? ServerEvent_Receiver_Stats_Transmit.fromPartial(object.transmit)
-        : undefined;
+    message.source = (object.source !== undefined && object.source !== null)
+      ? ServerEvent_Receiver_Stats_Source.fromPartial(object.source)
+      : undefined;
+    message.transmit = (object.transmit !== undefined && object.transmit !== null)
+      ? ServerEvent_Receiver_Stats_Transmit.fromPartial(object.transmit)
+      : undefined;
     return message;
   },
 };
@@ -4553,10 +4277,7 @@ function createBaseServerEvent_Receiver_Stats_Source(): ServerEvent_Receiver_Sta
 }
 
 export const ServerEvent_Receiver_Stats_Source = {
-  encode(
-    message: ServerEvent_Receiver_Stats_Source,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Receiver_Stats_Source, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.bitrateKbps !== 0) {
       writer.uint32(8).uint32(message.bitrateKbps);
     }
@@ -4572,12 +4293,8 @@ export const ServerEvent_Receiver_Stats_Source = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Receiver_Stats_Source {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Receiver_Stats_Source {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Receiver_Stats_Source();
     while (reader.pos < end) {
@@ -4622,9 +4339,7 @@ export const ServerEvent_Receiver_Stats_Source = {
 
   fromJSON(object: any): ServerEvent_Receiver_Stats_Source {
     return {
-      bitrateKbps: isSet(object.bitrateKbps)
-        ? globalThis.Number(object.bitrateKbps)
-        : 0,
+      bitrateKbps: isSet(object.bitrateKbps) ? globalThis.Number(object.bitrateKbps) : 0,
       rtt: isSet(object.rtt) ? globalThis.Number(object.rtt) : 0,
       lost: isSet(object.lost) ? globalThis.Number(object.lost) : 0,
       jitter: isSet(object.jitter) ? globalThis.Number(object.jitter) : 0,
@@ -4653,9 +4368,9 @@ export const ServerEvent_Receiver_Stats_Source = {
   ): ServerEvent_Receiver_Stats_Source {
     return ServerEvent_Receiver_Stats_Source.fromPartial(base ?? ({} as any));
   },
-  fromPartial<
-    I extends Exact<DeepPartial<ServerEvent_Receiver_Stats_Source>, I>,
-  >(object: I): ServerEvent_Receiver_Stats_Source {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Receiver_Stats_Source>, I>>(
+    object: I,
+  ): ServerEvent_Receiver_Stats_Source {
     const message = createBaseServerEvent_Receiver_Stats_Source();
     message.bitrateKbps = object.bitrateKbps ?? 0;
     message.rtt = object.rtt ?? 0;
@@ -4670,10 +4385,7 @@ function createBaseServerEvent_Receiver_Stats_Transmit(): ServerEvent_Receiver_S
 }
 
 export const ServerEvent_Receiver_Stats_Transmit = {
-  encode(
-    message: ServerEvent_Receiver_Stats_Transmit,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ServerEvent_Receiver_Stats_Transmit, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.spatial !== 0) {
       writer.uint32(8).uint32(message.spatial);
     }
@@ -4686,12 +4398,8 @@ export const ServerEvent_Receiver_Stats_Transmit = {
     return writer;
   },
 
-  decode(
-    input: _m0.Reader | Uint8Array,
-    length?: number,
-  ): ServerEvent_Receiver_Stats_Transmit {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Receiver_Stats_Transmit {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseServerEvent_Receiver_Stats_Transmit();
     while (reader.pos < end) {
@@ -4731,9 +4439,7 @@ export const ServerEvent_Receiver_Stats_Transmit = {
     return {
       spatial: isSet(object.spatial) ? globalThis.Number(object.spatial) : 0,
       temporal: isSet(object.temporal) ? globalThis.Number(object.temporal) : 0,
-      bitrateKbps: isSet(object.bitrateKbps)
-        ? globalThis.Number(object.bitrateKbps)
-        : 0,
+      bitrateKbps: isSet(object.bitrateKbps) ? globalThis.Number(object.bitrateKbps) : 0,
     };
   },
 
@@ -4756,9 +4462,9 @@ export const ServerEvent_Receiver_Stats_Transmit = {
   ): ServerEvent_Receiver_Stats_Transmit {
     return ServerEvent_Receiver_Stats_Transmit.fromPartial(base ?? ({} as any));
   },
-  fromPartial<
-    I extends Exact<DeepPartial<ServerEvent_Receiver_Stats_Transmit>, I>,
-  >(object: I): ServerEvent_Receiver_Stats_Transmit {
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Receiver_Stats_Transmit>, I>>(
+    object: I,
+  ): ServerEvent_Receiver_Stats_Transmit {
     const message = createBaseServerEvent_Receiver_Stats_Transmit();
     message.spatial = object.spatial ?? 0;
     message.temporal = object.temporal ?? 0;
@@ -4772,10 +4478,7 @@ function createBaseClientEvent(): ClientEvent {
 }
 
 export const ClientEvent = {
-  encode(
-    message: ClientEvent,
-    writer: _m0.Writer = _m0.Writer.create(),
-  ): _m0.Writer {
+  encode(message: ClientEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.seq !== 0) {
       writer.uint32(8).uint32(message.seq);
     }
@@ -4786,8 +4489,7 @@ export const ClientEvent = {
   },
 
   decode(input: _m0.Reader | Uint8Array, length?: number): ClientEvent {
-    const reader =
-      input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
     const message = createBaseClientEvent();
     while (reader.pos < end) {
@@ -4819,9 +4521,7 @@ export const ClientEvent = {
   fromJSON(object: any): ClientEvent {
     return {
       seq: isSet(object.seq) ? globalThis.Number(object.seq) : 0,
-      request: isSet(object.request)
-        ? Request.fromJSON(object.request)
-        : undefined,
+      request: isSet(object.request) ? Request.fromJSON(object.request) : undefined,
     };
   },
 
@@ -4839,44 +4539,27 @@ export const ClientEvent = {
   create<I extends Exact<DeepPartial<ClientEvent>, I>>(base?: I): ClientEvent {
     return ClientEvent.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ClientEvent>, I>>(
-    object: I,
-  ): ClientEvent {
+  fromPartial<I extends Exact<DeepPartial<ClientEvent>, I>>(object: I): ClientEvent {
     const message = createBaseClientEvent();
     message.seq = object.seq ?? 0;
-    message.request =
-      object.request !== undefined && object.request !== null
-        ? Request.fromPartial(object.request)
-        : undefined;
+    message.request = (object.request !== undefined && object.request !== null)
+      ? Request.fromPartial(object.request)
+      : undefined;
     return message;
   },
 };
 
-type Builtin =
-  | Date
-  | Function
-  | Uint8Array
-  | string
-  | number
-  | boolean
-  | undefined;
+type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 
-export type DeepPartial<T> = T extends Builtin
-  ? T
-  : T extends globalThis.Array<infer U>
-    ? globalThis.Array<DeepPartial<U>>
-    : T extends ReadonlyArray<infer U>
-      ? ReadonlyArray<DeepPartial<U>>
-      : T extends {}
-        ? { [K in keyof T]?: DeepPartial<T[K]> }
-        : Partial<T>;
+export type DeepPartial<T> = T extends Builtin ? T
+  : T extends globalThis.Array<infer U> ? globalThis.Array<DeepPartial<U>>
+  : T extends ReadonlyArray<infer U> ? ReadonlyArray<DeepPartial<U>>
+  : T extends {} ? { [K in keyof T]?: DeepPartial<T[K]> }
+  : Partial<T>;
 
 type KeysOfUnion<T> = T extends T ? keyof T : never;
-export type Exact<P, I extends P> = P extends Builtin
-  ? P
-  : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
-      [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
-    };
+export type Exact<P, I extends P> = P extends Builtin ? P
+  : P & { [K in keyof P]: Exact<P[K], I[K]> } & { [K in Exclude<keyof I, KeysOfUnion<P>>]: never };
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

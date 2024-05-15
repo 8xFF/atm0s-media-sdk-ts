@@ -16,6 +16,7 @@ import MeetSelection from "./selection";
 import { useCallback, useMemo, useState } from "react";
 import MeetInRoom from "./room";
 import { useSearchParams } from "next/navigation";
+import { SelectedGateway } from "../../../components/GatewaySelector";
 
 export default function MeetPage(): JSX.Element {
   const searchParams = useSearchParams();
@@ -38,7 +39,7 @@ export default function MeetPage(): JSX.Element {
   return (
     <main className="w-full h-screen">
       <Atm0sMediaProvider
-        gateway="http://localhost:3000"
+        gateway={SelectedGateway.url}
         cfg={cfg}
         prepareAudioReceivers={3}
         prepareVideoReceivers={3}

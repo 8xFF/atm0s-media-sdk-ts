@@ -11,6 +11,7 @@ import {
   Session,
   SessionEvent,
 } from "@atm0s-media-sdk/sdk-core/lib";
+import { SelectedGateway } from "../../components/GatewaySelector";
 
 export default function EchoLazy(): JSX.Element {
   useEffect(() => {
@@ -30,7 +31,7 @@ export default function EchoLazy(): JSX.Element {
     const disconnect_btn = document.getElementById("disconnect")!;
 
     async function connect() {
-      const session = new Session("http://localhost:3000", {
+      const session = new Session(SelectedGateway.url, {
         token: "demo-token",
       });
 

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useMemo, useRef, useState } from "react";
+import { GatewaySelectors } from "../../components/GatewaySelector";
 
 export default function MeetPage(): JSX.Element {
   const router = useRouter();
@@ -16,6 +17,7 @@ export default function MeetPage(): JSX.Element {
 
   return (
     <main>
+      <GatewaySelectors />
       <div>
         <span>Room</span>
         <input ref={roomRef} />
