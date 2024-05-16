@@ -22,14 +22,15 @@ export interface ConnectRequest {
 export interface ConnectResponse {
   connId: string;
   sdp: string;
+  iceLite: boolean;
 }
 
 export interface RemoteIceRequest {
-  connId: string;
-  candidate: string;
+  candidates: string[];
 }
 
 export interface RemoteIceResponse {
+  added: number;
 }
 
 function createBaseConnectRequest(): ConnectRequest {
@@ -156,7 +157,7 @@ export const ConnectRequest = {
 };
 
 function createBaseConnectResponse(): ConnectResponse {
-  return { connId: "", sdp: "" };
+  return { connId: "", sdp: "", iceLite: false };
 }
 
 export const ConnectResponse = {
@@ -166,6 +167,9 @@ export const ConnectResponse = {
     }
     if (message.sdp !== "") {
       writer.uint32(18).string(message.sdp);
+    }
+    if (message.iceLite !== false) {
+      writer.uint32(24).bool(message.iceLite);
     }
     return writer;
   },
@@ -191,6 +195,13 @@ export const ConnectResponse = {
 
           message.sdp = reader.string();
           continue;
+        case 3:
+          if (tag !== 24) {
+            break;
+          }
+
+          message.iceLite = reader.bool();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -204,6 +215,7 @@ export const ConnectResponse = {
     return {
       connId: isSet(object.connId) ? globalThis.String(object.connId) : "",
       sdp: isSet(object.sdp) ? globalThis.String(object.sdp) : "",
+      iceLite: isSet(object.iceLite) ? globalThis.Boolean(object.iceLite) : false,
     };
   },
 
@@ -215,6 +227,9 @@ export const ConnectResponse = {
     if (message.sdp !== "") {
       obj.sdp = message.sdp;
     }
+    if (message.iceLite !== false) {
+      obj.iceLite = message.iceLite;
+    }
     return obj;
   },
 
@@ -225,21 +240,19 @@ export const ConnectResponse = {
     const message = createBaseConnectResponse();
     message.connId = object.connId ?? "";
     message.sdp = object.sdp ?? "";
+    message.iceLite = object.iceLite ?? false;
     return message;
   },
 };
 
 function createBaseRemoteIceRequest(): RemoteIceRequest {
-  return { connId: "", candidate: "" };
+  return { candidates: [] };
 }
 
 export const RemoteIceRequest = {
   encode(message: RemoteIceRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.connId !== "") {
-      writer.uint32(10).string(message.connId);
-    }
-    if (message.candidate !== "") {
-      writer.uint32(18).string(message.candidate);
+    for (const v of message.candidates) {
+      writer.uint32(10).string(v!);
     }
     return writer;
   },
@@ -256,14 +269,7 @@ export const RemoteIceRequest = {
             break;
           }
 
-          message.connId = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.candidate = reader.string();
+          message.candidates.push(reader.string());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -276,18 +282,16 @@ export const RemoteIceRequest = {
 
   fromJSON(object: any): RemoteIceRequest {
     return {
-      connId: isSet(object.connId) ? globalThis.String(object.connId) : "",
-      candidate: isSet(object.candidate) ? globalThis.String(object.candidate) : "",
+      candidates: globalThis.Array.isArray(object?.candidates)
+        ? object.candidates.map((e: any) => globalThis.String(e))
+        : [],
     };
   },
 
   toJSON(message: RemoteIceRequest): unknown {
     const obj: any = {};
-    if (message.connId !== "") {
-      obj.connId = message.connId;
-    }
-    if (message.candidate !== "") {
-      obj.candidate = message.candidate;
+    if (message.candidates?.length) {
+      obj.candidates = message.candidates;
     }
     return obj;
   },
@@ -297,18 +301,20 @@ export const RemoteIceRequest = {
   },
   fromPartial<I extends Exact<DeepPartial<RemoteIceRequest>, I>>(object: I): RemoteIceRequest {
     const message = createBaseRemoteIceRequest();
-    message.connId = object.connId ?? "";
-    message.candidate = object.candidate ?? "";
+    message.candidates = object.candidates?.map((e) => e) || [];
     return message;
   },
 };
 
 function createBaseRemoteIceResponse(): RemoteIceResponse {
-  return {};
+  return { added: 0 };
 }
 
 export const RemoteIceResponse = {
-  encode(_: RemoteIceResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(message: RemoteIceResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.added !== 0) {
+      writer.uint32(8).uint32(message.added);
+    }
     return writer;
   },
 
@@ -319,6 +325,13 @@ export const RemoteIceResponse = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.added = reader.uint32();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -328,20 +341,24 @@ export const RemoteIceResponse = {
     return message;
   },
 
-  fromJSON(_: any): RemoteIceResponse {
-    return {};
+  fromJSON(object: any): RemoteIceResponse {
+    return { added: isSet(object.added) ? globalThis.Number(object.added) : 0 };
   },
 
-  toJSON(_: RemoteIceResponse): unknown {
+  toJSON(message: RemoteIceResponse): unknown {
     const obj: any = {};
+    if (message.added !== 0) {
+      obj.added = Math.round(message.added);
+    }
     return obj;
   },
 
   create<I extends Exact<DeepPartial<RemoteIceResponse>, I>>(base?: I): RemoteIceResponse {
     return RemoteIceResponse.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<RemoteIceResponse>, I>>(_: I): RemoteIceResponse {
+  fromPartial<I extends Exact<DeepPartial<RemoteIceResponse>, I>>(object: I): RemoteIceResponse {
     const message = createBaseRemoteIceResponse();
+    message.added = object.added ?? 0;
     return message;
   },
 };

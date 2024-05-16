@@ -1,4 +1,9 @@
-import { ConnectRequest, ConnectResponse } from "./generated/protobuf/gateway";
+import {
+  ConnectRequest,
+  ConnectResponse,
+  RemoteIceRequest,
+  RemoteIceResponse,
+} from "./generated/protobuf/gateway";
 import { TrackReceiver } from "./receiver";
 import { TrackSender, TrackSenderConfig } from "./sender";
 import { EventEmitter, post_protobuf } from "./utils";
@@ -32,6 +37,7 @@ export enum SessionEvent {
 }
 
 export class Session extends EventEmitter {
+  ice_lite: boolean = false;
   created_at: number;
   version?: string;
   conn_id?: string;
@@ -103,6 +109,25 @@ export class Session extends EventEmitter {
         }
       }
       console.warn("[Session] not found receiver for track", event.track);
+    };
+
+    this.peer.onicecandidate = async (event) => {
+      if (event.candidate && !this.ice_lite) {
+        const req = RemoteIceRequest.create({
+          candidates: [event.candidate.candidate],
+        });
+        console.log("Send ice-candidate", event.candidate.candidate);
+        const res = await post_protobuf(
+          RemoteIceRequest,
+          RemoteIceResponse,
+          this.gateway + "/webrtc/" + this.conn_id + "/ice-candidate",
+          req,
+          {
+            "Content-Type": "application/grpc",
+          },
+        );
+        console.log("Sent ice-candidate", res);
+      }
     };
   }
 
@@ -176,6 +201,7 @@ export class Session extends EventEmitter {
       },
     );
     this.conn_id = res.connId;
+    this.ice_lite = res.iceLite;
     await this.peer.setLocalDescription(local_desc);
     await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
     await this.dc.ready();
@@ -210,6 +236,7 @@ export class Session extends EventEmitter {
       },
     );
     this.conn_id = res.connId;
+    this.ice_lite = res.iceLite;
     console.log("Apply restart-ice response");
     await this.peer.setLocalDescription(local_desc);
     await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
