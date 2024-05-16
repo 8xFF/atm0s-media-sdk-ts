@@ -13,9 +13,11 @@ import {
   BitrateControlMode,
   Sender_Config,
   string_to_kind,
+  JoinInfo,
 } from "@atm0s-media-sdk/sdk-core/lib";
 
 export enum ContextEvent {
+  RoomUpdated = "room.updated",
   PeersUpdated = "peers.updated",
   TracksUpdated = "tracks.updated",
   PeerTracksUpdated = "peer.tracks.updated.",
@@ -104,6 +106,13 @@ export class Context extends EventEmitter {
         this.emit(ContextEvent.PeerTracksUpdated + track.peer);
       },
     );
+    this.session.on(SessionEvent.ROOM_CHANGED, (e?: JoinInfo) => {
+      this.emit(ContextEvent.RoomUpdated, e);
+    });
+  }
+
+  get room(): JoinInfo | undefined {
+    return this.session.room;
   }
 
   takeReceiver(kind: Kind): TrackReceiver {

@@ -2,7 +2,7 @@ export { Context, Publisher } from "./context";
 export type { PublisherConfig } from "./context";
 
 export { Atm0sMediaProvider } from "./provider";
-export { useSession } from "./hooks/session";
+export { useSession, useRoom } from "./hooks/session";
 
 export {
   useRemoteAudioTracks,

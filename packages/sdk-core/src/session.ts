@@ -28,6 +28,7 @@ export interface SessionConfig {
 }
 
 export enum SessionEvent {
+  ROOM_CHANGED = "room.changed",
   ROOM_PEER_JOINED = "room.peer.joined",
   ROOM_PEER_UPDATED = "room.peer.updated",
   ROOM_PEER_LEAVED = "room.peer.leaved",
@@ -129,6 +130,10 @@ export class Session extends EventEmitter {
         console.log("Sent ice-candidate", res);
       }
     };
+  }
+
+  get room() {
+    return this.cfg.join;
   }
 
   receiver(kind: Kind): TrackReceiver {
@@ -243,14 +248,15 @@ export class Session extends EventEmitter {
   }
 
   async join(info: JoinInfo, token: string) {
-    this.cfg.join = info;
-    this.cfg.token = token;
-    return this.dc.request_session({
+    await this.dc.request_session({
       join: {
         info,
         token,
       },
     });
+    this.cfg.join = info;
+    this.cfg.token = token;
+    this.emit(SessionEvent.ROOM_CHANGED, info);
   }
 
   async sync_sdp() {
@@ -276,10 +282,11 @@ export class Session extends EventEmitter {
   }
 
   async leave() {
-    this.cfg.join = undefined;
-    return this.dc.request_session({
+    await this.dc.request_session({
       leave: {},
     });
+    this.cfg.join = undefined;
+    this.emit(SessionEvent.ROOM_CHANGED, undefined);
   }
 
   disconnect() {

@@ -1,3 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.flex-grow-row {
+  min-width: 0;
+}
+
+.flex-grow-col {
+  min-height: 0;
+}

@@ -54,7 +54,7 @@ function MeetContent(): JSX.Element {
 
 export default function MeetPage(): JSX.Element {
   return (
-    <main className="w-full h-screen">
+    <main className="w-screen h-screen">
       <Suspense fallback={<span>Loading</span>}>
         <MeetContent />
       </Suspense>

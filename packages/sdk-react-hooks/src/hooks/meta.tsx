@@ -33,14 +33,15 @@ export function useRemoteTracks(peer?: string, kind?: Kind): RemoteTrack[] {
   const ctx = useContext(Atm0sMediaContext);
   const [tracks, setTracks] = useState(() =>
     Array.from(ctx.tracks.values()).filter(
-      (t) => (!peer || t.peer == peer) && (!kind || t.kind == kind),
+      (t) => (!peer || t.peer == peer) && (kind == undefined || t.kind == kind),
     ),
   );
   useEffect(() => {
     console.log("new", peer, kind, tracks, tracks);
     const handler = () => {
       let tracks = Array.from(ctx.tracks.values()).filter(
-        (t) => (!peer || t.peer == peer) && (!kind || t.kind == kind),
+        (t) =>
+          (!peer || t.peer == peer) && (kind == undefined || t.kind == kind),
       );
       console.log("update", peer, kind, tracks);
       setTracks(tracks);

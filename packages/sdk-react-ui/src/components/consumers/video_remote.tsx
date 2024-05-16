@@ -5,7 +5,7 @@ interface Props {
   track: RemoteTrack;
 }
 
-export function VideoSingle({ track }: Props) {
+export function VideoRemote({ track }: Props) {
   const consumer = useConsumer(track);
   const videoRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
@@ -25,5 +25,5 @@ export function VideoSingle({ track }: Props) {
     }
   }, [consumer, videoRef.current]);
 
-  return <video muted autoPlay width={400} height={400} ref={videoRef} />;
+  return <video muted autoPlay className="w-full h-full" ref={videoRef} />;
 }
