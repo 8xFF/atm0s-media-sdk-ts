@@ -4,9 +4,12 @@ import {
   BitrateControlMode,
   Sender_State,
   Sender_Config,
+  Sender_Status,
 } from "./generated/protobuf/shared";
-import { Datachannel } from "./data";
+import { Datachannel, DatachannelEvent } from "./data";
 import { kind_to_string, string_to_kind } from "./types";
+import { ServerEvent_Sender_State } from "./generated/protobuf/conn";
+import { EventEmitter } from "./utils";
 
 const DEFAULT_CFG = {
   priority: 1,
@@ -14,18 +17,23 @@ const DEFAULT_CFG = {
   simulcast: false,
 };
 
+export enum TrackSenderEvent {
+  StateUpdated = "StateUpdated",
+}
+
 export interface TrackSenderConfig {
   priority: number;
   bitrate: BitrateControlMode;
   simulcast?: boolean;
 }
 
-export class TrackSender {
+export class TrackSender extends EventEmitter {
   sender_state: Sender_State;
   transceiver?: RTCRtpTransceiver;
   kind: Kind;
   track?: MediaStreamTrack;
   simulcast: boolean;
+  _status?: Sender_Status;
 
   constructor(
     private dc: Datachannel,
@@ -33,6 +41,7 @@ export class TrackSender {
     track_or_kind: MediaStreamTrack | Kind,
     cfg: TrackSenderConfig = DEFAULT_CFG,
   ) {
+    super();
     console.log("[TrackSender] created", track_name, dc, track_or_kind);
     if (track_or_kind instanceof MediaStreamTrack) {
       this.track = track_or_kind;
@@ -53,10 +62,21 @@ export class TrackSender {
           }
         : undefined,
     };
+    this.dc.on(
+      DatachannelEvent.SENDER + track_name,
+      (event: ServerEvent_Sender_State) => {
+        this._status = event.status;
+        this.emit(TrackSenderEvent.StateUpdated, this._status);
+      },
+    );
   }
 
   get name(): string {
     return this.track_name;
+  }
+
+  get status(): Sender_Status | undefined {
+    return this.status;
   }
 
   get attached() {
@@ -145,6 +165,8 @@ export class TrackSender {
     }
     this.track = undefined;
     this.sender_state.source = undefined;
+    this._status = undefined;
+    this.emit(TrackSenderEvent.StateUpdated, this._status);
 
     //if we in prepare state, we dont need to access to server, just update local
     if (!this.transceiver) {

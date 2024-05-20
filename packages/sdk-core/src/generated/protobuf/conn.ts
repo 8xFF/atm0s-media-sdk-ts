@@ -14,9 +14,15 @@ import {
   kindToJSON,
   Receiver_Config,
   Receiver_Source,
+  Receiver_Status,
+  receiver_StatusFromJSON,
+  receiver_StatusToJSON,
   RoomJoin,
   Sender_Config,
   Sender_Source,
+  Sender_Status,
+  sender_StatusFromJSON,
+  sender_StatusToJSON,
   Tracks,
 } from "./shared";
 
@@ -257,52 +263,7 @@ export interface ServerEvent_Sender {
 }
 
 export interface ServerEvent_Sender_State {
-  state: ServerEvent_Sender_State_StateType;
-}
-
-export enum ServerEvent_Sender_State_StateType {
-  WAITING = 0,
-  NO_SOURCE = 1,
-  ACTIVE = 2,
-  INACTIVE = 3,
-  UNRECOGNIZED = -1,
-}
-
-export function serverEvent_Sender_State_StateTypeFromJSON(object: any): ServerEvent_Sender_State_StateType {
-  switch (object) {
-    case 0:
-    case "WAITING":
-      return ServerEvent_Sender_State_StateType.WAITING;
-    case 1:
-    case "NO_SOURCE":
-      return ServerEvent_Sender_State_StateType.NO_SOURCE;
-    case 2:
-    case "ACTIVE":
-      return ServerEvent_Sender_State_StateType.ACTIVE;
-    case 3:
-    case "INACTIVE":
-      return ServerEvent_Sender_State_StateType.INACTIVE;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return ServerEvent_Sender_State_StateType.UNRECOGNIZED;
-  }
-}
-
-export function serverEvent_Sender_State_StateTypeToJSON(object: ServerEvent_Sender_State_StateType): string {
-  switch (object) {
-    case ServerEvent_Sender_State_StateType.WAITING:
-      return "WAITING";
-    case ServerEvent_Sender_State_StateType.NO_SOURCE:
-      return "NO_SOURCE";
-    case ServerEvent_Sender_State_StateType.ACTIVE:
-      return "ACTIVE";
-    case ServerEvent_Sender_State_StateType.INACTIVE:
-      return "INACTIVE";
-    case ServerEvent_Sender_State_StateType.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
+  status: Sender_Status;
 }
 
 export interface ServerEvent_Receiver {
@@ -312,58 +273,7 @@ export interface ServerEvent_Receiver {
 }
 
 export interface ServerEvent_Receiver_State {
-  state: ServerEvent_Receiver_State_StateType;
-}
-
-export enum ServerEvent_Receiver_State_StateType {
-  NO_SOURCE = 0,
-  WAITING = 1,
-  LIVE = 2,
-  KEY_ONLY = 3,
-  INACTIVE = 4,
-  UNRECOGNIZED = -1,
-}
-
-export function serverEvent_Receiver_State_StateTypeFromJSON(object: any): ServerEvent_Receiver_State_StateType {
-  switch (object) {
-    case 0:
-    case "NO_SOURCE":
-      return ServerEvent_Receiver_State_StateType.NO_SOURCE;
-    case 1:
-    case "WAITING":
-      return ServerEvent_Receiver_State_StateType.WAITING;
-    case 2:
-    case "LIVE":
-      return ServerEvent_Receiver_State_StateType.LIVE;
-    case 3:
-    case "KEY_ONLY":
-      return ServerEvent_Receiver_State_StateType.KEY_ONLY;
-    case 4:
-    case "INACTIVE":
-      return ServerEvent_Receiver_State_StateType.INACTIVE;
-    case -1:
-    case "UNRECOGNIZED":
-    default:
-      return ServerEvent_Receiver_State_StateType.UNRECOGNIZED;
-  }
-}
-
-export function serverEvent_Receiver_State_StateTypeToJSON(object: ServerEvent_Receiver_State_StateType): string {
-  switch (object) {
-    case ServerEvent_Receiver_State_StateType.NO_SOURCE:
-      return "NO_SOURCE";
-    case ServerEvent_Receiver_State_StateType.WAITING:
-      return "WAITING";
-    case ServerEvent_Receiver_State_StateType.LIVE:
-      return "LIVE";
-    case ServerEvent_Receiver_State_StateType.KEY_ONLY:
-      return "KEY_ONLY";
-    case ServerEvent_Receiver_State_StateType.INACTIVE:
-      return "INACTIVE";
-    case ServerEvent_Receiver_State_StateType.UNRECOGNIZED:
-    default:
-      return "UNRECOGNIZED";
-  }
+  status: Receiver_Status;
 }
 
 export interface ServerEvent_Receiver_Stats {
@@ -3988,13 +3898,13 @@ export const ServerEvent_Sender = {
 };
 
 function createBaseServerEvent_Sender_State(): ServerEvent_Sender_State {
-  return { state: 0 };
+  return { status: 0 };
 }
 
 export const ServerEvent_Sender_State = {
   encode(message: ServerEvent_Sender_State, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.state !== 0) {
-      writer.uint32(8).int32(message.state);
+    if (message.status !== 0) {
+      writer.uint32(8).int32(message.status);
     }
     return writer;
   },
@@ -4011,7 +3921,7 @@ export const ServerEvent_Sender_State = {
             break;
           }
 
-          message.state = reader.int32() as any;
+          message.status = reader.int32() as any;
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -4023,13 +3933,13 @@ export const ServerEvent_Sender_State = {
   },
 
   fromJSON(object: any): ServerEvent_Sender_State {
-    return { state: isSet(object.state) ? serverEvent_Sender_State_StateTypeFromJSON(object.state) : 0 };
+    return { status: isSet(object.status) ? sender_StatusFromJSON(object.status) : 0 };
   },
 
   toJSON(message: ServerEvent_Sender_State): unknown {
     const obj: any = {};
-    if (message.state !== 0) {
-      obj.state = serverEvent_Sender_State_StateTypeToJSON(message.state);
+    if (message.status !== 0) {
+      obj.status = sender_StatusToJSON(message.status);
     }
     return obj;
   },
@@ -4039,7 +3949,7 @@ export const ServerEvent_Sender_State = {
   },
   fromPartial<I extends Exact<DeepPartial<ServerEvent_Sender_State>, I>>(object: I): ServerEvent_Sender_State {
     const message = createBaseServerEvent_Sender_State();
-    message.state = object.state ?? 0;
+    message.status = object.status ?? 0;
     return message;
   },
 };
@@ -4138,13 +4048,13 @@ export const ServerEvent_Receiver = {
 };
 
 function createBaseServerEvent_Receiver_State(): ServerEvent_Receiver_State {
-  return { state: 0 };
+  return { status: 0 };
 }
 
 export const ServerEvent_Receiver_State = {
   encode(message: ServerEvent_Receiver_State, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.state !== 0) {
-      writer.uint32(8).int32(message.state);
+    if (message.status !== 0) {
+      writer.uint32(8).int32(message.status);
     }
     return writer;
   },
@@ -4161,7 +4071,7 @@ export const ServerEvent_Receiver_State = {
             break;
           }
 
-          message.state = reader.int32() as any;
+          message.status = reader.int32() as any;
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -4173,13 +4083,13 @@ export const ServerEvent_Receiver_State = {
   },
 
   fromJSON(object: any): ServerEvent_Receiver_State {
-    return { state: isSet(object.state) ? serverEvent_Receiver_State_StateTypeFromJSON(object.state) : 0 };
+    return { status: isSet(object.status) ? receiver_StatusFromJSON(object.status) : 0 };
   },
 
   toJSON(message: ServerEvent_Receiver_State): unknown {
     const obj: any = {};
-    if (message.state !== 0) {
-      obj.state = serverEvent_Receiver_State_StateTypeToJSON(message.state);
+    if (message.status !== 0) {
+      obj.status = receiver_StatusToJSON(message.status);
     }
     return obj;
   },
@@ -4189,7 +4099,7 @@ export const ServerEvent_Receiver_State = {
   },
   fromPartial<I extends Exact<DeepPartial<ServerEvent_Receiver_State>, I>>(object: I): ServerEvent_Receiver_State {
     const message = createBaseServerEvent_Receiver_State();
-    message.state = object.state ?? 0;
+    message.status = object.status ?? 0;
     return message;
   },
 };

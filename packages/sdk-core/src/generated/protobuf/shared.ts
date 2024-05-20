@@ -81,6 +81,57 @@ export interface Receiver {
   state: Receiver_State | undefined;
 }
 
+export enum Receiver_Status {
+  NO_SOURCE = 0,
+  WAITING = 1,
+  LIVE = 2,
+  KEY_ONLY = 3,
+  INACTIVE = 4,
+  UNRECOGNIZED = -1,
+}
+
+export function receiver_StatusFromJSON(object: any): Receiver_Status {
+  switch (object) {
+    case 0:
+    case "NO_SOURCE":
+      return Receiver_Status.NO_SOURCE;
+    case 1:
+    case "WAITING":
+      return Receiver_Status.WAITING;
+    case 2:
+    case "LIVE":
+      return Receiver_Status.LIVE;
+    case 3:
+    case "KEY_ONLY":
+      return Receiver_Status.KEY_ONLY;
+    case 4:
+    case "INACTIVE":
+      return Receiver_Status.INACTIVE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return Receiver_Status.UNRECOGNIZED;
+  }
+}
+
+export function receiver_StatusToJSON(object: Receiver_Status): string {
+  switch (object) {
+    case Receiver_Status.NO_SOURCE:
+      return "NO_SOURCE";
+    case Receiver_Status.WAITING:
+      return "WAITING";
+    case Receiver_Status.LIVE:
+      return "LIVE";
+    case Receiver_Status.KEY_ONLY:
+      return "KEY_ONLY";
+    case Receiver_Status.INACTIVE:
+      return "INACTIVE";
+    case Receiver_Status.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
+}
+
 export interface Receiver_Source {
   peer: string;
   track: string;
@@ -103,6 +154,39 @@ export interface Sender {
   kind: Kind;
   name: string;
   state: Sender_State | undefined;
+}
+
+export enum Sender_Status {
+  ACTIVE = 0,
+  INACTIVE = 1,
+  UNRECOGNIZED = -1,
+}
+
+export function sender_StatusFromJSON(object: any): Sender_Status {
+  switch (object) {
+    case 0:
+    case "ACTIVE":
+      return Sender_Status.ACTIVE;
+    case 1:
+    case "INACTIVE":
+      return Sender_Status.INACTIVE;
+    case -1:
+    case "UNRECOGNIZED":
+    default:
+      return Sender_Status.UNRECOGNIZED;
+  }
+}
+
+export function sender_StatusToJSON(object: Sender_Status): string {
+  switch (object) {
+    case Sender_Status.ACTIVE:
+      return "ACTIVE";
+    case Sender_Status.INACTIVE:
+      return "INACTIVE";
+    case Sender_Status.UNRECOGNIZED:
+    default:
+      return "UNRECOGNIZED";
+  }
 }
 
 export interface Sender_Source {

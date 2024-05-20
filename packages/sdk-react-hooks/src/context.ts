@@ -30,22 +30,26 @@ export interface PublisherConfig {
 }
 
 export class Publisher {
-  constructor(private sender: TrackSender) {}
+  constructor(private _sender: TrackSender) {}
+
+  get sender() {
+    return this._sender;
+  }
 
   get attached() {
-    return this.sender.attached;
+    return this._sender.attached;
   }
 
   async attach(track: MediaStreamTrack) {
-    await this.sender.attach(track);
+    await this._sender.attach(track);
   }
 
   async config(config: Sender_Config) {
-    await this.sender.config(config);
+    await this._sender.config(config);
   }
 
   async detach() {
-    await this.sender.detach();
+    await this._sender.detach();
   }
 }
 
