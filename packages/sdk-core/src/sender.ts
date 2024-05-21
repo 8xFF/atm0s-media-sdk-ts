@@ -4,12 +4,12 @@ import {
   BitrateControlMode,
   Sender_State,
   Sender_Config,
-  Sender_Status,
 } from "./generated/protobuf/shared";
 import { Datachannel, DatachannelEvent } from "./data";
 import { kind_to_string, string_to_kind } from "./types";
-import { ServerEvent_Sender_State } from "./generated/protobuf/conn";
+import { ServerEvent_Sender } from "./generated/protobuf/conn";
 import { EventEmitter } from "./utils";
+import { TrackSenderStatus } from "./lib";
 
 const DEFAULT_CFG = {
   priority: 1,
@@ -18,7 +18,7 @@ const DEFAULT_CFG = {
 };
 
 export enum TrackSenderEvent {
-  StateUpdated = "StateUpdated",
+  StatusUpdated = "StatusUpdated",
 }
 
 export interface TrackSenderConfig {
@@ -33,7 +33,7 @@ export class TrackSender extends EventEmitter {
   kind: Kind;
   track?: MediaStreamTrack;
   simulcast: boolean;
-  _status?: Sender_Status;
+  _status?: TrackSenderStatus;
 
   constructor(
     private dc: Datachannel,
@@ -64,26 +64,28 @@ export class TrackSender extends EventEmitter {
     };
     this.dc.on(
       DatachannelEvent.SENDER + track_name,
-      (event: ServerEvent_Sender_State) => {
-        this._status = event.status;
-        this.emit(TrackSenderEvent.StateUpdated, this._status);
+      (event: ServerEvent_Sender) => {
+        if (event.state) {
+          this._status = event.state.status;
+          this.emit(TrackSenderEvent.StatusUpdated, this._status);
+        }
       },
     );
   }
 
-  get name(): string {
+  public get name(): string {
     return this.track_name;
   }
 
-  get status(): Sender_Status | undefined {
+  public get status(): TrackSenderStatus | undefined {
     return this.status;
   }
 
-  get attached() {
+  public get attached() {
     return !!this.track;
   }
 
-  get state(): Sender {
+  public get state(): Sender {
     return {
       name: this.track_name,
       kind: this.kind,
@@ -109,7 +111,7 @@ export class TrackSender extends EventEmitter {
     );
   }
 
-  async attach(track: MediaStreamTrack) {
+  public async attach(track: MediaStreamTrack) {
     if (this.track) {
       throw new Error("This sender already attached");
     }
@@ -128,6 +130,8 @@ export class TrackSender extends EventEmitter {
       return;
     }
 
+    this._status = undefined;
+    this.emit(TrackSenderEvent.StatusUpdated, this._status);
     await this.dc.ready();
     await this.transceiver.sender.replaceTrack(track);
     return await this.dc.request_sender({
@@ -139,7 +143,7 @@ export class TrackSender extends EventEmitter {
     });
   }
 
-  async config(config: Sender_Config) {
+  public async config(config: Sender_Config) {
     //if we in prepare state, we dont need to access to server, just update local
     if (!this.transceiver) {
       console.log("[TrackSender] config on prepare state");
@@ -159,14 +163,14 @@ export class TrackSender extends EventEmitter {
     });
   }
 
-  async detach() {
+  public async detach() {
     if (!this.track) {
       throw new Error("This sender wasn't attach to any track");
     }
     this.track = undefined;
     this.sender_state.source = undefined;
     this._status = undefined;
-    this.emit(TrackSenderEvent.StateUpdated, this._status);
+    this.emit(TrackSenderEvent.StatusUpdated, this._status);
 
     //if we in prepare state, we dont need to access to server, just update local
     if (!this.transceiver) {

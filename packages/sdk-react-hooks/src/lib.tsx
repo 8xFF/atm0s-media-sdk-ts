@@ -12,7 +12,7 @@ export {
 } from "./hooks/meta";
 export type { RemotePeer, RemoteTrack } from "./hooks/meta";
 
-export { usePublisher } from "./hooks/publisher";
+export { usePublisher, usePublisherStatus } from "./hooks/publisher";
 
-export { useConsumer, Consumer } from "./hooks/consumer";
+export { useConsumer, useConsumerStatus, Consumer } from "./hooks/consumer";
 export type { ConsumerConfig } from "./hooks/consumer";

@@ -20,6 +20,7 @@ import {
   useRemoteVideoTracks,
   useSession,
   RemoteTrack,
+  useConsumerStatus,
 } from "@atm0s-media-sdk/sdk-react-hooks/lib";
 import { Kind } from "@atm0s-media-sdk/sdk-core/lib";
 import { SelectedGateway } from "../../components/GatewaySelector";
@@ -27,6 +28,7 @@ import { SelectedGateway } from "../../components/GatewaySelector";
 function EchoViewer({ track }: { track: RemoteTrack }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const consumer = useConsumer(track);
+  const consumerStatus = useConsumerStatus(consumer);
   useEffect(() => {
     videoRef.current!.srcObject = consumer.stream;
   }, [videoRef.current, consumer]);
@@ -43,7 +45,7 @@ function EchoViewer({ track }: { track: RemoteTrack }) {
 
   return (
     <div>
-      {track.peer}/{track.track}
+      {track.peer}/{track.track} - {consumerStatus}
       <video
         muted
         autoPlay

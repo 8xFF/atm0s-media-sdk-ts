@@ -10,6 +10,8 @@ import {
   RoomTrackStopped,
   Session,
   SessionEvent,
+  TrackReceiverEvent,
+  TrackReceiverStatus,
 } from "@atm0s-media-sdk/sdk-core/lib";
 import { SelectedGateway } from "../../components/GatewaySelector";
 
@@ -73,6 +75,20 @@ export default function SwitchSenderTrack(): JSX.Element {
       let video_recv_track = session.receiver(Kind.VIDEO);
       audio_echo.srcObject = audio_recv_track.stream;
       video_echo.srcObject = video_recv_track.stream;
+
+      audio_recv_track.on(
+        TrackReceiverEvent.StatusUpdated,
+        (status: TrackReceiverStatus) => {
+          console.log("audio receiver status", status);
+        },
+      );
+
+      video_recv_track.on(
+        TrackReceiverEvent.StatusUpdated,
+        (status: TrackReceiverStatus) => {
+          console.log("video receiver status", status);
+        },
+      );
 
       session.on(SessionEvent.ROOM_PEER_JOINED, (peer: RoomPeerJoined) => {
         console.log("Peer joined", peer);

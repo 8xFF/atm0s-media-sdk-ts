@@ -1,6 +1,7 @@
 export { Session, SessionEvent } from "./session";
-export { TrackSender } from "./sender";
-export { TrackReceiver } from "./receiver";
+export { TrackSender, TrackSenderEvent } from "./sender";
+export type { TrackSenderConfig } from "./sender";
+export { TrackReceiver, TrackReceiverEvent } from "./receiver";
 export * from "./events";
 export { EventEmitter } from "./utils";
 
@@ -17,3 +18,8 @@ export {
 } from "./types";
 export type SessionConfig = SessionConfigRaw;
 export type JoinInfo = JoinInfoRaw;
+
+export {
+  Receiver_Status as TrackReceiverStatus,
+  Sender_Status as TrackSenderStatus,
+} from "./generated/protobuf/shared";

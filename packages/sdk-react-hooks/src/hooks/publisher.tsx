@@ -25,9 +25,9 @@ export function usePublisherStatus(
     const handler = (status: Sender_Status | undefined) => {
       setStatus(status);
     };
-    publisher.sender.on(TrackSenderEvent.StateUpdated, handler);
+    publisher.sender.on(TrackSenderEvent.StatusUpdated, handler);
     return () => {
-      publisher.sender.off(TrackSenderEvent.StateUpdated, handler);
+      publisher.sender.off(TrackSenderEvent.StatusUpdated, handler);
     };
   }, [publisher]);
   return status;

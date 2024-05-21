@@ -5,9 +5,11 @@ import {
   Receiver_Source,
   Receiver_State,
 } from "./generated/protobuf/shared";
-import { ReadyWaiter } from "./utils";
-import { Datachannel } from "./data";
+import { EventEmitter, ReadyWaiter } from "./utils";
+import { Datachannel, DatachannelEvent } from "./data";
 import { kind_to_string } from "./types";
+import { ServerEvent_Receiver } from "./generated/protobuf/conn";
+import { TrackReceiverStatus } from "./lib";
 
 const DEFAULT_CFG = {
   priority: 1,
@@ -15,19 +17,34 @@ const DEFAULT_CFG = {
   maxTemporal: 2,
 };
 
-export class TrackReceiver {
+export enum TrackReceiverEvent {
+  StatusUpdated = "StatusUpdated",
+}
+
+export class TrackReceiver extends EventEmitter {
   transceiver?: RTCRtpTransceiver;
   waiter: ReadyWaiter = new ReadyWaiter();
   media_stream: MediaStream;
   receiver_state: Receiver_State = { config: undefined, source: undefined };
+  _status?: TrackReceiverStatus;
 
   constructor(
     private dc: Datachannel,
     private track_name: string,
     private _kind: Kind,
   ) {
+    super();
     this.media_stream = new MediaStream();
     console.log("[TrackReceiver] create ", track_name, dc);
+    this.dc.on(
+      DatachannelEvent.RECEIVER + track_name,
+      (event: ServerEvent_Receiver) => {
+        if (event.state) {
+          this._status = event.state.status;
+          this.emit(TrackReceiverEvent.StatusUpdated, this._status);
+        }
+      },
+    );
   }
 
   public get kind() {
@@ -36,6 +53,10 @@ export class TrackReceiver {
 
   public has_track() {
     return this.media_stream.getTracks().length > 0;
+  }
+
+  public get status(): TrackReceiverStatus | undefined {
+    return this.status;
   }
 
   public set_track(track: MediaStreamTrack) {
@@ -68,6 +89,8 @@ export class TrackReceiver {
   ) {
     this.receiver_state.config = config;
     this.receiver_state.source = source;
+    this._status = TrackReceiverStatus.WAITING;
+    this.emit(TrackReceiverEvent.StatusUpdated, this._status);
 
     //if we in prepare state, we dont need to access to server, just update local
     if (!this.transceiver) {
@@ -89,6 +112,8 @@ export class TrackReceiver {
   public async detach() {
     delete this.receiver_state.source;
     delete this.receiver_state.config;
+    delete this._status;
+    this.emit(TrackReceiverEvent.StatusUpdated, undefined);
 
     //if we in prepare state, we dont need to access to server, just update local
     if (!this.transceiver) {

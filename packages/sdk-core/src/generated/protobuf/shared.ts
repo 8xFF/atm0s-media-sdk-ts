@@ -82,29 +82,21 @@ export interface Receiver {
 }
 
 export enum Receiver_Status {
-  NO_SOURCE = 0,
-  WAITING = 1,
-  LIVE = 2,
-  KEY_ONLY = 3,
-  INACTIVE = 4,
+  WAITING = 0,
+  ACTIVE = 1,
+  INACTIVE = 2,
   UNRECOGNIZED = -1,
 }
 
 export function receiver_StatusFromJSON(object: any): Receiver_Status {
   switch (object) {
     case 0:
-    case "NO_SOURCE":
-      return Receiver_Status.NO_SOURCE;
-    case 1:
     case "WAITING":
       return Receiver_Status.WAITING;
+    case 1:
+    case "ACTIVE":
+      return Receiver_Status.ACTIVE;
     case 2:
-    case "LIVE":
-      return Receiver_Status.LIVE;
-    case 3:
-    case "KEY_ONLY":
-      return Receiver_Status.KEY_ONLY;
-    case 4:
     case "INACTIVE":
       return Receiver_Status.INACTIVE;
     case -1:
@@ -116,14 +108,10 @@ export function receiver_StatusFromJSON(object: any): Receiver_Status {
 
 export function receiver_StatusToJSON(object: Receiver_Status): string {
   switch (object) {
-    case Receiver_Status.NO_SOURCE:
-      return "NO_SOURCE";
     case Receiver_Status.WAITING:
       return "WAITING";
-    case Receiver_Status.LIVE:
-      return "LIVE";
-    case Receiver_Status.KEY_ONLY:
-      return "KEY_ONLY";
+    case Receiver_Status.ACTIVE:
+      return "ACTIVE";
     case Receiver_Status.INACTIVE:
       return "INACTIVE";
     case Receiver_Status.UNRECOGNIZED:
