@@ -59,7 +59,9 @@ export class Session extends EventEmitter {
     this.created_at = new Date().getTime();
     console.warn("Create session", this.created_at);
     this.peer = new RTCPeerConnection();
-    this.dc = new Datachannel(this.peer.createDataChannel("data"));
+    this.dc = new Datachannel(
+      this.peer.createDataChannel("data", { negotiated: true, id: 1000 }),
+    );
     this.dc.on(DatachannelEvent.ROOM, (event: ServerEvent_Room) => {
       if (event.peerJoined) {
         this.emit(SessionEvent.ROOM_PEER_JOINED, event.peerJoined);
@@ -240,9 +242,17 @@ export class Session extends EventEmitter {
         "Content-Type": "application/grpc",
       },
     );
-    this.conn_id = res.connId;
     this.ice_lite = res.iceLite;
     console.log("Apply restart-ice response");
+    if (this.conn_id !== res.connId) {
+      console.log(
+        "Session connect to new server, reset receivers for handling new recv tracks",
+      );
+      this.conn_id = res.connId;
+      this.receivers.map((r) => {
+        r.media_stream.removeTrack(r.media_stream.getTracks()[0]!);
+      }, []);
+    }
     await this.peer.setLocalDescription(local_desc);
     await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
   }
