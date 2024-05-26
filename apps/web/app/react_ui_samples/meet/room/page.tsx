@@ -23,10 +23,10 @@ function MeetContent(): JSX.Element {
   const searchParams = useSearchParams();
   const cfg = useMemo(() => {
     return {
-      token: searchParams.get("token") || "demo",
+      token: searchParams!.get("token") || "demo",
       join: {
-        room: searchParams.get("room") || "room1",
-        peer: searchParams.get("peer") || "peer1",
+        room: searchParams!.get("room") || "room1",
+        peer: searchParams!.get("peer") || "peer1",
         publish: { peer: true, tracks: true },
         subscribe: { peers: true, tracks: true },
       },
