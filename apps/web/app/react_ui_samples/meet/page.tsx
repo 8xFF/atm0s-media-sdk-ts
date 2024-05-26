@@ -1,18 +1,27 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import { GatewaySelectors } from "../../components/GatewaySelector";
+import { generate_token } from "../../api_handler";
 
 export default function MeetPage(): JSX.Element {
   const router = useRouter();
   const roomRef = useRef<HTMLInputElement>(null);
   const peerRef = useRef<HTMLInputElement>(null);
 
-  const onEnter = useCallback(() => {
+  const onEnter = useCallback(async () => {
     const room = roomRef.current!.value;
     const peer = peerRef.current!.value;
-    router.push("/react_ui_samples/meet/room?room=" + room + "&peer=" + peer);
+    const token = await generate_token(room, peer);
+    router.push(
+      "/react_ui_samples/meet/room?room=" +
+        room +
+        "&peer=" +
+        peer +
+        "&token=" +
+        token,
+    );
   }, [roomRef, peerRef]);
 
   return (

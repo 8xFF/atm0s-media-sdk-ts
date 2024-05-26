@@ -60,6 +60,12 @@ export default function Page(): JSX.Element {
           </Link>
         </div>
       </div>
+      <div>React-ui sample</div>
+      <div className="pl-3">
+        <div>
+          <Link href="/react_ui_samples/meet">Meet</Link>
+        </div>
+      </div>
     </main>
   );
 }
