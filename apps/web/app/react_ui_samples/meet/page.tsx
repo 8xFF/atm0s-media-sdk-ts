@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useRef } from "react";
 import { GatewaySelectors } from "../../components/GatewaySelector";
-import { generate_token } from "../../api_handler";
+import { generate_token } from "../../actions/token";
 
 export default function MeetPage(): JSX.Element {
   const router = useRouter();
@@ -15,12 +15,7 @@ export default function MeetPage(): JSX.Element {
     const peer = peerRef.current!.value;
     const token = await generate_token(room, peer);
     router.push(
-      "/react_ui_samples/meet/room?room=" +
-        room +
-        "&peer=" +
-        peer +
-        "&token=" +
-        token,
+      `/react_ui_samples/meet/room?room=${room}&peer=${peer}&token=${token}`,
     );
   }, [roomRef, peerRef]);
 

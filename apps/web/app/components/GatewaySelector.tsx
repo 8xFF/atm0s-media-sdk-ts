@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
-import { Gateways } from "../constants";
+import { useCallback, useState } from "react";
+import { env } from "../env";
 
 export const SelectedGateway = {
-  url: Gateways[0]!,
+  url: env.GATEWAY_ENDPOINTS[0]!,
 };
 
 export function GatewaySelectors() {
@@ -17,7 +17,7 @@ export function GatewaySelectors() {
     <div>
       Gateways:{" "}
       <select onChange={change} value={selected}>
-        {Gateways.map((g) => (
+        {env.GATEWAY_ENDPOINTS.map((g) => (
           <option key={g} value={g}>
             {g}
           </option>
