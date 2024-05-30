@@ -1,6 +1,6 @@
 import Link from "next/link";
 import "./globals.css";
-import { Gateways } from "./constants";
+import { env } from "./env";
 
 export default function Page(): JSX.Element {
   return (
@@ -8,7 +8,7 @@ export default function Page(): JSX.Element {
       <div>
         Gateways:
         <div className="p-2">
-          {Gateways.map((g) => (
+          {env.GATEWAY_ENDPOINTS.map((g) => (
             <div>{g}</div>
           ))}
         </div>

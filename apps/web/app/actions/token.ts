@@ -1,14 +1,16 @@
-import { AppToken, Gateways } from "./constants";
+"use server";
+
+import { env } from "../env";
 
 export async function generate_token(
   room: string,
   peer: string,
 ): Promise<string> {
   console.log("create token");
-  const rawResponse = await fetch(Gateways[0]! + "/token/webrtc", {
+  const rawResponse = await fetch(env.GATEWAY_ENDPOINTS[0]! + "/token/webrtc", {
     method: "POST",
     headers: {
-      Authorization: "Bearer " + AppToken,
+      Authorization: "Bearer " + env.APP_SECRET,
       Accept: "application/json",
       "Content-Type": "application/json",
     },

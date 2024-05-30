@@ -1,4 +1,4 @@
-import { generate_random_token } from "../../api_handler";
+import { generate_random_token } from "../../actions/token";
 import Content from "./content";
 
 export default async function EchoRestartIce() {

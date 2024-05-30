@@ -1,4 +1,4 @@
-import { generate_random_token } from "../../api_handler";
+import { generate_random_token } from "../../actions/token";
 import EchoLazyContent from "./content";
 
 export default async function EchoLazy() {
