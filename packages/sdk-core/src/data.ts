@@ -9,7 +9,7 @@ import {
   Response_Sender,
   Request_Receiver,
   Response_Receiver,
-} from "./generated/protobuf/conn";
+} from "./generated/protobuf/session";
 import { EventEmitter, ReadyWaiter } from "./utils";
 
 export enum DatachannelEvent {

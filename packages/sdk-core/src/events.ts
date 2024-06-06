@@ -3,4 +3,4 @@ export {
   ServerEvent_Room_PeerLeaved as RoomPeerLeaved,
   ServerEvent_Room_TrackStarted as RoomTrackStarted,
   ServerEvent_Room_TrackStopped as RoomTrackStopped,
-} from "./generated/protobuf/conn";
+} from "./generated/protobuf/session";

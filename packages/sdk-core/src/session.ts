@@ -11,7 +11,8 @@ import { Datachannel, DatachannelEvent } from "./data";
 import {
   Request_Session_UpdateSdp,
   ServerEvent_Room,
-} from "./generated/protobuf/conn";
+} from "./generated/protobuf/session";
+import * as mixer from "./features/audio_mixer";
 import { Kind } from "./generated/protobuf/shared";
 import { kind_to_string } from "./types";
 
@@ -20,6 +21,9 @@ export interface JoinInfo {
   peer: string;
   publish: { peer: boolean; tracks: boolean };
   subscribe: { peers: boolean; tracks: boolean };
+  features?: {
+    mixer?: mixer.AudioMixerConfig;
+  };
 }
 
 export interface SessionConfig {
@@ -46,6 +50,7 @@ export class Session extends EventEmitter {
   dc: Datachannel;
   receivers: TrackReceiver[] = [];
   senders: TrackSender[] = [];
+  _mixer?: mixer.AudioMixer;
 
   /// Prepaer state for flagging when ever this peer is created offer.
   /// This flag is useful for avoiding tranceiver config is changed before it connect
@@ -132,10 +137,19 @@ export class Session extends EventEmitter {
         console.log("Sent ice-candidate", res);
       }
     };
+
+    //init audios
+    if (cfg.join?.features?.mixer) {
+      this._mixer = new mixer.AudioMixer(this, cfg.join?.features.mixer);
+    }
   }
 
   get room() {
     return this.cfg.join;
+  }
+
+  get mixer() {
+    return this._mixer;
   }
 
   receiver(kind: Kind): TrackReceiver {
@@ -188,8 +202,14 @@ export class Session extends EventEmitter {
     });
     const req = ConnectRequest.create({
       version: version || "pure-ts@0.0.0", //TODO auto get from package.json
-      join: this.cfg.join,
-      features: {},
+      join: {
+        room: this.cfg.join?.room,
+        peer: this.cfg.join?.peer,
+        metadata: undefined,
+        publish: this.cfg.join?.publish,
+        subscribe: this.cfg.join?.subscribe,
+        features: { mixer: this.mixer?.state() },
+      },
       tracks: {
         receivers: this.receivers.map((r) => r.state),
         senders: this.senders.map((r) => r.state),
@@ -223,8 +243,14 @@ export class Session extends EventEmitter {
     });
     const req = ConnectRequest.create({
       version: this.version || "pure-ts@0.0.0", //TODO auto get from package.json
-      join: this.cfg.join,
-      features: {},
+      join: {
+        room: this.cfg.join?.room,
+        peer: this.cfg.join?.peer,
+        metadata: undefined,
+        publish: this.cfg.join?.publish,
+        subscribe: this.cfg.join?.subscribe,
+        features: { mixer: this.mixer?.state() },
+      },
       tracks: {
         receivers: this.receivers.map((r) => r.state),
         senders: this.senders.map((r) => r.state),
@@ -260,7 +286,14 @@ export class Session extends EventEmitter {
   async join(info: JoinInfo, token: string) {
     await this.dc.request_session({
       join: {
-        info,
+        info: {
+          room: info.room,
+          peer: info.peer,
+          metadata: undefined,
+          publish: info.publish,
+          subscribe: info.subscribe,
+          features: { mixer: this.mixer?.state() },
+        },
         token,
       },
     });

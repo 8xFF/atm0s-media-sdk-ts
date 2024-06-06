@@ -3,6 +3,8 @@ export type { PublisherConfig } from "./context";
 
 export { Atm0sMediaProvider } from "./provider";
 export { useSession, useRoom } from "./hooks/session";
+export { useMixer } from "./hooks/mixer";
+export type { AudioMixer } from "./hooks/mixer";
 
 export {
   useRemoteAudioTracks,

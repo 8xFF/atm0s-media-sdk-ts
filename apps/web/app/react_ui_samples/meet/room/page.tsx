@@ -18,10 +18,11 @@ import { useCallback, useMemo, useState } from "react";
 import MeetInRoom from "./room";
 import { useSearchParams } from "next/navigation";
 import { SelectedGateway } from "../../../components/GatewaySelector";
+import { AudioMixerMode, SessionConfig } from "@atm0s-media-sdk/sdk-core/lib";
 
 function MeetContent(): JSX.Element {
   const searchParams = useSearchParams();
-  const cfg = useMemo(() => {
+  const cfg = useMemo<SessionConfig>(() => {
     return {
       token: searchParams!.get("token") || "demo",
       join: {
@@ -29,6 +30,12 @@ function MeetContent(): JSX.Element {
         peer: searchParams!.get("peer") || "peer1",
         publish: { peer: true, tracks: true },
         subscribe: { peers: true, tracks: true },
+        features: {
+          mixer: {
+            mode: AudioMixerMode.AUTO,
+            outputs: 3,
+          },
+        },
       },
     };
   }, [searchParams]);

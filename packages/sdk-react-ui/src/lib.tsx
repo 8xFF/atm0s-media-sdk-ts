@@ -1,5 +1,6 @@
 export { Atm0sMediaUIProvider } from "./provider";
 export { CameraPreview, CameraSelection } from "./components/previews/camera";
+export { AudioMixerPlayer } from "./components/consumers/audio_mixer";
 export {
   MicrophonePreview,
   MicrophoneSelection,

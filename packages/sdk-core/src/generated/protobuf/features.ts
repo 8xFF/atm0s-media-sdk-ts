@@ -11,34 +11,34 @@ import {
   Request as Request2,
   Response as Response3,
   ServerEvent as ServerEvent4,
-} from "./features_mix_minus";
+} from "./features.mixer";
 
 export const protobufPackage = "features";
 
 export interface Config {
-  mixMinus?: Config1 | undefined;
+  mixer?: Config1 | undefined;
 }
 
 export interface Request {
-  mixMinus?: Request2 | undefined;
+  mixer?: Request2 | undefined;
 }
 
 export interface Response {
-  mixMinus?: Response3 | undefined;
+  mixer?: Response3 | undefined;
 }
 
 export interface ServerEvent {
-  mixMinus?: ServerEvent4 | undefined;
+  mixer?: ServerEvent4 | undefined;
 }
 
 function createBaseConfig(): Config {
-  return { mixMinus: undefined };
+  return { mixer: undefined };
 }
 
 export const Config = {
   encode(message: Config, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.mixMinus !== undefined) {
-      Config1.encode(message.mixMinus, writer.uint32(10).fork()).ldelim();
+    if (message.mixer !== undefined) {
+      Config1.encode(message.mixer, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -55,7 +55,7 @@ export const Config = {
             break;
           }
 
-          message.mixMinus = Config1.decode(reader, reader.uint32());
+          message.mixer = Config1.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -67,13 +67,13 @@ export const Config = {
   },
 
   fromJSON(object: any): Config {
-    return { mixMinus: isSet(object.mixMinus) ? Config1.fromJSON(object.mixMinus) : undefined };
+    return { mixer: isSet(object.mixer) ? Config1.fromJSON(object.mixer) : undefined };
   },
 
   toJSON(message: Config): unknown {
     const obj: any = {};
-    if (message.mixMinus !== undefined) {
-      obj.mixMinus = Config1.toJSON(message.mixMinus);
+    if (message.mixer !== undefined) {
+      obj.mixer = Config1.toJSON(message.mixer);
     }
     return obj;
   },
@@ -83,21 +83,21 @@ export const Config = {
   },
   fromPartial<I extends Exact<DeepPartial<Config>, I>>(object: I): Config {
     const message = createBaseConfig();
-    message.mixMinus = (object.mixMinus !== undefined && object.mixMinus !== null)
-      ? Config1.fromPartial(object.mixMinus)
+    message.mixer = (object.mixer !== undefined && object.mixer !== null)
+      ? Config1.fromPartial(object.mixer)
       : undefined;
     return message;
   },
 };
 
 function createBaseRequest(): Request {
-  return { mixMinus: undefined };
+  return { mixer: undefined };
 }
 
 export const Request = {
   encode(message: Request, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.mixMinus !== undefined) {
-      Request2.encode(message.mixMinus, writer.uint32(10).fork()).ldelim();
+    if (message.mixer !== undefined) {
+      Request2.encode(message.mixer, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -114,7 +114,7 @@ export const Request = {
             break;
           }
 
-          message.mixMinus = Request2.decode(reader, reader.uint32());
+          message.mixer = Request2.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -126,13 +126,13 @@ export const Request = {
   },
 
   fromJSON(object: any): Request {
-    return { mixMinus: isSet(object.mixMinus) ? Request2.fromJSON(object.mixMinus) : undefined };
+    return { mixer: isSet(object.mixer) ? Request2.fromJSON(object.mixer) : undefined };
   },
 
   toJSON(message: Request): unknown {
     const obj: any = {};
-    if (message.mixMinus !== undefined) {
-      obj.mixMinus = Request2.toJSON(message.mixMinus);
+    if (message.mixer !== undefined) {
+      obj.mixer = Request2.toJSON(message.mixer);
     }
     return obj;
   },
@@ -142,21 +142,21 @@ export const Request = {
   },
   fromPartial<I extends Exact<DeepPartial<Request>, I>>(object: I): Request {
     const message = createBaseRequest();
-    message.mixMinus = (object.mixMinus !== undefined && object.mixMinus !== null)
-      ? Request2.fromPartial(object.mixMinus)
+    message.mixer = (object.mixer !== undefined && object.mixer !== null)
+      ? Request2.fromPartial(object.mixer)
       : undefined;
     return message;
   },
 };
 
 function createBaseResponse(): Response {
-  return { mixMinus: undefined };
+  return { mixer: undefined };
 }
 
 export const Response = {
   encode(message: Response, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.mixMinus !== undefined) {
-      Response3.encode(message.mixMinus, writer.uint32(10).fork()).ldelim();
+    if (message.mixer !== undefined) {
+      Response3.encode(message.mixer, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -173,7 +173,7 @@ export const Response = {
             break;
           }
 
-          message.mixMinus = Response3.decode(reader, reader.uint32());
+          message.mixer = Response3.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -185,13 +185,13 @@ export const Response = {
   },
 
   fromJSON(object: any): Response {
-    return { mixMinus: isSet(object.mixMinus) ? Response3.fromJSON(object.mixMinus) : undefined };
+    return { mixer: isSet(object.mixer) ? Response3.fromJSON(object.mixer) : undefined };
   },
 
   toJSON(message: Response): unknown {
     const obj: any = {};
-    if (message.mixMinus !== undefined) {
-      obj.mixMinus = Response3.toJSON(message.mixMinus);
+    if (message.mixer !== undefined) {
+      obj.mixer = Response3.toJSON(message.mixer);
     }
     return obj;
   },
@@ -201,21 +201,21 @@ export const Response = {
   },
   fromPartial<I extends Exact<DeepPartial<Response>, I>>(object: I): Response {
     const message = createBaseResponse();
-    message.mixMinus = (object.mixMinus !== undefined && object.mixMinus !== null)
-      ? Response3.fromPartial(object.mixMinus)
+    message.mixer = (object.mixer !== undefined && object.mixer !== null)
+      ? Response3.fromPartial(object.mixer)
       : undefined;
     return message;
   },
 };
 
 function createBaseServerEvent(): ServerEvent {
-  return { mixMinus: undefined };
+  return { mixer: undefined };
 }
 
 export const ServerEvent = {
   encode(message: ServerEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.mixMinus !== undefined) {
-      ServerEvent4.encode(message.mixMinus, writer.uint32(10).fork()).ldelim();
+    if (message.mixer !== undefined) {
+      ServerEvent4.encode(message.mixer, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -232,7 +232,7 @@ export const ServerEvent = {
             break;
           }
 
-          message.mixMinus = ServerEvent4.decode(reader, reader.uint32());
+          message.mixer = ServerEvent4.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -244,13 +244,13 @@ export const ServerEvent = {
   },
 
   fromJSON(object: any): ServerEvent {
-    return { mixMinus: isSet(object.mixMinus) ? ServerEvent4.fromJSON(object.mixMinus) : undefined };
+    return { mixer: isSet(object.mixer) ? ServerEvent4.fromJSON(object.mixer) : undefined };
   },
 
   toJSON(message: ServerEvent): unknown {
     const obj: any = {};
-    if (message.mixMinus !== undefined) {
-      obj.mixMinus = ServerEvent4.toJSON(message.mixMinus);
+    if (message.mixer !== undefined) {
+      obj.mixer = ServerEvent4.toJSON(message.mixer);
     }
     return obj;
   },
@@ -260,8 +260,8 @@ export const ServerEvent = {
   },
   fromPartial<I extends Exact<DeepPartial<ServerEvent>, I>>(object: I): ServerEvent {
     const message = createBaseServerEvent();
-    message.mixMinus = (object.mixMinus !== undefined && object.mixMinus !== null)
-      ? ServerEvent4.fromPartial(object.mixMinus)
+    message.mixer = (object.mixer !== undefined && object.mixer !== null)
+      ? ServerEvent4.fromPartial(object.mixer)
       : undefined;
     return message;
   },

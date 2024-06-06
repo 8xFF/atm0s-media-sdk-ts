@@ -6,15 +6,14 @@
 
 /* eslint-disable */
 import * as _m0 from "protobufjs/minimal";
-import { Config } from "./features";
-import { RoomJoin, Tracks } from "./shared";
+import { RoomJoin } from "./session";
+import { Tracks } from "./shared";
 
 export const protobufPackage = "gateway";
 
 export interface ConnectRequest {
   version: string;
   join?: RoomJoin | undefined;
-  features: Config | undefined;
   tracks: Tracks | undefined;
   sdp: string;
 }
@@ -34,7 +33,7 @@ export interface RemoteIceResponse {
 }
 
 function createBaseConnectRequest(): ConnectRequest {
-  return { version: "", join: undefined, features: undefined, tracks: undefined, sdp: "" };
+  return { version: "", join: undefined, tracks: undefined, sdp: "" };
 }
 
 export const ConnectRequest = {
@@ -45,14 +44,11 @@ export const ConnectRequest = {
     if (message.join !== undefined) {
       RoomJoin.encode(message.join, writer.uint32(26).fork()).ldelim();
     }
-    if (message.features !== undefined) {
-      Config.encode(message.features, writer.uint32(34).fork()).ldelim();
-    }
     if (message.tracks !== undefined) {
-      Tracks.encode(message.tracks, writer.uint32(42).fork()).ldelim();
+      Tracks.encode(message.tracks, writer.uint32(34).fork()).ldelim();
     }
     if (message.sdp !== "") {
-      writer.uint32(50).string(message.sdp);
+      writer.uint32(42).string(message.sdp);
     }
     return writer;
   },
@@ -83,17 +79,10 @@ export const ConnectRequest = {
             break;
           }
 
-          message.features = Config.decode(reader, reader.uint32());
+          message.tracks = Tracks.decode(reader, reader.uint32());
           continue;
         case 5:
           if (tag !== 42) {
-            break;
-          }
-
-          message.tracks = Tracks.decode(reader, reader.uint32());
-          continue;
-        case 6:
-          if (tag !== 50) {
             break;
           }
 
@@ -112,7 +101,6 @@ export const ConnectRequest = {
     return {
       version: isSet(object.version) ? globalThis.String(object.version) : "",
       join: isSet(object.join) ? RoomJoin.fromJSON(object.join) : undefined,
-      features: isSet(object.features) ? Config.fromJSON(object.features) : undefined,
       tracks: isSet(object.tracks) ? Tracks.fromJSON(object.tracks) : undefined,
       sdp: isSet(object.sdp) ? globalThis.String(object.sdp) : "",
     };
@@ -125,9 +113,6 @@ export const ConnectRequest = {
     }
     if (message.join !== undefined) {
       obj.join = RoomJoin.toJSON(message.join);
-    }
-    if (message.features !== undefined) {
-      obj.features = Config.toJSON(message.features);
     }
     if (message.tracks !== undefined) {
       obj.tracks = Tracks.toJSON(message.tracks);
@@ -145,9 +130,6 @@ export const ConnectRequest = {
     const message = createBaseConnectRequest();
     message.version = object.version ?? "";
     message.join = (object.join !== undefined && object.join !== null) ? RoomJoin.fromPartial(object.join) : undefined;
-    message.features = (object.features !== undefined && object.features !== null)
-      ? Config.fromPartial(object.features)
-      : undefined;
     message.tracks = (object.tracks !== undefined && object.tracks !== null)
       ? Tracks.fromPartial(object.tracks)
       : undefined;

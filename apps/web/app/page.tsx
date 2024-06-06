@@ -37,6 +37,9 @@ export default function Page(): JSX.Element {
             Switch sender track
           </Link>
         </div>
+        <div>
+          <Link href="/ts_samples/audio_mixer">Audio_mixer with mix-minus</Link>
+        </div>
       </div>
       <div>React sample</div>
       <div className="pl-3">

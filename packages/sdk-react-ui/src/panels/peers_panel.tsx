@@ -1,6 +1,7 @@
 import { useRemotePeers, useRoom } from "@atm0s-media-sdk/sdk-react-hooks/lib";
 import { PeerRemote } from "../components/consumers/peer_remote";
 import { PeerLocal } from "../components/consumers/peer_local";
+import { AudioMixerPlayer } from "../lib";
 
 interface Props {
   /// Default is false, in this mode audio mix-minus will be used
@@ -23,6 +24,7 @@ export function PeersPanel({ audio_direct, my_video }: Props) {
         .map((p) => (
           <PeerRemote key={p.peer} peer={p} audio={audio_direct} />
         ))}
+      {!audio_direct && <AudioMixerPlayer />}
     </div>
   );
 }
