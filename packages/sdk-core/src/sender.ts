@@ -7,7 +7,7 @@ import {
 } from "./generated/protobuf/shared";
 import { Datachannel, DatachannelEvent } from "./data";
 import { kind_to_string, string_to_kind } from "./types";
-import { ServerEvent_Sender } from "./generated/protobuf/conn";
+import { ServerEvent_Sender } from "./generated/protobuf/session";
 import { EventEmitter } from "./utils";
 import { TrackSenderStatus } from "./lib";
 
