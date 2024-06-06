@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { AudioMixerMode, Session } from "@atm0s-media-sdk/sdk-core/lib";
-import { SelectedGateway } from "../../components/GatewaySelector";
+import { env } from "../../env";
 
 interface Props {
   room: string;
@@ -28,7 +28,7 @@ export default function EchoFast({ room, peer, token }: Props) {
     )! as HTMLAudioElement;
 
     async function connect(_e: any) {
-      const session = new Session(SelectedGateway.url, {
+      const session = new Session(env.GATEWAY_ENDPOINTS[0]!, {
         token,
         join: {
           room,
