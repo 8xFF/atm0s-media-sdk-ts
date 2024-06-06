@@ -13,6 +13,18 @@ export function AudioMixerPlayer() {
     }
   }, [mixer, audio1Ref.current]);
 
+  useEffect(() => {
+    if (audio2Ref.current && mixer) {
+      audio2Ref.current.srcObject = mixer.streams()[1] || null;
+    }
+  }, [mixer, audio1Ref.current]);
+
+  useEffect(() => {
+    if (audio3Ref.current && mixer) {
+      audio3Ref.current.srcObject = mixer.streams()[2] || null;
+    }
+  }, [mixer, audio3Ref.current]);
+
   return (
     <div>
       <audio autoPlay ref={audio1Ref} />
