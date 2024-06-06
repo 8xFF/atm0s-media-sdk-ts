@@ -17,11 +17,12 @@ import { Suspense } from "react";
 import { useCallback, useMemo, useState } from "react";
 import MeetInRoom from "./room";
 import { useSearchParams } from "next/navigation";
-import { SelectedGateway } from "../../../components/GatewaySelector";
 import { AudioMixerMode, SessionConfig } from "@atm0s-media-sdk/sdk-core/lib";
+import { env } from "../../../env";
 
 function MeetContent(): JSX.Element {
   const searchParams = useSearchParams();
+  const gatewayIndex = parseInt(searchParams!.get("gateway") || "0");
   const cfg = useMemo<SessionConfig>(() => {
     return {
       token: searchParams!.get("token") || "demo",
@@ -46,7 +47,7 @@ function MeetContent(): JSX.Element {
 
   return (
     <Atm0sMediaProvider
-      gateway={SelectedGateway.url}
+      gateway={env.GATEWAY_ENDPOINTS[gatewayIndex]!}
       cfg={cfg}
       prepareAudioReceivers={3}
       prepareVideoReceivers={3}

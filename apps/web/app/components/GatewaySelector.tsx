@@ -1,24 +1,23 @@
 import { useCallback, useState } from "react";
 import { env } from "../env";
 
-export const SelectedGateway = {
-  url: env.GATEWAY_ENDPOINTS[0]!,
-};
+interface Props {
+  onChanged: (index: number) => void;
+}
 
-export function GatewaySelectors() {
-  const [selected, setSelected] = useState(SelectedGateway.url);
+export function GatewaySelectors({ onChanged }: Props) {
+  const [selected, setSelected] = useState(0);
   const change = useCallback((e: any) => {
-    (window as any).selectoio = e;
-    SelectedGateway.url = e.target.options[e.target.selectedIndex].value;
-    setSelected(SelectedGateway.url);
+    onChanged(e.target.options[e.target.selectedIndex].value);
+    setSelected(e.target.options[e.target.selectedIndex].value);
   }, []);
 
   return (
     <div>
       Gateways:{" "}
       <select onChange={change} value={selected}>
-        {env.GATEWAY_ENDPOINTS.map((g) => (
-          <option key={g} value={g}>
+        {env.GATEWAY_ENDPOINTS.map((g, i) => (
+          <option key={i} value={i}>
             {g}
           </option>
         ))}
