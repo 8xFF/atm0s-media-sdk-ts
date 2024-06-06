@@ -17,6 +17,7 @@ export enum DatachannelEvent {
   SESSION = "event.session",
   SENDER = "event.sender.",
   RECEIVER = "event.receiver.",
+  FEATURE_MIXER = "event.features.mixer",
 }
 
 export class Datachannel extends EventEmitter {
@@ -44,6 +45,10 @@ export class Datachannel extends EventEmitter {
         this.emit(DatachannelEvent.SENDER + msg.sender.name, msg.sender);
       } else if (msg.receiver) {
         this.emit(DatachannelEvent.RECEIVER + msg.receiver.name, msg.receiver);
+      } else if (msg.features) {
+        if (msg.features.mixer) {
+          this.emit(DatachannelEvent.FEATURE_MIXER, msg.features.mixer);
+        }
       } else if (msg.response) {
         const req_cb = this.reqs.get(msg.response.reqId);
         if (req_cb) {

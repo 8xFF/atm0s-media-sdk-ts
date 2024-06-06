@@ -140,7 +140,11 @@ export class Session extends EventEmitter {
 
     //init audios
     if (cfg.join?.features?.mixer) {
-      this._mixer = new mixer.AudioMixer(this, cfg.join?.features.mixer);
+      this._mixer = new mixer.AudioMixer(
+        this,
+        this.dc,
+        cfg.join?.features.mixer,
+      );
     }
   }
 
@@ -202,7 +206,7 @@ export class Session extends EventEmitter {
     });
     const req = ConnectRequest.create({
       version: version || "pure-ts@0.0.0", //TODO auto get from package.json
-      join: {
+      join: this.cfg.join && {
         room: this.cfg.join?.room,
         peer: this.cfg.join?.peer,
         metadata: undefined,
@@ -284,6 +288,16 @@ export class Session extends EventEmitter {
   }
 
   async join(info: JoinInfo, token: string) {
+    // We need to create new mixer or reconfig it according to new info.
+    // In case of newer room dont have mixer, we just reject it and remain old mixer,
+    // the server don't send any update in this case.
+    if (info.features?.mixer) {
+      if (this._mixer) {
+        this._mixer.reconfig(info.features.mixer);
+      } else {
+        this._mixer = new mixer.AudioMixer(this, this.dc, info.features.mixer);
+      }
+    }
     await this.dc.request_session({
       join: {
         info: {
@@ -325,6 +339,10 @@ export class Session extends EventEmitter {
   }
 
   async leave() {
+    //reset local here
+    this.receivers.map((r) => r.leave_room());
+    this.mixer?.leave_room();
+
     await this.dc.request_session({
       leave: {},
     });

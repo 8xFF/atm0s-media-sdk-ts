@@ -2,7 +2,11 @@ import { useContext, useEffect, useMemo, useState } from "react";
 import { RemoteTrack } from "./meta";
 import { Context } from "../context";
 import { Atm0sMediaContext } from "../provider";
-import { EventEmitter, TrackReceiver } from "@atm0s-media-sdk/sdk-core/lib";
+import {
+  EventEmitter,
+  TrackReceiver,
+  TrackReceiverVoiceActivity,
+} from "@atm0s-media-sdk/sdk-core/lib";
 import { Receiver_Status } from "../../../sdk-core/src/generated/protobuf/shared";
 import { TrackReceiverEvent } from "../../../sdk-core/src/receiver";
 
@@ -78,6 +82,24 @@ export function useConsumerStatus(
     consumer.on(TrackReceiverEvent.StatusUpdated, handler);
     return () => {
       consumer.off(TrackReceiverEvent.StatusUpdated, handler);
+    };
+  }, [consumer]);
+  return status;
+}
+
+export function useConsumerVoiceActivity(
+  consumer: Consumer,
+): TrackReceiverVoiceActivity | undefined {
+  let [status, setStatus] = useState<TrackReceiverVoiceActivity | undefined>(
+    undefined,
+  );
+  useEffect(() => {
+    const handler = (status: TrackReceiverVoiceActivity | undefined) => {
+      setStatus(status);
+    };
+    consumer.on(TrackReceiverEvent.VoiceActivity, handler);
+    return () => {
+      consumer.off(TrackReceiverEvent.VoiceActivity, handler);
     };
   }, [consumer]);
   return status;

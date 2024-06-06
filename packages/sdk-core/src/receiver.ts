@@ -19,6 +19,7 @@ const DEFAULT_CFG = {
 
 export enum TrackReceiverEvent {
   StatusUpdated = "StatusUpdated",
+  VoiceActivity = "VoiceActivity",
 }
 
 export class TrackReceiver extends EventEmitter {
@@ -42,6 +43,8 @@ export class TrackReceiver extends EventEmitter {
         if (event.state) {
           this._status = event.state.status;
           this.emit(TrackReceiverEvent.StatusUpdated, this._status);
+        } else if (event.voiceActivity) {
+          this.emit(TrackReceiverEvent.VoiceActivity, event.voiceActivity);
         }
       },
     );
@@ -144,6 +147,11 @@ export class TrackReceiver extends EventEmitter {
       name: this.track_name,
       config,
     });
+  }
+
+  // We need to reset local state when leave room
+  public leave_room() {
+    this.receiver_state.source = undefined;
   }
 
   get stream() {

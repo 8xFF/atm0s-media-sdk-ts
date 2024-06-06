@@ -10,7 +10,15 @@ import {
   JoinInfo as JoinInfoRaw,
 } from "./session";
 
-export type { AudioMixerConfig, AudioMixer } from "./features/audio_mixer";
+export type {
+  AudioMixerConfig,
+  AudioMixer,
+  AudioMixerVoiceActivity,
+  AudioMixerPeerVoiceActivity,
+  AudioMixerOutputChanged,
+} from "./features/audio_mixer";
+
+export { AudioMixerEvent } from "./features/audio_mixer";
 
 export {
   BitrateControlMode,
@@ -27,5 +35,7 @@ export {
   Sender_Status as TrackSenderStatus,
 } from "./generated/protobuf/shared";
 
-export { Mode as AudioMixerMode } from "./generated/protobuf/features_mixer";
+export { ServerEvent_Receiver_VoiceActivity as TrackReceiverVoiceActivity } from "./generated/protobuf/session";
+
+export { Mode as AudioMixerMode } from "./generated/protobuf/features.mixer";
 export { Receiver_Source as AudioMixerSource } from "./generated/protobuf/shared";

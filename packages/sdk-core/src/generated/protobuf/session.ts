@@ -280,6 +280,7 @@ export interface ServerEvent_Receiver {
   name: string;
   state?: ServerEvent_Receiver_State | undefined;
   stats?: ServerEvent_Receiver_Stats | undefined;
+  voiceActivity?: ServerEvent_Receiver_VoiceActivity | undefined;
 }
 
 export interface ServerEvent_Receiver_State {
@@ -302,6 +303,10 @@ export interface ServerEvent_Receiver_Stats_Transmit {
   spatial: number;
   temporal: number;
   bitrateKbps: number;
+}
+
+export interface ServerEvent_Receiver_VoiceActivity {
+  audioLevel: number;
 }
 
 export interface ClientEvent {
@@ -4105,7 +4110,7 @@ export const ServerEvent_Sender_State = {
 };
 
 function createBaseServerEvent_Receiver(): ServerEvent_Receiver {
-  return { name: "", state: undefined, stats: undefined };
+  return { name: "", state: undefined, stats: undefined, voiceActivity: undefined };
 }
 
 export const ServerEvent_Receiver = {
@@ -4118,6 +4123,9 @@ export const ServerEvent_Receiver = {
     }
     if (message.stats !== undefined) {
       ServerEvent_Receiver_Stats.encode(message.stats, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.voiceActivity !== undefined) {
+      ServerEvent_Receiver_VoiceActivity.encode(message.voiceActivity, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -4150,6 +4158,13 @@ export const ServerEvent_Receiver = {
 
           message.stats = ServerEvent_Receiver_Stats.decode(reader, reader.uint32());
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.voiceActivity = ServerEvent_Receiver_VoiceActivity.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4164,6 +4179,9 @@ export const ServerEvent_Receiver = {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       state: isSet(object.state) ? ServerEvent_Receiver_State.fromJSON(object.state) : undefined,
       stats: isSet(object.stats) ? ServerEvent_Receiver_Stats.fromJSON(object.stats) : undefined,
+      voiceActivity: isSet(object.voiceActivity)
+        ? ServerEvent_Receiver_VoiceActivity.fromJSON(object.voiceActivity)
+        : undefined,
     };
   },
 
@@ -4177,6 +4195,9 @@ export const ServerEvent_Receiver = {
     }
     if (message.stats !== undefined) {
       obj.stats = ServerEvent_Receiver_Stats.toJSON(message.stats);
+    }
+    if (message.voiceActivity !== undefined) {
+      obj.voiceActivity = ServerEvent_Receiver_VoiceActivity.toJSON(message.voiceActivity);
     }
     return obj;
   },
@@ -4192,6 +4213,9 @@ export const ServerEvent_Receiver = {
       : undefined;
     message.stats = (object.stats !== undefined && object.stats !== null)
       ? ServerEvent_Receiver_Stats.fromPartial(object.stats)
+      : undefined;
+    message.voiceActivity = (object.voiceActivity !== undefined && object.voiceActivity !== null)
+      ? ServerEvent_Receiver_VoiceActivity.fromPartial(object.voiceActivity)
       : undefined;
     return message;
   },
@@ -4529,6 +4553,67 @@ export const ServerEvent_Receiver_Stats_Transmit = {
     message.spatial = object.spatial ?? 0;
     message.temporal = object.temporal ?? 0;
     message.bitrateKbps = object.bitrateKbps ?? 0;
+    return message;
+  },
+};
+
+function createBaseServerEvent_Receiver_VoiceActivity(): ServerEvent_Receiver_VoiceActivity {
+  return { audioLevel: 0 };
+}
+
+export const ServerEvent_Receiver_VoiceActivity = {
+  encode(message: ServerEvent_Receiver_VoiceActivity, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.audioLevel !== 0) {
+      writer.uint32(8).int32(message.audioLevel);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Receiver_VoiceActivity {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerEvent_Receiver_VoiceActivity();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.audioLevel = reader.int32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerEvent_Receiver_VoiceActivity {
+    return { audioLevel: isSet(object.audioLevel) ? globalThis.Number(object.audioLevel) : 0 };
+  },
+
+  toJSON(message: ServerEvent_Receiver_VoiceActivity): unknown {
+    const obj: any = {};
+    if (message.audioLevel !== 0) {
+      obj.audioLevel = Math.round(message.audioLevel);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerEvent_Receiver_VoiceActivity>, I>>(
+    base?: I,
+  ): ServerEvent_Receiver_VoiceActivity {
+    return ServerEvent_Receiver_VoiceActivity.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Receiver_VoiceActivity>, I>>(
+    object: I,
+  ): ServerEvent_Receiver_VoiceActivity {
+    const message = createBaseServerEvent_Receiver_VoiceActivity();
+    message.audioLevel = object.audioLevel ?? 0;
     return message;
   },
 };
