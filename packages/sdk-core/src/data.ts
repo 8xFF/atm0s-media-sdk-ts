@@ -10,6 +10,10 @@ import {
   Request_Receiver,
   Response_Receiver,
 } from "./generated/protobuf/session";
+import {
+  Request as RequestMixer,
+  Response as ResponseMixer,
+} from "./generated/protobuf/features.mixer";
 import { EventEmitter, ReadyWaiter } from "./utils";
 
 export enum DatachannelEvent {
@@ -109,6 +113,16 @@ export class Datachannel extends EventEmitter {
     const res = await this.request({ reqId, receiver: req });
     if (res.receiver) {
       return res.receiver;
+    } else {
+      throw Error("INVALID_SERVER_RESPONSE");
+    }
+  }
+
+  public async request_mixer(req: RequestMixer): Promise<ResponseMixer> {
+    const reqId = this.gen_req_id();
+    const res = await this.request({ reqId, features: { mixer: req } });
+    if (res.features?.mixer) {
+      return res.features.mixer;
     } else {
       throw Error("INVALID_SERVER_RESPONSE");
     }

@@ -48,7 +48,11 @@ export class AudioMixer extends EventEmitter {
   sources: AudioMixerSource[];
   outputs: OutputSlot[] = [{}, {}, {}];
 
-  constructor(session: Session, dc: Datachannel, config: AudioMixerConfig) {
+  constructor(
+    session: Session,
+    private dc: Datachannel,
+    config: AudioMixerConfig,
+  ) {
     super();
     this.mode = config.mode;
     for (let i = 0; i < config.outputs; i++) {
@@ -77,6 +81,45 @@ export class AudioMixer extends EventEmitter {
 
   public streams(): MediaStream[] {
     return this.receivers.map((r) => r.stream);
+  }
+
+  public attach(sources: AudioMixerSource[]) {
+    const req_srcs = [];
+    for (const i in sources) {
+      const source = sources[i]!;
+      const existed = this.sources.find((s) => {
+        return s.peer == source.peer && s.track == source.track;
+      });
+      if (!existed) {
+        this.sources.push(source);
+        req_srcs.push(source);
+      }
+    }
+    return this.dc.request_mixer({
+      attach: {
+        sources: req_srcs,
+      },
+    });
+  }
+
+  public detach(sources: AudioMixerSource[]) {
+    const req_srcs = [];
+    for (const i in sources) {
+      const source = sources[i]!;
+      const existed = this.sources.findIndex((s) => {
+        return s.peer == source.peer && s.track == source.track;
+      });
+      if (existed != -1) {
+        this.sources.splice(existed, 1);
+        req_srcs.push(source);
+      }
+    }
+
+    return this.dc.request_mixer({
+      detach: {
+        sources: req_srcs,
+      },
+    });
   }
 
   // We need to reset local state when leave room

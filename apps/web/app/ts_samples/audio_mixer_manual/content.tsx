@@ -5,9 +5,12 @@ import {
   AudioMixerEvent,
   AudioMixerMode,
   AudioMixerOutputChanged,
+  Kind,
   Session,
+  SessionEvent,
 } from "@atm0s-media-sdk/sdk-core/lib";
 import { env } from "../../env";
+import { RemoteTrack } from "@atm0s-media-sdk/sdk-react-hooks/lib";
 
 interface Props {
   room: string;
@@ -15,7 +18,7 @@ interface Props {
   token: string;
 }
 
-export default function EchoFast({ room, peer, token }: Props) {
+export default function AudioMixerManualContent({ room, peer, token }: Props) {
   useEffect(() => {
     const connect_btn = document.getElementById("connect")!;
     const disconnect_btn = document.getElementById("disconnect")!;
@@ -46,10 +49,10 @@ export default function EchoFast({ room, peer, token }: Props) {
           room,
           peer,
           publish: { peer: false, tracks: true },
-          subscribe: { peers: false, tracks: false },
+          subscribe: { peers: false, tracks: true },
           features: {
             mixer: {
-              mode: AudioMixerMode.AUTO,
+              mode: AudioMixerMode.MANUAL,
               outputs: 3,
             },
           },
@@ -71,6 +74,17 @@ export default function EchoFast({ room, peer, token }: Props) {
           }
         },
       );
+
+      session.on(SessionEvent.ROOM_TRACK_STARTED, (track: RemoteTrack) => {
+        if (track.kind == Kind.AUDIO) {
+          session.mixer!.attach([track]);
+        }
+      });
+      session.on(SessionEvent.ROOM_TRACK_STOPPED, (track: RemoteTrack) => {
+        if (track.kind == Kind.AUDIO) {
+          session.mixer!.detach([track]);
+        }
+      });
 
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,

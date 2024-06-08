@@ -38,7 +38,14 @@ export default function Page(): JSX.Element {
           </Link>
         </div>
         <div>
-          <Link href="/ts_samples/audio_mixer">Audio_mixer with mix-minus</Link>
+          <Link href="/ts_samples/audio_mixer_auto">
+            Audio_mixer with mix-minus Auto mode
+          </Link>
+        </div>
+        <div>
+          <Link href="/ts_samples/audio_mixer_manual">
+            Audio_mixer with mix-minus Manual mode
+          </Link>
         </div>
       </div>
       <div>React sample</div>

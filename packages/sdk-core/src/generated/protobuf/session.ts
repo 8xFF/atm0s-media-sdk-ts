@@ -6,7 +6,7 @@
 
 /* eslint-disable */
 import * as _m0 from "protobufjs/minimal";
-import { Config, Request as Request1, ServerEvent as ServerEvent2 } from "./features";
+import { Config, Request as Request1, Response as Response2, ServerEvent as ServerEvent3 } from "./features";
 import {
   Error,
   Kind,
@@ -120,7 +120,7 @@ export interface Response {
   room?: Response_Room | undefined;
   sender?: Response_Sender | undefined;
   receiver?: Response_Receiver | undefined;
-  features?: Request1 | undefined;
+  features?: Response2 | undefined;
 }
 
 export interface Response_Session {
@@ -191,7 +191,7 @@ export interface ServerEvent {
   sender?: ServerEvent_Sender | undefined;
   receiver?: ServerEvent_Receiver | undefined;
   response?: Response | undefined;
-  features?: ServerEvent2 | undefined;
+  features?: ServerEvent3 | undefined;
 }
 
 export interface ServerEvent_Session {
@@ -1635,7 +1635,7 @@ export const Response = {
       Response_Receiver.encode(message.receiver, writer.uint32(50).fork()).ldelim();
     }
     if (message.features !== undefined) {
-      Request1.encode(message.features, writer.uint32(58).fork()).ldelim();
+      Response2.encode(message.features, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -1694,7 +1694,7 @@ export const Response = {
             break;
           }
 
-          message.features = Request1.decode(reader, reader.uint32());
+          message.features = Response2.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1713,7 +1713,7 @@ export const Response = {
       room: isSet(object.room) ? Response_Room.fromJSON(object.room) : undefined,
       sender: isSet(object.sender) ? Response_Sender.fromJSON(object.sender) : undefined,
       receiver: isSet(object.receiver) ? Response_Receiver.fromJSON(object.receiver) : undefined,
-      features: isSet(object.features) ? Request1.fromJSON(object.features) : undefined,
+      features: isSet(object.features) ? Response2.fromJSON(object.features) : undefined,
     };
   },
 
@@ -1738,7 +1738,7 @@ export const Response = {
       obj.receiver = Response_Receiver.toJSON(message.receiver);
     }
     if (message.features !== undefined) {
-      obj.features = Request1.toJSON(message.features);
+      obj.features = Response2.toJSON(message.features);
     }
     return obj;
   },
@@ -1763,7 +1763,7 @@ export const Response = {
       ? Response_Receiver.fromPartial(object.receiver)
       : undefined;
     message.features = (object.features !== undefined && object.features !== null)
-      ? Request1.fromPartial(object.features)
+      ? Response2.fromPartial(object.features)
       : undefined;
     return message;
   },
@@ -2712,7 +2712,7 @@ export const ServerEvent = {
       Response.encode(message.response, writer.uint32(50).fork()).ldelim();
     }
     if (message.features !== undefined) {
-      ServerEvent2.encode(message.features, writer.uint32(58).fork()).ldelim();
+      ServerEvent3.encode(message.features, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -2771,7 +2771,7 @@ export const ServerEvent = {
             break;
           }
 
-          message.features = ServerEvent2.decode(reader, reader.uint32());
+          message.features = ServerEvent3.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -2790,7 +2790,7 @@ export const ServerEvent = {
       sender: isSet(object.sender) ? ServerEvent_Sender.fromJSON(object.sender) : undefined,
       receiver: isSet(object.receiver) ? ServerEvent_Receiver.fromJSON(object.receiver) : undefined,
       response: isSet(object.response) ? Response.fromJSON(object.response) : undefined,
-      features: isSet(object.features) ? ServerEvent2.fromJSON(object.features) : undefined,
+      features: isSet(object.features) ? ServerEvent3.fromJSON(object.features) : undefined,
     };
   },
 
@@ -2815,7 +2815,7 @@ export const ServerEvent = {
       obj.response = Response.toJSON(message.response);
     }
     if (message.features !== undefined) {
-      obj.features = ServerEvent2.toJSON(message.features);
+      obj.features = ServerEvent3.toJSON(message.features);
     }
     return obj;
   },
@@ -2842,7 +2842,7 @@ export const ServerEvent = {
       ? Response.fromPartial(object.response)
       : undefined;
     message.features = (object.features !== undefined && object.features !== null)
-      ? ServerEvent2.fromPartial(object.features)
+      ? ServerEvent3.fromPartial(object.features)
       : undefined;
     return message;
   },
