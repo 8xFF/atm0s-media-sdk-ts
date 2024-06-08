@@ -21,6 +21,9 @@ export function useRemotePeers(): RemotePeer[] {
       let peers = Array.from(ctx.peers.values());
       setPeers(peers);
     };
+    // because useEffect have some delay after useState, we need to update now
+    // TODO: avoid call twice if data not changed
+    handler();
     ctx.on(ContextEvent.PeersUpdated, handler);
     return () => {
       ctx.off(ContextEvent.PeersUpdated, handler);
@@ -37,15 +40,16 @@ export function useRemoteTracks(peer?: string, kind?: Kind): RemoteTrack[] {
     ),
   );
   useEffect(() => {
-    console.log("new", peer, kind, tracks, tracks);
     const handler = () => {
       let tracks = Array.from(ctx.tracks.values()).filter(
         (t) =>
           (!peer || t.peer == peer) && (kind == undefined || t.kind == kind),
       );
-      console.log("update", peer, kind, tracks);
       setTracks(tracks);
     };
+    // because useEffect have some delay after useState, we need to update now
+    // TODO: avoid call twice if data not changed
+    handler();
     ctx.on(
       peer ? ContextEvent.PeerTracksUpdated + peer : ContextEvent.TracksUpdated,
       handler,

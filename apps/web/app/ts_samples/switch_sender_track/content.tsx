@@ -13,7 +13,7 @@ import {
   TrackReceiverEvent,
   TrackReceiverStatus,
 } from "@atm0s-media-sdk/sdk-core/lib";
-import { SelectedGateway } from "../../components/GatewaySelector";
+import { env } from "../../env";
 
 interface Props {
   room: string;
@@ -37,7 +37,7 @@ export default function PageContent({ room, peer, token }: Props) {
     const disconnect_btn = document.getElementById("disconnect")!;
 
     async function connect() {
-      const session = new Session(SelectedGateway.url, {
+      const session = new Session(env.GATEWAY_ENDPOINTS[0]!, {
         token,
         join: {
           room,

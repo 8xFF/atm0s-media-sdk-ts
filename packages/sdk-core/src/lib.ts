@@ -9,6 +9,17 @@ import {
   SessionConfig as SessionConfigRaw,
   JoinInfo as JoinInfoRaw,
 } from "./session";
+
+export type {
+  AudioMixerConfig,
+  AudioMixer,
+  AudioMixerVoiceActivity,
+  AudioMixerPeerVoiceActivity,
+  AudioMixerOutputChanged,
+} from "./features/audio_mixer";
+
+export { AudioMixerEvent } from "./features/audio_mixer";
+
 export {
   BitrateControlMode,
   Sender_Config,
@@ -23,3 +34,8 @@ export {
   Receiver_Status as TrackReceiverStatus,
   Sender_Status as TrackSenderStatus,
 } from "./generated/protobuf/shared";
+
+export { ServerEvent_Receiver_VoiceActivity as TrackReceiverVoiceActivity } from "./generated/protobuf/session";
+
+export { Mode as AudioMixerMode } from "./generated/protobuf/features.mixer";
+export { Receiver_Source as AudioMixerSource } from "./generated/protobuf/shared";

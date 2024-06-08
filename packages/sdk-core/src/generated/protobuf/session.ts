@@ -2,11 +2,11 @@
 // versions:
 //   protoc-gen-ts_proto  v1.174.0
 //   protoc               v4.25.1
-// source: conn.proto
+// source: session.proto
 
 /* eslint-disable */
 import * as _m0 from "protobufjs/minimal";
-import { Request as Request1, ServerEvent as ServerEvent2 } from "./features";
+import { Config, Request as Request1, Response as Response2, ServerEvent as ServerEvent3 } from "./features";
 import {
   Error,
   Kind,
@@ -17,7 +17,8 @@ import {
   Receiver_Status,
   receiver_StatusFromJSON,
   receiver_StatusToJSON,
-  RoomJoin,
+  RoomInfoPublish,
+  RoomInfoSubscribe,
   Sender_Config,
   Sender_Source,
   Sender_Status,
@@ -26,7 +27,16 @@ import {
   Tracks,
 } from "./shared";
 
-export const protobufPackage = "conn";
+export const protobufPackage = "session";
+
+export interface RoomJoin {
+  room: string;
+  peer: string;
+  publish: RoomInfoPublish | undefined;
+  subscribe: RoomInfoSubscribe | undefined;
+  features: Config | undefined;
+  metadata?: string | undefined;
+}
 
 export interface Request {
   reqId: number;
@@ -38,18 +48,18 @@ export interface Request {
 }
 
 export interface Request_Session {
-  join?: Request_Session_RoomJoin | undefined;
-  leave?: Request_Session_RoomLeave | undefined;
+  join?: Request_Session_Join | undefined;
+  leave?: Request_Session_Leave | undefined;
   sdp?: Request_Session_UpdateSdp | undefined;
   disconnect?: Request_Session_Disconnect | undefined;
 }
 
-export interface Request_Session_RoomJoin {
+export interface Request_Session_Join {
   info: RoomJoin | undefined;
   token: string;
 }
 
-export interface Request_Session_RoomLeave {
+export interface Request_Session_Leave {
 }
 
 export interface Request_Session_UpdateSdp {
@@ -110,20 +120,20 @@ export interface Response {
   room?: Response_Room | undefined;
   sender?: Response_Sender | undefined;
   receiver?: Response_Receiver | undefined;
-  features?: Request1 | undefined;
+  features?: Response2 | undefined;
 }
 
 export interface Response_Session {
-  join?: Response_Session_RoomJoin | undefined;
-  leave?: Response_Session_RoomLeave | undefined;
+  join?: Response_Session_Join | undefined;
+  leave?: Response_Session_Leave | undefined;
   sdp?: Response_Session_UpdateSdp | undefined;
   disconnect?: Response_Session_Disconnect | undefined;
 }
 
-export interface Response_Session_RoomJoin {
+export interface Response_Session_Join {
 }
 
-export interface Response_Session_RoomLeave {
+export interface Response_Session_Leave {
 }
 
 export interface Response_Session_UpdateSdp {
@@ -181,7 +191,7 @@ export interface ServerEvent {
   sender?: ServerEvent_Sender | undefined;
   receiver?: ServerEvent_Receiver | undefined;
   response?: Response | undefined;
-  features?: ServerEvent2 | undefined;
+  features?: ServerEvent3 | undefined;
 }
 
 export interface ServerEvent_Session {
@@ -270,6 +280,7 @@ export interface ServerEvent_Receiver {
   name: string;
   state?: ServerEvent_Receiver_State | undefined;
   stats?: ServerEvent_Receiver_Stats | undefined;
+  voiceActivity?: ServerEvent_Receiver_VoiceActivity | undefined;
 }
 
 export interface ServerEvent_Receiver_State {
@@ -294,10 +305,154 @@ export interface ServerEvent_Receiver_Stats_Transmit {
   bitrateKbps: number;
 }
 
+export interface ServerEvent_Receiver_VoiceActivity {
+  audioLevel: number;
+}
+
 export interface ClientEvent {
   seq: number;
   request?: Request | undefined;
 }
+
+function createBaseRoomJoin(): RoomJoin {
+  return { room: "", peer: "", publish: undefined, subscribe: undefined, features: undefined, metadata: undefined };
+}
+
+export const RoomJoin = {
+  encode(message: RoomJoin, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.room !== "") {
+      writer.uint32(10).string(message.room);
+    }
+    if (message.peer !== "") {
+      writer.uint32(18).string(message.peer);
+    }
+    if (message.publish !== undefined) {
+      RoomInfoPublish.encode(message.publish, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.subscribe !== undefined) {
+      RoomInfoSubscribe.encode(message.subscribe, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.features !== undefined) {
+      Config.encode(message.features, writer.uint32(42).fork()).ldelim();
+    }
+    if (message.metadata !== undefined) {
+      writer.uint32(50).string(message.metadata);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): RoomJoin {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRoomJoin();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.room = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.peer = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.publish = RoomInfoPublish.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.subscribe = RoomInfoSubscribe.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.features = Config.decode(reader, reader.uint32());
+          continue;
+        case 6:
+          if (tag !== 50) {
+            break;
+          }
+
+          message.metadata = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): RoomJoin {
+    return {
+      room: isSet(object.room) ? globalThis.String(object.room) : "",
+      peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
+      publish: isSet(object.publish) ? RoomInfoPublish.fromJSON(object.publish) : undefined,
+      subscribe: isSet(object.subscribe) ? RoomInfoSubscribe.fromJSON(object.subscribe) : undefined,
+      features: isSet(object.features) ? Config.fromJSON(object.features) : undefined,
+      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : undefined,
+    };
+  },
+
+  toJSON(message: RoomJoin): unknown {
+    const obj: any = {};
+    if (message.room !== "") {
+      obj.room = message.room;
+    }
+    if (message.peer !== "") {
+      obj.peer = message.peer;
+    }
+    if (message.publish !== undefined) {
+      obj.publish = RoomInfoPublish.toJSON(message.publish);
+    }
+    if (message.subscribe !== undefined) {
+      obj.subscribe = RoomInfoSubscribe.toJSON(message.subscribe);
+    }
+    if (message.features !== undefined) {
+      obj.features = Config.toJSON(message.features);
+    }
+    if (message.metadata !== undefined) {
+      obj.metadata = message.metadata;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<RoomJoin>, I>>(base?: I): RoomJoin {
+    return RoomJoin.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<RoomJoin>, I>>(object: I): RoomJoin {
+    const message = createBaseRoomJoin();
+    message.room = object.room ?? "";
+    message.peer = object.peer ?? "";
+    message.publish = (object.publish !== undefined && object.publish !== null)
+      ? RoomInfoPublish.fromPartial(object.publish)
+      : undefined;
+    message.subscribe = (object.subscribe !== undefined && object.subscribe !== null)
+      ? RoomInfoSubscribe.fromPartial(object.subscribe)
+      : undefined;
+    message.features = (object.features !== undefined && object.features !== null)
+      ? Config.fromPartial(object.features)
+      : undefined;
+    message.metadata = object.metadata ?? undefined;
+    return message;
+  },
+};
 
 function createBaseRequest(): Request {
   return { reqId: 0, session: undefined, room: undefined, sender: undefined, receiver: undefined, features: undefined };
@@ -450,10 +605,10 @@ function createBaseRequest_Session(): Request_Session {
 export const Request_Session = {
   encode(message: Request_Session, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.join !== undefined) {
-      Request_Session_RoomJoin.encode(message.join, writer.uint32(10).fork()).ldelim();
+      Request_Session_Join.encode(message.join, writer.uint32(10).fork()).ldelim();
     }
     if (message.leave !== undefined) {
-      Request_Session_RoomLeave.encode(message.leave, writer.uint32(18).fork()).ldelim();
+      Request_Session_Leave.encode(message.leave, writer.uint32(18).fork()).ldelim();
     }
     if (message.sdp !== undefined) {
       Request_Session_UpdateSdp.encode(message.sdp, writer.uint32(26).fork()).ldelim();
@@ -476,14 +631,14 @@ export const Request_Session = {
             break;
           }
 
-          message.join = Request_Session_RoomJoin.decode(reader, reader.uint32());
+          message.join = Request_Session_Join.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.leave = Request_Session_RoomLeave.decode(reader, reader.uint32());
+          message.leave = Request_Session_Leave.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
@@ -510,8 +665,8 @@ export const Request_Session = {
 
   fromJSON(object: any): Request_Session {
     return {
-      join: isSet(object.join) ? Request_Session_RoomJoin.fromJSON(object.join) : undefined,
-      leave: isSet(object.leave) ? Request_Session_RoomLeave.fromJSON(object.leave) : undefined,
+      join: isSet(object.join) ? Request_Session_Join.fromJSON(object.join) : undefined,
+      leave: isSet(object.leave) ? Request_Session_Leave.fromJSON(object.leave) : undefined,
       sdp: isSet(object.sdp) ? Request_Session_UpdateSdp.fromJSON(object.sdp) : undefined,
       disconnect: isSet(object.disconnect) ? Request_Session_Disconnect.fromJSON(object.disconnect) : undefined,
     };
@@ -520,10 +675,10 @@ export const Request_Session = {
   toJSON(message: Request_Session): unknown {
     const obj: any = {};
     if (message.join !== undefined) {
-      obj.join = Request_Session_RoomJoin.toJSON(message.join);
+      obj.join = Request_Session_Join.toJSON(message.join);
     }
     if (message.leave !== undefined) {
-      obj.leave = Request_Session_RoomLeave.toJSON(message.leave);
+      obj.leave = Request_Session_Leave.toJSON(message.leave);
     }
     if (message.sdp !== undefined) {
       obj.sdp = Request_Session_UpdateSdp.toJSON(message.sdp);
@@ -540,10 +695,10 @@ export const Request_Session = {
   fromPartial<I extends Exact<DeepPartial<Request_Session>, I>>(object: I): Request_Session {
     const message = createBaseRequest_Session();
     message.join = (object.join !== undefined && object.join !== null)
-      ? Request_Session_RoomJoin.fromPartial(object.join)
+      ? Request_Session_Join.fromPartial(object.join)
       : undefined;
     message.leave = (object.leave !== undefined && object.leave !== null)
-      ? Request_Session_RoomLeave.fromPartial(object.leave)
+      ? Request_Session_Leave.fromPartial(object.leave)
       : undefined;
     message.sdp = (object.sdp !== undefined && object.sdp !== null)
       ? Request_Session_UpdateSdp.fromPartial(object.sdp)
@@ -555,12 +710,12 @@ export const Request_Session = {
   },
 };
 
-function createBaseRequest_Session_RoomJoin(): Request_Session_RoomJoin {
+function createBaseRequest_Session_Join(): Request_Session_Join {
   return { info: undefined, token: "" };
 }
 
-export const Request_Session_RoomJoin = {
-  encode(message: Request_Session_RoomJoin, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const Request_Session_Join = {
+  encode(message: Request_Session_Join, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.info !== undefined) {
       RoomJoin.encode(message.info, writer.uint32(10).fork()).ldelim();
     }
@@ -570,10 +725,10 @@ export const Request_Session_RoomJoin = {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Session_RoomJoin {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Session_Join {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRequest_Session_RoomJoin();
+    const message = createBaseRequest_Session_Join();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -600,14 +755,14 @@ export const Request_Session_RoomJoin = {
     return message;
   },
 
-  fromJSON(object: any): Request_Session_RoomJoin {
+  fromJSON(object: any): Request_Session_Join {
     return {
       info: isSet(object.info) ? RoomJoin.fromJSON(object.info) : undefined,
       token: isSet(object.token) ? globalThis.String(object.token) : "",
     };
   },
 
-  toJSON(message: Request_Session_RoomJoin): unknown {
+  toJSON(message: Request_Session_Join): unknown {
     const obj: any = {};
     if (message.info !== undefined) {
       obj.info = RoomJoin.toJSON(message.info);
@@ -618,30 +773,30 @@ export const Request_Session_RoomJoin = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Session_RoomJoin>, I>>(base?: I): Request_Session_RoomJoin {
-    return Request_Session_RoomJoin.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<Request_Session_Join>, I>>(base?: I): Request_Session_Join {
+    return Request_Session_Join.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Session_RoomJoin>, I>>(object: I): Request_Session_RoomJoin {
-    const message = createBaseRequest_Session_RoomJoin();
+  fromPartial<I extends Exact<DeepPartial<Request_Session_Join>, I>>(object: I): Request_Session_Join {
+    const message = createBaseRequest_Session_Join();
     message.info = (object.info !== undefined && object.info !== null) ? RoomJoin.fromPartial(object.info) : undefined;
     message.token = object.token ?? "";
     return message;
   },
 };
 
-function createBaseRequest_Session_RoomLeave(): Request_Session_RoomLeave {
+function createBaseRequest_Session_Leave(): Request_Session_Leave {
   return {};
 }
 
-export const Request_Session_RoomLeave = {
-  encode(_: Request_Session_RoomLeave, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const Request_Session_Leave = {
+  encode(_: Request_Session_Leave, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Session_RoomLeave {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Session_Leave {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRequest_Session_RoomLeave();
+    const message = createBaseRequest_Session_Leave();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -654,20 +809,20 @@ export const Request_Session_RoomLeave = {
     return message;
   },
 
-  fromJSON(_: any): Request_Session_RoomLeave {
+  fromJSON(_: any): Request_Session_Leave {
     return {};
   },
 
-  toJSON(_: Request_Session_RoomLeave): unknown {
+  toJSON(_: Request_Session_Leave): unknown {
     const obj: any = {};
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Session_RoomLeave>, I>>(base?: I): Request_Session_RoomLeave {
-    return Request_Session_RoomLeave.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<Request_Session_Leave>, I>>(base?: I): Request_Session_Leave {
+    return Request_Session_Leave.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Session_RoomLeave>, I>>(_: I): Request_Session_RoomLeave {
-    const message = createBaseRequest_Session_RoomLeave();
+  fromPartial<I extends Exact<DeepPartial<Request_Session_Leave>, I>>(_: I): Request_Session_Leave {
+    const message = createBaseRequest_Session_Leave();
     return message;
   },
 };
@@ -1480,7 +1635,7 @@ export const Response = {
       Response_Receiver.encode(message.receiver, writer.uint32(50).fork()).ldelim();
     }
     if (message.features !== undefined) {
-      Request1.encode(message.features, writer.uint32(58).fork()).ldelim();
+      Response2.encode(message.features, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -1539,7 +1694,7 @@ export const Response = {
             break;
           }
 
-          message.features = Request1.decode(reader, reader.uint32());
+          message.features = Response2.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1558,7 +1713,7 @@ export const Response = {
       room: isSet(object.room) ? Response_Room.fromJSON(object.room) : undefined,
       sender: isSet(object.sender) ? Response_Sender.fromJSON(object.sender) : undefined,
       receiver: isSet(object.receiver) ? Response_Receiver.fromJSON(object.receiver) : undefined,
-      features: isSet(object.features) ? Request1.fromJSON(object.features) : undefined,
+      features: isSet(object.features) ? Response2.fromJSON(object.features) : undefined,
     };
   },
 
@@ -1583,7 +1738,7 @@ export const Response = {
       obj.receiver = Response_Receiver.toJSON(message.receiver);
     }
     if (message.features !== undefined) {
-      obj.features = Request1.toJSON(message.features);
+      obj.features = Response2.toJSON(message.features);
     }
     return obj;
   },
@@ -1608,7 +1763,7 @@ export const Response = {
       ? Response_Receiver.fromPartial(object.receiver)
       : undefined;
     message.features = (object.features !== undefined && object.features !== null)
-      ? Request1.fromPartial(object.features)
+      ? Response2.fromPartial(object.features)
       : undefined;
     return message;
   },
@@ -1621,10 +1776,10 @@ function createBaseResponse_Session(): Response_Session {
 export const Response_Session = {
   encode(message: Response_Session, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.join !== undefined) {
-      Response_Session_RoomJoin.encode(message.join, writer.uint32(10).fork()).ldelim();
+      Response_Session_Join.encode(message.join, writer.uint32(10).fork()).ldelim();
     }
     if (message.leave !== undefined) {
-      Response_Session_RoomLeave.encode(message.leave, writer.uint32(18).fork()).ldelim();
+      Response_Session_Leave.encode(message.leave, writer.uint32(18).fork()).ldelim();
     }
     if (message.sdp !== undefined) {
       Response_Session_UpdateSdp.encode(message.sdp, writer.uint32(26).fork()).ldelim();
@@ -1647,14 +1802,14 @@ export const Response_Session = {
             break;
           }
 
-          message.join = Response_Session_RoomJoin.decode(reader, reader.uint32());
+          message.join = Response_Session_Join.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.leave = Response_Session_RoomLeave.decode(reader, reader.uint32());
+          message.leave = Response_Session_Leave.decode(reader, reader.uint32());
           continue;
         case 3:
           if (tag !== 26) {
@@ -1681,8 +1836,8 @@ export const Response_Session = {
 
   fromJSON(object: any): Response_Session {
     return {
-      join: isSet(object.join) ? Response_Session_RoomJoin.fromJSON(object.join) : undefined,
-      leave: isSet(object.leave) ? Response_Session_RoomLeave.fromJSON(object.leave) : undefined,
+      join: isSet(object.join) ? Response_Session_Join.fromJSON(object.join) : undefined,
+      leave: isSet(object.leave) ? Response_Session_Leave.fromJSON(object.leave) : undefined,
       sdp: isSet(object.sdp) ? Response_Session_UpdateSdp.fromJSON(object.sdp) : undefined,
       disconnect: isSet(object.disconnect) ? Response_Session_Disconnect.fromJSON(object.disconnect) : undefined,
     };
@@ -1691,10 +1846,10 @@ export const Response_Session = {
   toJSON(message: Response_Session): unknown {
     const obj: any = {};
     if (message.join !== undefined) {
-      obj.join = Response_Session_RoomJoin.toJSON(message.join);
+      obj.join = Response_Session_Join.toJSON(message.join);
     }
     if (message.leave !== undefined) {
-      obj.leave = Response_Session_RoomLeave.toJSON(message.leave);
+      obj.leave = Response_Session_Leave.toJSON(message.leave);
     }
     if (message.sdp !== undefined) {
       obj.sdp = Response_Session_UpdateSdp.toJSON(message.sdp);
@@ -1711,10 +1866,10 @@ export const Response_Session = {
   fromPartial<I extends Exact<DeepPartial<Response_Session>, I>>(object: I): Response_Session {
     const message = createBaseResponse_Session();
     message.join = (object.join !== undefined && object.join !== null)
-      ? Response_Session_RoomJoin.fromPartial(object.join)
+      ? Response_Session_Join.fromPartial(object.join)
       : undefined;
     message.leave = (object.leave !== undefined && object.leave !== null)
-      ? Response_Session_RoomLeave.fromPartial(object.leave)
+      ? Response_Session_Leave.fromPartial(object.leave)
       : undefined;
     message.sdp = (object.sdp !== undefined && object.sdp !== null)
       ? Response_Session_UpdateSdp.fromPartial(object.sdp)
@@ -1726,19 +1881,19 @@ export const Response_Session = {
   },
 };
 
-function createBaseResponse_Session_RoomJoin(): Response_Session_RoomJoin {
+function createBaseResponse_Session_Join(): Response_Session_Join {
   return {};
 }
 
-export const Response_Session_RoomJoin = {
-  encode(_: Response_Session_RoomJoin, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const Response_Session_Join = {
+  encode(_: Response_Session_Join, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Session_RoomJoin {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Session_Join {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseResponse_Session_RoomJoin();
+    const message = createBaseResponse_Session_Join();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1751,37 +1906,37 @@ export const Response_Session_RoomJoin = {
     return message;
   },
 
-  fromJSON(_: any): Response_Session_RoomJoin {
+  fromJSON(_: any): Response_Session_Join {
     return {};
   },
 
-  toJSON(_: Response_Session_RoomJoin): unknown {
+  toJSON(_: Response_Session_Join): unknown {
     const obj: any = {};
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Session_RoomJoin>, I>>(base?: I): Response_Session_RoomJoin {
-    return Response_Session_RoomJoin.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<Response_Session_Join>, I>>(base?: I): Response_Session_Join {
+    return Response_Session_Join.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Session_RoomJoin>, I>>(_: I): Response_Session_RoomJoin {
-    const message = createBaseResponse_Session_RoomJoin();
+  fromPartial<I extends Exact<DeepPartial<Response_Session_Join>, I>>(_: I): Response_Session_Join {
+    const message = createBaseResponse_Session_Join();
     return message;
   },
 };
 
-function createBaseResponse_Session_RoomLeave(): Response_Session_RoomLeave {
+function createBaseResponse_Session_Leave(): Response_Session_Leave {
   return {};
 }
 
-export const Response_Session_RoomLeave = {
-  encode(_: Response_Session_RoomLeave, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const Response_Session_Leave = {
+  encode(_: Response_Session_Leave, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Session_RoomLeave {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Session_Leave {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseResponse_Session_RoomLeave();
+    const message = createBaseResponse_Session_Leave();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1794,20 +1949,20 @@ export const Response_Session_RoomLeave = {
     return message;
   },
 
-  fromJSON(_: any): Response_Session_RoomLeave {
+  fromJSON(_: any): Response_Session_Leave {
     return {};
   },
 
-  toJSON(_: Response_Session_RoomLeave): unknown {
+  toJSON(_: Response_Session_Leave): unknown {
     const obj: any = {};
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Response_Session_RoomLeave>, I>>(base?: I): Response_Session_RoomLeave {
-    return Response_Session_RoomLeave.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<Response_Session_Leave>, I>>(base?: I): Response_Session_Leave {
+    return Response_Session_Leave.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Response_Session_RoomLeave>, I>>(_: I): Response_Session_RoomLeave {
-    const message = createBaseResponse_Session_RoomLeave();
+  fromPartial<I extends Exact<DeepPartial<Response_Session_Leave>, I>>(_: I): Response_Session_Leave {
+    const message = createBaseResponse_Session_Leave();
     return message;
   },
 };
@@ -2557,7 +2712,7 @@ export const ServerEvent = {
       Response.encode(message.response, writer.uint32(50).fork()).ldelim();
     }
     if (message.features !== undefined) {
-      ServerEvent2.encode(message.features, writer.uint32(58).fork()).ldelim();
+      ServerEvent3.encode(message.features, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -2616,7 +2771,7 @@ export const ServerEvent = {
             break;
           }
 
-          message.features = ServerEvent2.decode(reader, reader.uint32());
+          message.features = ServerEvent3.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -2635,7 +2790,7 @@ export const ServerEvent = {
       sender: isSet(object.sender) ? ServerEvent_Sender.fromJSON(object.sender) : undefined,
       receiver: isSet(object.receiver) ? ServerEvent_Receiver.fromJSON(object.receiver) : undefined,
       response: isSet(object.response) ? Response.fromJSON(object.response) : undefined,
-      features: isSet(object.features) ? ServerEvent2.fromJSON(object.features) : undefined,
+      features: isSet(object.features) ? ServerEvent3.fromJSON(object.features) : undefined,
     };
   },
 
@@ -2660,7 +2815,7 @@ export const ServerEvent = {
       obj.response = Response.toJSON(message.response);
     }
     if (message.features !== undefined) {
-      obj.features = ServerEvent2.toJSON(message.features);
+      obj.features = ServerEvent3.toJSON(message.features);
     }
     return obj;
   },
@@ -2687,7 +2842,7 @@ export const ServerEvent = {
       ? Response.fromPartial(object.response)
       : undefined;
     message.features = (object.features !== undefined && object.features !== null)
-      ? ServerEvent2.fromPartial(object.features)
+      ? ServerEvent3.fromPartial(object.features)
       : undefined;
     return message;
   },
@@ -3955,7 +4110,7 @@ export const ServerEvent_Sender_State = {
 };
 
 function createBaseServerEvent_Receiver(): ServerEvent_Receiver {
-  return { name: "", state: undefined, stats: undefined };
+  return { name: "", state: undefined, stats: undefined, voiceActivity: undefined };
 }
 
 export const ServerEvent_Receiver = {
@@ -3968,6 +4123,9 @@ export const ServerEvent_Receiver = {
     }
     if (message.stats !== undefined) {
       ServerEvent_Receiver_Stats.encode(message.stats, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.voiceActivity !== undefined) {
+      ServerEvent_Receiver_VoiceActivity.encode(message.voiceActivity, writer.uint32(34).fork()).ldelim();
     }
     return writer;
   },
@@ -4000,6 +4158,13 @@ export const ServerEvent_Receiver = {
 
           message.stats = ServerEvent_Receiver_Stats.decode(reader, reader.uint32());
           continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.voiceActivity = ServerEvent_Receiver_VoiceActivity.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -4014,6 +4179,9 @@ export const ServerEvent_Receiver = {
       name: isSet(object.name) ? globalThis.String(object.name) : "",
       state: isSet(object.state) ? ServerEvent_Receiver_State.fromJSON(object.state) : undefined,
       stats: isSet(object.stats) ? ServerEvent_Receiver_Stats.fromJSON(object.stats) : undefined,
+      voiceActivity: isSet(object.voiceActivity)
+        ? ServerEvent_Receiver_VoiceActivity.fromJSON(object.voiceActivity)
+        : undefined,
     };
   },
 
@@ -4027,6 +4195,9 @@ export const ServerEvent_Receiver = {
     }
     if (message.stats !== undefined) {
       obj.stats = ServerEvent_Receiver_Stats.toJSON(message.stats);
+    }
+    if (message.voiceActivity !== undefined) {
+      obj.voiceActivity = ServerEvent_Receiver_VoiceActivity.toJSON(message.voiceActivity);
     }
     return obj;
   },
@@ -4042,6 +4213,9 @@ export const ServerEvent_Receiver = {
       : undefined;
     message.stats = (object.stats !== undefined && object.stats !== null)
       ? ServerEvent_Receiver_Stats.fromPartial(object.stats)
+      : undefined;
+    message.voiceActivity = (object.voiceActivity !== undefined && object.voiceActivity !== null)
+      ? ServerEvent_Receiver_VoiceActivity.fromPartial(object.voiceActivity)
       : undefined;
     return message;
   },
@@ -4379,6 +4553,67 @@ export const ServerEvent_Receiver_Stats_Transmit = {
     message.spatial = object.spatial ?? 0;
     message.temporal = object.temporal ?? 0;
     message.bitrateKbps = object.bitrateKbps ?? 0;
+    return message;
+  },
+};
+
+function createBaseServerEvent_Receiver_VoiceActivity(): ServerEvent_Receiver_VoiceActivity {
+  return { audioLevel: 0 };
+}
+
+export const ServerEvent_Receiver_VoiceActivity = {
+  encode(message: ServerEvent_Receiver_VoiceActivity, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.audioLevel !== 0) {
+      writer.uint32(8).int32(message.audioLevel);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Receiver_VoiceActivity {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerEvent_Receiver_VoiceActivity();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.audioLevel = reader.int32();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerEvent_Receiver_VoiceActivity {
+    return { audioLevel: isSet(object.audioLevel) ? globalThis.Number(object.audioLevel) : 0 };
+  },
+
+  toJSON(message: ServerEvent_Receiver_VoiceActivity): unknown {
+    const obj: any = {};
+    if (message.audioLevel !== 0) {
+      obj.audioLevel = Math.round(message.audioLevel);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerEvent_Receiver_VoiceActivity>, I>>(
+    base?: I,
+  ): ServerEvent_Receiver_VoiceActivity {
+    return ServerEvent_Receiver_VoiceActivity.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Receiver_VoiceActivity>, I>>(
+    object: I,
+  ): ServerEvent_Receiver_VoiceActivity {
+    const message = createBaseServerEvent_Receiver_VoiceActivity();
+    message.audioLevel = object.audioLevel ?? 0;
     return message;
   },
 };

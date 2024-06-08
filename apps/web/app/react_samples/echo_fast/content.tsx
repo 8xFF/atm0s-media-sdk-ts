@@ -23,7 +23,7 @@ import {
   useConsumerStatus,
 } from "@atm0s-media-sdk/sdk-react-hooks/lib";
 import { Kind } from "@atm0s-media-sdk/sdk-core/lib";
-import { SelectedGateway } from "../../components/GatewaySelector";
+import { env } from "../../env";
 
 function EchoViewer({ track }: { track: RemoteTrack }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -147,7 +147,7 @@ export default function PageContent({ room, peer, token }: Props) {
   return (
     <main>
       <Atm0sMediaProvider
-        gateway={SelectedGateway.url}
+        gateway={env.GATEWAY_ENDPOINTS[0]!}
         cfg={{
           token,
           join: {

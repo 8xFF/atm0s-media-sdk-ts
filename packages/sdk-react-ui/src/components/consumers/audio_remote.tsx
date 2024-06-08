@@ -1,4 +1,8 @@
-import { RemoteTrack, useConsumer } from "@atm0s-media-sdk/sdk-react-hooks/lib";
+import {
+  RemoteTrack,
+  useConsumer,
+  useConsumerVoiceActivity,
+} from "@atm0s-media-sdk/sdk-react-hooks/lib";
 import { useEffect, useRef } from "react";
 
 interface Props {
@@ -7,6 +11,8 @@ interface Props {
 
 export function AudioRemote({ track }: Props) {
   const consumer = useConsumer(track);
+  const _audioActivity = useConsumerVoiceActivity(consumer);
+  //TODO show audio activity here
   const audioRef = useRef<HTMLAudioElement>(null);
   useEffect(() => {
     consumer.attach({

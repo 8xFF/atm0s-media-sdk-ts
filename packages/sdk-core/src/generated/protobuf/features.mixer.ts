@@ -2,12 +2,13 @@
 // versions:
 //   protoc-gen-ts_proto  v1.174.0
 //   protoc               v4.25.1
-// source: features_mix_minus.proto
+// source: features.mixer.proto
 
 /* eslint-disable */
 import * as _m0 from "protobufjs/minimal";
+import { Receiver_Source } from "./shared";
 
-export const protobufPackage = "mix_minus";
+export const protobufPackage = "features.mixer";
 
 export enum Mode {
   AUTO = 0,
@@ -42,14 +43,10 @@ export function modeToJSON(object: Mode): string {
   }
 }
 
-export interface Source {
-  peer: string;
-  track: string;
-}
-
 export interface Config {
   mode: Mode;
-  sources: Source[];
+  outputs: string[];
+  sources: Receiver_Source[];
 }
 
 export interface Request {
@@ -58,11 +55,11 @@ export interface Request {
 }
 
 export interface Request_Attach {
-  sources: Source[];
+  sources: Receiver_Source[];
 }
 
 export interface Request_Detach {
-  sources: Source[];
+  sources: Receiver_Source[];
 }
 
 export interface Response {
@@ -77,105 +74,21 @@ export interface Response_Detach {
 }
 
 export interface ServerEvent {
-  slotSet?: ServerEvent_MappingSlotSet | undefined;
-  slotDel?: ServerEvent_MappingSlotDel | undefined;
-  slotsAudioLevel?: ServerEvent_MappingSlotsAudioLevel | undefined;
+  slotSet?: ServerEvent_SlotSet | undefined;
+  slotUnset?: ServerEvent_SlotUnset | undefined;
 }
 
-export interface ServerEvent_MappingSlotSet {
+export interface ServerEvent_SlotSet {
   slot: number;
-  source: Source | undefined;
+  source: Receiver_Source | undefined;
 }
 
-export interface ServerEvent_MappingSlotDel {
+export interface ServerEvent_SlotUnset {
   slot: number;
 }
-
-export interface ServerEvent_SlotAudioLevel {
-  slot: number;
-  audioLevel: number;
-}
-
-export interface ServerEvent_MappingSlotsAudioLevel {
-  slots: ServerEvent_SlotAudioLevel[];
-}
-
-function createBaseSource(): Source {
-  return { peer: "", track: "" };
-}
-
-export const Source = {
-  encode(message: Source, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.peer !== "") {
-      writer.uint32(10).string(message.peer);
-    }
-    if (message.track !== "") {
-      writer.uint32(18).string(message.track);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Source {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSource();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.peer = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.track = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Source {
-    return {
-      peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
-      track: isSet(object.track) ? globalThis.String(object.track) : "",
-    };
-  },
-
-  toJSON(message: Source): unknown {
-    const obj: any = {};
-    if (message.peer !== "") {
-      obj.peer = message.peer;
-    }
-    if (message.track !== "") {
-      obj.track = message.track;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Source>, I>>(base?: I): Source {
-    return Source.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<Source>, I>>(object: I): Source {
-    const message = createBaseSource();
-    message.peer = object.peer ?? "";
-    message.track = object.track ?? "";
-    return message;
-  },
-};
 
 function createBaseConfig(): Config {
-  return { mode: 0, sources: [] };
+  return { mode: 0, outputs: [], sources: [] };
 }
 
 export const Config = {
@@ -183,8 +96,11 @@ export const Config = {
     if (message.mode !== 0) {
       writer.uint32(8).int32(message.mode);
     }
+    for (const v of message.outputs) {
+      writer.uint32(18).string(v!);
+    }
     for (const v of message.sources) {
-      Source.encode(v!, writer.uint32(18).fork()).ldelim();
+      Receiver_Source.encode(v!, writer.uint32(26).fork()).ldelim();
     }
     return writer;
   },
@@ -208,7 +124,14 @@ export const Config = {
             break;
           }
 
-          message.sources.push(Source.decode(reader, reader.uint32()));
+          message.outputs.push(reader.string());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.sources.push(Receiver_Source.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -222,7 +145,10 @@ export const Config = {
   fromJSON(object: any): Config {
     return {
       mode: isSet(object.mode) ? modeFromJSON(object.mode) : 0,
-      sources: globalThis.Array.isArray(object?.sources) ? object.sources.map((e: any) => Source.fromJSON(e)) : [],
+      outputs: globalThis.Array.isArray(object?.outputs) ? object.outputs.map((e: any) => globalThis.String(e)) : [],
+      sources: globalThis.Array.isArray(object?.sources)
+        ? object.sources.map((e: any) => Receiver_Source.fromJSON(e))
+        : [],
     };
   },
 
@@ -231,8 +157,11 @@ export const Config = {
     if (message.mode !== 0) {
       obj.mode = modeToJSON(message.mode);
     }
+    if (message.outputs?.length) {
+      obj.outputs = message.outputs;
+    }
     if (message.sources?.length) {
-      obj.sources = message.sources.map((e) => Source.toJSON(e));
+      obj.sources = message.sources.map((e) => Receiver_Source.toJSON(e));
     }
     return obj;
   },
@@ -243,7 +172,8 @@ export const Config = {
   fromPartial<I extends Exact<DeepPartial<Config>, I>>(object: I): Config {
     const message = createBaseConfig();
     message.mode = object.mode ?? 0;
-    message.sources = object.sources?.map((e) => Source.fromPartial(e)) || [];
+    message.outputs = object.outputs?.map((e) => e) || [];
+    message.sources = object.sources?.map((e) => Receiver_Source.fromPartial(e)) || [];
     return message;
   },
 };
@@ -333,7 +263,7 @@ function createBaseRequest_Attach(): Request_Attach {
 export const Request_Attach = {
   encode(message: Request_Attach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.sources) {
-      Source.encode(v!, writer.uint32(10).fork()).ldelim();
+      Receiver_Source.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -350,7 +280,7 @@ export const Request_Attach = {
             break;
           }
 
-          message.sources.push(Source.decode(reader, reader.uint32()));
+          message.sources.push(Receiver_Source.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -363,14 +293,16 @@ export const Request_Attach = {
 
   fromJSON(object: any): Request_Attach {
     return {
-      sources: globalThis.Array.isArray(object?.sources) ? object.sources.map((e: any) => Source.fromJSON(e)) : [],
+      sources: globalThis.Array.isArray(object?.sources)
+        ? object.sources.map((e: any) => Receiver_Source.fromJSON(e))
+        : [],
     };
   },
 
   toJSON(message: Request_Attach): unknown {
     const obj: any = {};
     if (message.sources?.length) {
-      obj.sources = message.sources.map((e) => Source.toJSON(e));
+      obj.sources = message.sources.map((e) => Receiver_Source.toJSON(e));
     }
     return obj;
   },
@@ -380,7 +312,7 @@ export const Request_Attach = {
   },
   fromPartial<I extends Exact<DeepPartial<Request_Attach>, I>>(object: I): Request_Attach {
     const message = createBaseRequest_Attach();
-    message.sources = object.sources?.map((e) => Source.fromPartial(e)) || [];
+    message.sources = object.sources?.map((e) => Receiver_Source.fromPartial(e)) || [];
     return message;
   },
 };
@@ -392,7 +324,7 @@ function createBaseRequest_Detach(): Request_Detach {
 export const Request_Detach = {
   encode(message: Request_Detach, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     for (const v of message.sources) {
-      Source.encode(v!, writer.uint32(10).fork()).ldelim();
+      Receiver_Source.encode(v!, writer.uint32(10).fork()).ldelim();
     }
     return writer;
   },
@@ -409,7 +341,7 @@ export const Request_Detach = {
             break;
           }
 
-          message.sources.push(Source.decode(reader, reader.uint32()));
+          message.sources.push(Receiver_Source.decode(reader, reader.uint32()));
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -422,14 +354,16 @@ export const Request_Detach = {
 
   fromJSON(object: any): Request_Detach {
     return {
-      sources: globalThis.Array.isArray(object?.sources) ? object.sources.map((e: any) => Source.fromJSON(e)) : [],
+      sources: globalThis.Array.isArray(object?.sources)
+        ? object.sources.map((e: any) => Receiver_Source.fromJSON(e))
+        : [],
     };
   },
 
   toJSON(message: Request_Detach): unknown {
     const obj: any = {};
     if (message.sources?.length) {
-      obj.sources = message.sources.map((e) => Source.toJSON(e));
+      obj.sources = message.sources.map((e) => Receiver_Source.toJSON(e));
     }
     return obj;
   },
@@ -439,7 +373,7 @@ export const Request_Detach = {
   },
   fromPartial<I extends Exact<DeepPartial<Request_Detach>, I>>(object: I): Request_Detach {
     const message = createBaseRequest_Detach();
-    message.sources = object.sources?.map((e) => Source.fromPartial(e)) || [];
+    message.sources = object.sources?.map((e) => Receiver_Source.fromPartial(e)) || [];
     return message;
   },
 };
@@ -609,19 +543,16 @@ export const Response_Detach = {
 };
 
 function createBaseServerEvent(): ServerEvent {
-  return { slotSet: undefined, slotDel: undefined, slotsAudioLevel: undefined };
+  return { slotSet: undefined, slotUnset: undefined };
 }
 
 export const ServerEvent = {
   encode(message: ServerEvent, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.slotSet !== undefined) {
-      ServerEvent_MappingSlotSet.encode(message.slotSet, writer.uint32(10).fork()).ldelim();
+      ServerEvent_SlotSet.encode(message.slotSet, writer.uint32(10).fork()).ldelim();
     }
-    if (message.slotDel !== undefined) {
-      ServerEvent_MappingSlotDel.encode(message.slotDel, writer.uint32(18).fork()).ldelim();
-    }
-    if (message.slotsAudioLevel !== undefined) {
-      ServerEvent_MappingSlotsAudioLevel.encode(message.slotsAudioLevel, writer.uint32(26).fork()).ldelim();
+    if (message.slotUnset !== undefined) {
+      ServerEvent_SlotUnset.encode(message.slotUnset, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -638,21 +569,14 @@ export const ServerEvent = {
             break;
           }
 
-          message.slotSet = ServerEvent_MappingSlotSet.decode(reader, reader.uint32());
+          message.slotSet = ServerEvent_SlotSet.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.slotDel = ServerEvent_MappingSlotDel.decode(reader, reader.uint32());
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.slotsAudioLevel = ServerEvent_MappingSlotsAudioLevel.decode(reader, reader.uint32());
+          message.slotUnset = ServerEvent_SlotUnset.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -665,24 +589,18 @@ export const ServerEvent = {
 
   fromJSON(object: any): ServerEvent {
     return {
-      slotSet: isSet(object.slotSet) ? ServerEvent_MappingSlotSet.fromJSON(object.slotSet) : undefined,
-      slotDel: isSet(object.slotDel) ? ServerEvent_MappingSlotDel.fromJSON(object.slotDel) : undefined,
-      slotsAudioLevel: isSet(object.slotsAudioLevel)
-        ? ServerEvent_MappingSlotsAudioLevel.fromJSON(object.slotsAudioLevel)
-        : undefined,
+      slotSet: isSet(object.slotSet) ? ServerEvent_SlotSet.fromJSON(object.slotSet) : undefined,
+      slotUnset: isSet(object.slotUnset) ? ServerEvent_SlotUnset.fromJSON(object.slotUnset) : undefined,
     };
   },
 
   toJSON(message: ServerEvent): unknown {
     const obj: any = {};
     if (message.slotSet !== undefined) {
-      obj.slotSet = ServerEvent_MappingSlotSet.toJSON(message.slotSet);
+      obj.slotSet = ServerEvent_SlotSet.toJSON(message.slotSet);
     }
-    if (message.slotDel !== undefined) {
-      obj.slotDel = ServerEvent_MappingSlotDel.toJSON(message.slotDel);
-    }
-    if (message.slotsAudioLevel !== undefined) {
-      obj.slotsAudioLevel = ServerEvent_MappingSlotsAudioLevel.toJSON(message.slotsAudioLevel);
+    if (message.slotUnset !== undefined) {
+      obj.slotUnset = ServerEvent_SlotUnset.toJSON(message.slotUnset);
     }
     return obj;
   },
@@ -693,37 +611,34 @@ export const ServerEvent = {
   fromPartial<I extends Exact<DeepPartial<ServerEvent>, I>>(object: I): ServerEvent {
     const message = createBaseServerEvent();
     message.slotSet = (object.slotSet !== undefined && object.slotSet !== null)
-      ? ServerEvent_MappingSlotSet.fromPartial(object.slotSet)
+      ? ServerEvent_SlotSet.fromPartial(object.slotSet)
       : undefined;
-    message.slotDel = (object.slotDel !== undefined && object.slotDel !== null)
-      ? ServerEvent_MappingSlotDel.fromPartial(object.slotDel)
-      : undefined;
-    message.slotsAudioLevel = (object.slotsAudioLevel !== undefined && object.slotsAudioLevel !== null)
-      ? ServerEvent_MappingSlotsAudioLevel.fromPartial(object.slotsAudioLevel)
+    message.slotUnset = (object.slotUnset !== undefined && object.slotUnset !== null)
+      ? ServerEvent_SlotUnset.fromPartial(object.slotUnset)
       : undefined;
     return message;
   },
 };
 
-function createBaseServerEvent_MappingSlotSet(): ServerEvent_MappingSlotSet {
+function createBaseServerEvent_SlotSet(): ServerEvent_SlotSet {
   return { slot: 0, source: undefined };
 }
 
-export const ServerEvent_MappingSlotSet = {
-  encode(message: ServerEvent_MappingSlotSet, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const ServerEvent_SlotSet = {
+  encode(message: ServerEvent_SlotSet, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.slot !== 0) {
       writer.uint32(8).uint32(message.slot);
     }
     if (message.source !== undefined) {
-      Source.encode(message.source, writer.uint32(18).fork()).ldelim();
+      Receiver_Source.encode(message.source, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_MappingSlotSet {
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_SlotSet {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseServerEvent_MappingSlotSet();
+    const message = createBaseServerEvent_SlotSet();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -739,7 +654,7 @@ export const ServerEvent_MappingSlotSet = {
             break;
           }
 
-          message.source = Source.decode(reader, reader.uint32());
+          message.source = Receiver_Source.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -750,53 +665,53 @@ export const ServerEvent_MappingSlotSet = {
     return message;
   },
 
-  fromJSON(object: any): ServerEvent_MappingSlotSet {
+  fromJSON(object: any): ServerEvent_SlotSet {
     return {
       slot: isSet(object.slot) ? globalThis.Number(object.slot) : 0,
-      source: isSet(object.source) ? Source.fromJSON(object.source) : undefined,
+      source: isSet(object.source) ? Receiver_Source.fromJSON(object.source) : undefined,
     };
   },
 
-  toJSON(message: ServerEvent_MappingSlotSet): unknown {
+  toJSON(message: ServerEvent_SlotSet): unknown {
     const obj: any = {};
     if (message.slot !== 0) {
       obj.slot = Math.round(message.slot);
     }
     if (message.source !== undefined) {
-      obj.source = Source.toJSON(message.source);
+      obj.source = Receiver_Source.toJSON(message.source);
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_MappingSlotSet>, I>>(base?: I): ServerEvent_MappingSlotSet {
-    return ServerEvent_MappingSlotSet.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<ServerEvent_SlotSet>, I>>(base?: I): ServerEvent_SlotSet {
+    return ServerEvent_SlotSet.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_MappingSlotSet>, I>>(object: I): ServerEvent_MappingSlotSet {
-    const message = createBaseServerEvent_MappingSlotSet();
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_SlotSet>, I>>(object: I): ServerEvent_SlotSet {
+    const message = createBaseServerEvent_SlotSet();
     message.slot = object.slot ?? 0;
     message.source = (object.source !== undefined && object.source !== null)
-      ? Source.fromPartial(object.source)
+      ? Receiver_Source.fromPartial(object.source)
       : undefined;
     return message;
   },
 };
 
-function createBaseServerEvent_MappingSlotDel(): ServerEvent_MappingSlotDel {
+function createBaseServerEvent_SlotUnset(): ServerEvent_SlotUnset {
   return { slot: 0 };
 }
 
-export const ServerEvent_MappingSlotDel = {
-  encode(message: ServerEvent_MappingSlotDel, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const ServerEvent_SlotUnset = {
+  encode(message: ServerEvent_SlotUnset, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.slot !== 0) {
       writer.uint32(8).uint32(message.slot);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_MappingSlotDel {
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_SlotUnset {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseServerEvent_MappingSlotDel();
+    const message = createBaseServerEvent_SlotUnset();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -816,11 +731,11 @@ export const ServerEvent_MappingSlotDel = {
     return message;
   },
 
-  fromJSON(object: any): ServerEvent_MappingSlotDel {
+  fromJSON(object: any): ServerEvent_SlotUnset {
     return { slot: isSet(object.slot) ? globalThis.Number(object.slot) : 0 };
   },
 
-  toJSON(message: ServerEvent_MappingSlotDel): unknown {
+  toJSON(message: ServerEvent_SlotUnset): unknown {
     const obj: any = {};
     if (message.slot !== 0) {
       obj.slot = Math.round(message.slot);
@@ -828,151 +743,12 @@ export const ServerEvent_MappingSlotDel = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<ServerEvent_MappingSlotDel>, I>>(base?: I): ServerEvent_MappingSlotDel {
-    return ServerEvent_MappingSlotDel.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<ServerEvent_SlotUnset>, I>>(base?: I): ServerEvent_SlotUnset {
+    return ServerEvent_SlotUnset.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_MappingSlotDel>, I>>(object: I): ServerEvent_MappingSlotDel {
-    const message = createBaseServerEvent_MappingSlotDel();
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_SlotUnset>, I>>(object: I): ServerEvent_SlotUnset {
+    const message = createBaseServerEvent_SlotUnset();
     message.slot = object.slot ?? 0;
-    return message;
-  },
-};
-
-function createBaseServerEvent_SlotAudioLevel(): ServerEvent_SlotAudioLevel {
-  return { slot: 0, audioLevel: 0 };
-}
-
-export const ServerEvent_SlotAudioLevel = {
-  encode(message: ServerEvent_SlotAudioLevel, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.slot !== 0) {
-      writer.uint32(8).uint32(message.slot);
-    }
-    if (message.audioLevel !== 0) {
-      writer.uint32(16).int32(message.audioLevel);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_SlotAudioLevel {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseServerEvent_SlotAudioLevel();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.slot = reader.uint32();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.audioLevel = reader.int32();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ServerEvent_SlotAudioLevel {
-    return {
-      slot: isSet(object.slot) ? globalThis.Number(object.slot) : 0,
-      audioLevel: isSet(object.audioLevel) ? globalThis.Number(object.audioLevel) : 0,
-    };
-  },
-
-  toJSON(message: ServerEvent_SlotAudioLevel): unknown {
-    const obj: any = {};
-    if (message.slot !== 0) {
-      obj.slot = Math.round(message.slot);
-    }
-    if (message.audioLevel !== 0) {
-      obj.audioLevel = Math.round(message.audioLevel);
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ServerEvent_SlotAudioLevel>, I>>(base?: I): ServerEvent_SlotAudioLevel {
-    return ServerEvent_SlotAudioLevel.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_SlotAudioLevel>, I>>(object: I): ServerEvent_SlotAudioLevel {
-    const message = createBaseServerEvent_SlotAudioLevel();
-    message.slot = object.slot ?? 0;
-    message.audioLevel = object.audioLevel ?? 0;
-    return message;
-  },
-};
-
-function createBaseServerEvent_MappingSlotsAudioLevel(): ServerEvent_MappingSlotsAudioLevel {
-  return { slots: [] };
-}
-
-export const ServerEvent_MappingSlotsAudioLevel = {
-  encode(message: ServerEvent_MappingSlotsAudioLevel, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    for (const v of message.slots) {
-      ServerEvent_SlotAudioLevel.encode(v!, writer.uint32(10).fork()).ldelim();
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_MappingSlotsAudioLevel {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseServerEvent_MappingSlotsAudioLevel();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.slots.push(ServerEvent_SlotAudioLevel.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): ServerEvent_MappingSlotsAudioLevel {
-    return {
-      slots: globalThis.Array.isArray(object?.slots)
-        ? object.slots.map((e: any) => ServerEvent_SlotAudioLevel.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: ServerEvent_MappingSlotsAudioLevel): unknown {
-    const obj: any = {};
-    if (message.slots?.length) {
-      obj.slots = message.slots.map((e) => ServerEvent_SlotAudioLevel.toJSON(e));
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<ServerEvent_MappingSlotsAudioLevel>, I>>(
-    base?: I,
-  ): ServerEvent_MappingSlotsAudioLevel {
-    return ServerEvent_MappingSlotsAudioLevel.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<ServerEvent_MappingSlotsAudioLevel>, I>>(
-    object: I,
-  ): ServerEvent_MappingSlotsAudioLevel {
-    const message = createBaseServerEvent_MappingSlotsAudioLevel();
-    message.slots = object.slots?.map((e) => ServerEvent_SlotAudioLevel.fromPartial(e)) || [];
     return message;
   },
 };

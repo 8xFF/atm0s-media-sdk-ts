@@ -75,6 +75,11 @@ export function bitrateControlModeToJSON(object: BitrateControlMode): string {
   }
 }
 
+export interface Error {
+  code: number;
+  message: string;
+}
+
 export interface Receiver {
   kind: Kind;
   name: string;
@@ -208,18 +213,79 @@ export interface RoomInfoSubscribe {
   tracks: boolean;
 }
 
-export interface RoomJoin {
-  room: string;
-  peer: string;
-  publish: RoomInfoPublish | undefined;
-  subscribe: RoomInfoSubscribe | undefined;
-  metadata?: string | undefined;
+function createBaseError(): Error {
+  return { code: 0, message: "" };
 }
 
-export interface Error {
-  code: number;
-  message: string;
-}
+export const Error = {
+  encode(message: Error, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.code !== 0) {
+      writer.uint32(8).uint32(message.code);
+    }
+    if (message.message !== "") {
+      writer.uint32(18).string(message.message);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Error {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseError();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 8) {
+            break;
+          }
+
+          message.code = reader.uint32();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Error {
+    return {
+      code: isSet(object.code) ? globalThis.Number(object.code) : 0,
+      message: isSet(object.message) ? globalThis.String(object.message) : "",
+    };
+  },
+
+  toJSON(message: Error): unknown {
+    const obj: any = {};
+    if (message.code !== 0) {
+      obj.code = Math.round(message.code);
+    }
+    if (message.message !== "") {
+      obj.message = message.message;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Error>, I>>(base?: I): Error {
+    return Error.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Error>, I>>(object: I): Error {
+    const message = createBaseError();
+    message.code = object.code ?? 0;
+    message.message = object.message ?? "";
+    return message;
+  },
+};
 
 function createBaseReceiver(): Receiver {
   return { kind: 0, name: "", state: undefined };
@@ -1135,203 +1201,6 @@ export const RoomInfoSubscribe = {
     const message = createBaseRoomInfoSubscribe();
     message.peers = object.peers ?? false;
     message.tracks = object.tracks ?? false;
-    return message;
-  },
-};
-
-function createBaseRoomJoin(): RoomJoin {
-  return { room: "", peer: "", publish: undefined, subscribe: undefined, metadata: undefined };
-}
-
-export const RoomJoin = {
-  encode(message: RoomJoin, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.room !== "") {
-      writer.uint32(10).string(message.room);
-    }
-    if (message.peer !== "") {
-      writer.uint32(18).string(message.peer);
-    }
-    if (message.publish !== undefined) {
-      RoomInfoPublish.encode(message.publish, writer.uint32(26).fork()).ldelim();
-    }
-    if (message.subscribe !== undefined) {
-      RoomInfoSubscribe.encode(message.subscribe, writer.uint32(34).fork()).ldelim();
-    }
-    if (message.metadata !== undefined) {
-      writer.uint32(42).string(message.metadata);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): RoomJoin {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRoomJoin();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.room = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.peer = reader.string();
-          continue;
-        case 3:
-          if (tag !== 26) {
-            break;
-          }
-
-          message.publish = RoomInfoPublish.decode(reader, reader.uint32());
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.subscribe = RoomInfoSubscribe.decode(reader, reader.uint32());
-          continue;
-        case 5:
-          if (tag !== 42) {
-            break;
-          }
-
-          message.metadata = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): RoomJoin {
-    return {
-      room: isSet(object.room) ? globalThis.String(object.room) : "",
-      peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
-      publish: isSet(object.publish) ? RoomInfoPublish.fromJSON(object.publish) : undefined,
-      subscribe: isSet(object.subscribe) ? RoomInfoSubscribe.fromJSON(object.subscribe) : undefined,
-      metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : undefined,
-    };
-  },
-
-  toJSON(message: RoomJoin): unknown {
-    const obj: any = {};
-    if (message.room !== "") {
-      obj.room = message.room;
-    }
-    if (message.peer !== "") {
-      obj.peer = message.peer;
-    }
-    if (message.publish !== undefined) {
-      obj.publish = RoomInfoPublish.toJSON(message.publish);
-    }
-    if (message.subscribe !== undefined) {
-      obj.subscribe = RoomInfoSubscribe.toJSON(message.subscribe);
-    }
-    if (message.metadata !== undefined) {
-      obj.metadata = message.metadata;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<RoomJoin>, I>>(base?: I): RoomJoin {
-    return RoomJoin.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<RoomJoin>, I>>(object: I): RoomJoin {
-    const message = createBaseRoomJoin();
-    message.room = object.room ?? "";
-    message.peer = object.peer ?? "";
-    message.publish = (object.publish !== undefined && object.publish !== null)
-      ? RoomInfoPublish.fromPartial(object.publish)
-      : undefined;
-    message.subscribe = (object.subscribe !== undefined && object.subscribe !== null)
-      ? RoomInfoSubscribe.fromPartial(object.subscribe)
-      : undefined;
-    message.metadata = object.metadata ?? undefined;
-    return message;
-  },
-};
-
-function createBaseError(): Error {
-  return { code: 0, message: "" };
-}
-
-export const Error = {
-  encode(message: Error, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.code !== 0) {
-      writer.uint32(8).uint32(message.code);
-    }
-    if (message.message !== "") {
-      writer.uint32(18).string(message.message);
-    }
-    return writer;
-  },
-
-  decode(input: _m0.Reader | Uint8Array, length?: number): Error {
-    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseError();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 8) {
-            break;
-          }
-
-          message.code = reader.uint32();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.message = reader.string();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skipType(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): Error {
-    return {
-      code: isSet(object.code) ? globalThis.Number(object.code) : 0,
-      message: isSet(object.message) ? globalThis.String(object.message) : "",
-    };
-  },
-
-  toJSON(message: Error): unknown {
-    const obj: any = {};
-    if (message.code !== 0) {
-      obj.code = Math.round(message.code);
-    }
-    if (message.message !== "") {
-      obj.message = message.message;
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<Error>, I>>(base?: I): Error {
-    return Error.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<Error>, I>>(object: I): Error {
-    const message = createBaseError();
-    message.code = object.code ?? 0;
-    message.message = object.message ?? "";
     return message;
   },
 };
