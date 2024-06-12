@@ -1,8 +1,8 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useDeviceStream } from "../../hooks";
 import { Atm0sMediaUIContext } from "../../provider";
-import { usePublisher } from "@atm0s-media-sdk/sdk-react-hooks/lib";
-import { Kind } from "@atm0s-media-sdk/sdk-core/lib";
+import { usePublisher } from "@atm0s-media-sdk/react-hooks/lib";
+import { Kind } from "@atm0s-media-sdk/core/lib";
 import MicIcon from "@mui/icons-material/Mic";
 import MicOffIcon from "@mui/icons-material/MicOff";
 

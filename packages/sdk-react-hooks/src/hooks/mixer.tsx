@@ -3,8 +3,8 @@ import { Atm0sMediaContext } from "../provider";
 import {
   AudioMixerEvent,
   AudioMixerPeerVoiceActivity,
-} from "@atm0s-media-sdk/sdk-core/lib";
-export type { AudioMixer } from "@atm0s-media-sdk/sdk-core/lib";
+} from "@atm0s-media-sdk/core/lib";
+export type { AudioMixer } from "@atm0s-media-sdk/core/lib";
 
 export function useMixer() {
   const ctx = useContext(Atm0sMediaContext);

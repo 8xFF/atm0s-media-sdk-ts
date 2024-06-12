@@ -6,7 +6,7 @@ import {
   EventEmitter,
   TrackReceiver,
   TrackReceiverVoiceActivity,
-} from "@atm0s-media-sdk/sdk-core/lib";
+} from "@atm0s-media-sdk/core/lib";
 import { Receiver_Status } from "../../../sdk-core/src/generated/protobuf/shared";
 import { TrackReceiverEvent } from "../../../sdk-core/src/receiver";
 

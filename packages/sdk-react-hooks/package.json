@@ -1,5 +1,5 @@
 {
-  "name": "@atm0s-media-sdk/sdk-react-hooks",
+  "name": "@atm0s-media-sdk/react-hooks",
   "version": "0.0.0",
   "exports": {
     "./lib": "./src/lib.tsx"
@@ -9,7 +9,7 @@
     "generate:component": "turbo gen react-component"
   },
   "dependencies": {
-    "@atm0s-media-sdk/sdk-core": "workspace:*"
+    "@atm0s-media-sdk/core": "workspace:*"
   },
   "devDependencies": {
     "@atm0s-media-sdk/eslint-config": "workspace:*",

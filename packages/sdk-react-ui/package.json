@@ -9,8 +9,8 @@
     "generate:component": "turbo gen react-component"
   },
   "dependencies": {
-    "@atm0s-media-sdk/sdk-core": "workspace:*",
-    "@atm0s-media-sdk/sdk-react-hooks": "workspace:*",
+    "@atm0s-media-sdk/core": "workspace:*",
+    "@atm0s-media-sdk/react-hooks": "workspace:*",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/icons-material": "^5.15.17",

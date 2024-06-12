@@ -1,4 +1,4 @@
-import { RemoteTrack, useConsumer } from "@atm0s-media-sdk/sdk-react-hooks/lib";
+import { RemoteTrack, useConsumer } from "@atm0s-media-sdk/react-hooks/lib";
 import { useEffect, useRef } from "react";
 
 interface Props {

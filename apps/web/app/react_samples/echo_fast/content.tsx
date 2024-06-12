@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 const Atm0sMediaProvider = dynamic(
   () =>
-    import("@atm0s-media-sdk/sdk-react-hooks/lib").then(
+    import("@atm0s-media-sdk/react-hooks/lib").then(
       (mod) => mod.Atm0sMediaProvider,
     ),
   {
@@ -21,8 +21,8 @@ import {
   useSession,
   RemoteTrack,
   useConsumerStatus,
-} from "@atm0s-media-sdk/sdk-react-hooks/lib";
-import { Kind } from "@atm0s-media-sdk/sdk-core/lib";
+} from "@atm0s-media-sdk/react-hooks/lib";
+import { Kind } from "@atm0s-media-sdk/core/lib";
 import { env } from "../../env";
 
 function EchoViewer({ track }: { track: RemoteTrack }) {

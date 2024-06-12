@@ -1,4 +1,4 @@
-import { EventEmitter } from "@atm0s-media-sdk/sdk-core/lib";
+import { EventEmitter } from "@atm0s-media-sdk/core/lib";
 
 export enum ContextEvent {
   DeviceChanged = "device.changed.",

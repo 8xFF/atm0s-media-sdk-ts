@@ -1,8 +1,8 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { usePublisher } from "@atm0s-media-sdk/sdk-react-hooks/lib";
+import { usePublisher } from "@atm0s-media-sdk/react-hooks/lib";
 import { useDeviceStream } from "../../hooks";
 import { Atm0sMediaUIContext } from "../../provider";
-import { BitrateControlMode, Kind } from "@atm0s-media-sdk/sdk-core/lib";
+import { BitrateControlMode, Kind } from "@atm0s-media-sdk/core/lib";
 import VideocamIcon from "@mui/icons-material/Videocam";
 import VideocamOffIcon from "@mui/icons-material/VideocamOff";
 

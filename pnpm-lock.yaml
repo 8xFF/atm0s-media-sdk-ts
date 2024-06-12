@@ -23,7 +23,7 @@ importers:
 
   apps/docs:
     dependencies:
-      '@atm0s-media-sdk/sdk-react-ui':
+      '@atm0s-media-sdk/react-ui':
         specifier: workspace:*
         version: link:../../packages/sdk-react-ui
       next:
@@ -66,13 +66,13 @@ importers:
 
   apps/web:
     dependencies:
-      '@atm0s-media-sdk/sdk-core':
+      '@atm0s-media-sdk/core':
         specifier: workspace:*
         version: link:../../packages/sdk-core
-      '@atm0s-media-sdk/sdk-react-hooks':
+      '@atm0s-media-sdk/react-hooks':
         specifier: workspace:*
         version: link:../../packages/sdk-react-hooks
-      '@atm0s-media-sdk/sdk-react-ui':
+      '@atm0s-media-sdk/react-ui':
         specifier: workspace:*
         version: link:../../packages/sdk-react-ui
       next:
@@ -182,7 +182,7 @@ importers:
 
   packages/sdk-react-hooks:
     dependencies:
-      '@atm0s-media-sdk/sdk-core':
+      '@atm0s-media-sdk/core':
         specifier: workspace:*
         version: link:../sdk-core
     devDependencies:
@@ -219,10 +219,10 @@ importers:
 
   packages/sdk-react-ui:
     dependencies:
-      '@atm0s-media-sdk/sdk-core':
+      '@atm0s-media-sdk/core':
         specifier: workspace:*
         version: link:../sdk-core
-      '@atm0s-media-sdk/sdk-react-hooks':
+      '@atm0s-media-sdk/react-hooks':
         specifier: workspace:*
         version: link:../sdk-react-hooks
       '@emotion/react':

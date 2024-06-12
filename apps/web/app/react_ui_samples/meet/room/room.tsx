@@ -1,4 +1,4 @@
-import { ControlsPanel, PeersPanel } from "@atm0s-media-sdk/sdk-react-ui/lib";
+import { ControlsPanel, PeersPanel } from "@atm0s-media-sdk/react-ui/lib";
 
 interface Props {}
 

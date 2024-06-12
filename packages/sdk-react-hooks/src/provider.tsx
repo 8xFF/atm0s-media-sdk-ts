@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useEffect, useMemo } from "react";
-import { SessionConfig } from "@atm0s-media-sdk/sdk-core/lib";
+import { SessionConfig } from "@atm0s-media-sdk/core/lib";
 import { Context } from "./context";
 
 export const Atm0sMediaContext = createContext<Context>({} as any);
