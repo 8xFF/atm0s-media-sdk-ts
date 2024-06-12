@@ -2,17 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import dynamic from "next/dynamic";
-const Atm0sMediaProvider = dynamic(
-  () =>
-    import("@atm0s-media-sdk/react-hooks/lib").then(
-      (mod) => mod.Atm0sMediaProvider,
-    ),
-  {
-    ssr: false,
-  },
-);
-
 import {
   useConsumer,
   usePublisher,
@@ -21,7 +10,9 @@ import {
   useSession,
   RemoteTrack,
   useConsumerStatus,
+  Atm0sMediaProvider,
 } from "@atm0s-media-sdk/react-hooks/lib";
+
 import { Kind } from "@atm0s-media-sdk/core/lib";
 import { env } from "../../env";
 
