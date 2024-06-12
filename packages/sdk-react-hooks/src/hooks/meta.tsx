@@ -1,4 +1,4 @@
-import { Kind } from "@atm0s-media-sdk/sdk-core/lib";
+import { Kind } from "@atm0s-media-sdk/core/lib";
 import { useContext, useEffect, useState } from "react";
 import { Atm0sMediaContext } from "../provider";
 import { ContextEvent } from "../context";

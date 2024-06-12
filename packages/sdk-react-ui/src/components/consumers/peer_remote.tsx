@@ -2,11 +2,11 @@ import {
   RemotePeer,
   useRemoteAudioTracks,
   useRemoteVideoTracks,
-} from "@atm0s-media-sdk/sdk-react-hooks/lib";
+} from "@atm0s-media-sdk/react-hooks/lib";
 import { AudioRemote } from "./audio_remote";
 import { VideoRemote } from "./video_remote";
 import { AudioMixerSpeaking } from "../uis/audio_mixer_speaking";
-import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
+import { SpeakingIcon } from "../icons/speaking";
 
 interface Props {
   peer: RemotePeer;
@@ -37,7 +37,7 @@ export function PeerRemoteMixerAudio({ peer }: Props) {
       <span className="absolute left-2 top-2">
         {peer.peer}
         <AudioMixerSpeaking peer={peer.peer}>
-          <RecordVoiceOverIcon />
+          <SpeakingIcon />
         </AudioMixerSpeaking>
       </span>
       {remote_videos.map((t) => (

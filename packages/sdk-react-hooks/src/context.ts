@@ -14,7 +14,7 @@ import {
   Sender_Config,
   string_to_kind,
   JoinInfo,
-} from "@atm0s-media-sdk/sdk-core/lib";
+} from "@atm0s-media-sdk/core/lib";
 
 export enum ContextEvent {
   RoomUpdated = "room.updated",

@@ -18,9 +18,11 @@ This Turborepo includes the following packages/apps:
 
 - `docs`: a [Next.js](https://nextjs.org/) app
 - `web`: another [Next.js](https://nextjs.org/) app
-- `@atm0s-media-sdk/sdk-react-ui`: a stub React component library shared by both `web` and `docs` applications
-- `@atm0s-media-sdk/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@atm0s-media-sdk/typescript-config`: `tsconfig.json`s used throughout the monorepo
+- `packages/sdk-core`: core sdk with pure typescript
+- `packages/sdk-react-hooks`: sdk with react-hooks, use sdk-core inside
+- `packages/sdk-react-ui`: wrap sdk inside react components
+- `packages/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
+- `packages/typescript-config`: `tsconfig.json`s used throughout the monorepo
 
 Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
 
@@ -37,8 +39,8 @@ This Turborepo has some additional tools already setup for you:
 To build all apps and packages, run the following command:
 
 ```
-cd my-turborepo
-pnpm build
+cd atm0s-media-sdk-ts
+NEXT_PUBLIC_GATEWAYS="http://localhost:3001" pnpm build
 ```
 
 ### Develop
@@ -46,8 +48,8 @@ pnpm build
 To develop all apps and packages, run the following command:
 
 ```
-cd my-turborepo
-pnpm dev
+cd atm0s-media-sdk-ts
+NEXT_PUBLIC_GATEWAYS="http://localhost:3001" pnpm dev
 ```
 
 ### Remote Caching

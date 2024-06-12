@@ -9,7 +9,7 @@
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
-    "@atm0s-media-sdk/sdk-react-ui": "workspace:*",
+    "@atm0s-media-sdk/react-ui": "workspace:*",
     "next": "^14.1.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

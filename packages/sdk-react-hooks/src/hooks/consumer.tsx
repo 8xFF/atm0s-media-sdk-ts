@@ -5,10 +5,10 @@ import { Atm0sMediaContext } from "../provider";
 import {
   EventEmitter,
   TrackReceiver,
+  TrackReceiverEvent,
+  TrackReceiverStatus,
   TrackReceiverVoiceActivity,
-} from "@atm0s-media-sdk/sdk-core/lib";
-import { Receiver_Status } from "../../../sdk-core/src/generated/protobuf/shared";
-import { TrackReceiverEvent } from "../../../sdk-core/src/receiver";
+} from "@atm0s-media-sdk/core/lib";
 
 export interface ConsumerConfig {
   priority: number;
@@ -55,7 +55,7 @@ export class Consumer extends EventEmitter {
 
   release() {}
 
-  onStateEvent = (event: Receiver_Status | undefined) => {
+  onStateEvent = (event: TrackReceiverStatus | undefined) => {
     this.emit(TrackReceiverEvent.StatusUpdated, event);
   };
 }
@@ -73,10 +73,10 @@ export function useConsumer(track: RemoteTrack): Consumer {
 
 export function useConsumerStatus(
   consumer: Consumer,
-): Receiver_Status | undefined {
+): TrackReceiverStatus | undefined {
   let [status, setStatus] = useState(() => consumer.receiver?.status);
   useEffect(() => {
-    const handler = (status: Receiver_Status | undefined) => {
+    const handler = (status: TrackReceiverStatus | undefined) => {
       setStatus(status);
     };
     consumer.on(TrackReceiverEvent.StatusUpdated, handler);

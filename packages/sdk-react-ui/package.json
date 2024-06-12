@@ -1,6 +1,6 @@
 {
-  "name": "@atm0s-media-sdk/sdk-react-ui",
-  "version": "0.0.0",
+  "name": "@atm0s-media-sdk/react-ui",
+  "version": "1.0.0-alpha.2",
   "exports": {
     "./lib": "./src/lib.tsx"
   },
@@ -9,12 +9,10 @@
     "generate:component": "turbo gen react-component"
   },
   "dependencies": {
-    "@atm0s-media-sdk/sdk-core": "workspace:*",
-    "@atm0s-media-sdk/sdk-react-hooks": "workspace:*",
+    "@atm0s-media-sdk/core": "workspace:*",
+    "@atm0s-media-sdk/react-hooks": "workspace:*",
     "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5",
-    "@mui/icons-material": "^5.15.17",
-    "@mui/material": "^5.15.17"
+    "@emotion/styled": "^11.11.5"
   },
   "devDependencies": {
     "@atm0s-media-sdk/eslint-config": "workspace:*",

@@ -1,5 +1,5 @@
-import { useSession } from "@atm0s-media-sdk/sdk-react-hooks/lib";
-import { DevicesSelection } from "@atm0s-media-sdk/sdk-react-ui/lib";
+import { useSession } from "@atm0s-media-sdk/react-hooks/lib";
+import { DevicesSelection } from "@atm0s-media-sdk/react-ui/lib";
 import { useCallback } from "react";
 
 interface Props {

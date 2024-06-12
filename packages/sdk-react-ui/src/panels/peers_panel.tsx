@@ -1,4 +1,4 @@
-import { useRemotePeers, useRoom } from "@atm0s-media-sdk/sdk-react-hooks/lib";
+import { useRemotePeers, useRoom } from "@atm0s-media-sdk/react-hooks/lib";
 import {
   PeerRemoteDirectAudio,
   PeerRemoteMixerAudio,

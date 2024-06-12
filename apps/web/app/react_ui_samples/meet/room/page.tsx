@@ -1,23 +1,13 @@
 "use client";
 
-import dynamic from "next/dynamic";
-const Atm0sMediaProvider = dynamic(
-  () =>
-    import("@atm0s-media-sdk/sdk-react-hooks/lib").then(
-      (mod) => mod.Atm0sMediaProvider,
-    ),
-  {
-    ssr: false,
-  },
-);
-
-import { Atm0sMediaUIProvider } from "@atm0s-media-sdk/sdk-react-ui/lib";
+import { Atm0sMediaProvider } from "@atm0s-media-sdk/react-hooks/lib";
+import { Atm0sMediaUIProvider } from "@atm0s-media-sdk/react-ui/lib";
 import MeetSelection from "./selection";
 import { Suspense } from "react";
 import { useCallback, useMemo, useState } from "react";
 import MeetInRoom from "./room";
 import { useSearchParams } from "next/navigation";
-import { AudioMixerMode, SessionConfig } from "@atm0s-media-sdk/sdk-core/lib";
+import { AudioMixerMode, SessionConfig } from "@atm0s-media-sdk/core/lib";
 import { env } from "../../../env";
 
 function MeetContent(): JSX.Element {

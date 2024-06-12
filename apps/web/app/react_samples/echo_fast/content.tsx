@@ -2,27 +2,17 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import dynamic from "next/dynamic";
-const Atm0sMediaProvider = dynamic(
-  () =>
-    import("@atm0s-media-sdk/sdk-react-hooks/lib").then(
-      (mod) => mod.Atm0sMediaProvider,
-    ),
-  {
-    ssr: false,
-  },
-);
-
 import {
   useConsumer,
   usePublisher,
-  useRemoteAudioTracks,
   useRemoteVideoTracks,
   useSession,
   RemoteTrack,
   useConsumerStatus,
-} from "@atm0s-media-sdk/sdk-react-hooks/lib";
-import { Kind } from "@atm0s-media-sdk/sdk-core/lib";
+  Atm0sMediaProvider,
+} from "@atm0s-media-sdk/react-hooks/lib";
+
+import { Kind } from "@atm0s-media-sdk/core/lib";
 import { env } from "../../env";
 
 function EchoViewer({ track }: { track: RemoteTrack }) {
@@ -66,7 +56,6 @@ function EchoContent(): JSX.Element {
   const video_sender = usePublisher("video_main", Kind.VIDEO);
   const [view, setView] = useState(true);
 
-  const audio_tracks = useRemoteAudioTracks();
   const video_tracks = useRemoteVideoTracks();
 
   const connect = useCallback(async () => {
