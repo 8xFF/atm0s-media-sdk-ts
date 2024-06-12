@@ -1,16 +1,6 @@
 "use client";
 
-import dynamic from "next/dynamic";
-const Atm0sMediaProvider = dynamic(
-  () =>
-    import("@atm0s-media-sdk/react-hooks/lib").then(
-      (mod) => mod.Atm0sMediaProvider,
-    ),
-  {
-    ssr: false,
-  },
-);
-
+import { Atm0sMediaProvider } from "@atm0s-media-sdk/react-hooks/lib";
 import { Atm0sMediaUIProvider } from "@atm0s-media-sdk/react-ui/lib";
 import MeetSelection from "./selection";
 import { Suspense } from "react";

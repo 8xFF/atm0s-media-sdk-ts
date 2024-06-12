@@ -3,8 +3,7 @@ import { usePublisher } from "@atm0s-media-sdk/react-hooks/lib";
 import { useDeviceStream } from "../../hooks";
 import { Atm0sMediaUIContext } from "../../provider";
 import { BitrateControlMode, Kind } from "@atm0s-media-sdk/core/lib";
-import VideocamIcon from "@mui/icons-material/Videocam";
-import VideocamOffIcon from "@mui/icons-material/VideocamOff";
+import { CameraIcon, CameraOffIcon } from "../icons/camera";
 
 interface CameraPreviewProps {
   source_name: string;
@@ -108,7 +107,7 @@ export function CameraSelection({
   return (
     <div className="flex flex-row h-10">
       <button className="btn btn-circle" onClick={onToggle}>
-        {stream ? <VideocamIcon /> : <VideocamOffIcon />}
+        {stream ? <CameraIcon /> : <CameraOffIcon />}
       </button>
       <select
         className=""
