@@ -10,10 +10,12 @@ import {
   RemoteTrack,
   useConsumerStatus,
   Atm0sMediaProvider,
+  useDataChannel,
 } from "@atm0s-media-sdk/react-hooks/lib";
 
 import { Kind } from "@atm0s-media-sdk/core/lib";
 import { env } from "../../env";
+import { VirtualDataChannelEvent } from "../../../../../packages/sdk-core/src/features/datachannel";
 
 function EchoViewer({ track }: { track: RemoteTrack }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -49,14 +51,26 @@ function EchoViewer({ track }: { track: RemoteTrack }) {
   );
 }
 
+interface Message {
+  peer: string;
+  message: string;
+}
+
 function EchoContent(): JSX.Element {
   const previewVideoRef = useRef<HTMLVideoElement>(null);
   const session = useSession();
   const audio_sender = usePublisher("audio_main", Kind.AUDIO);
   const video_sender = usePublisher("video_main", Kind.VIDEO);
+  const [chats, setChats] = useState<Message[]>([]);
   const [view, setView] = useState(true);
 
   const video_tracks = useRemoteVideoTracks();
+  const datachannel = useDataChannel("test", (e: VirtualDataChannelEvent) => {
+    setChats((chats) => [
+      ...chats,
+      { peer: e.peer, message: e.message as string },
+    ]);
+  });
 
   const connect = useCallback(async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -76,6 +90,8 @@ function EchoContent(): JSX.Element {
     previewVideoRef.current!.srcObject = null;
     session.disconnect();
   }, [session]);
+
+  const chatInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="p-6">
@@ -121,6 +137,39 @@ function EchoContent(): JSX.Element {
         >
           Disconnect
         </button>
+      </div>
+
+      <div className="flex flex-col w-[400px] h-[500px] p-3 border rounded mx-auto">
+        <div id="chat-container" className="flex-1 w-full bg-base-300 p-2">
+          <div className="text-xs">
+            <i>Chat echo through virtual datachannel, connect to start.</i>
+          </div>
+
+          {chats.map((c, i) => (
+            <div key={i}>
+              <b>{c.peer}:</b> {c.message}
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input
+            id="chat-input"
+            className="flex-1 p-2 rounded"
+            ref={chatInputRef}
+          />
+          <button
+            id="send"
+            className="btn"
+            onClick={() => {
+              if (chatInputRef.current?.value) {
+                datachannel?.publish(chatInputRef.current.value);
+                chatInputRef.current.value = "";
+              }
+            }}
+          >
+            Send
+          </button>
+        </div>
       </div>
     </div>
   );

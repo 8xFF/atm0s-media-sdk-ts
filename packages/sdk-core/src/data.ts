@@ -9,6 +9,12 @@ import {
   Response_Sender,
   Request_Receiver,
   Response_Receiver,
+  Request_Room_SubscribeChannel,
+  Response_Room_SubscribeChannel,
+  Request_Room_UnsubscribeChannel,
+  Response_Room_UnsubscribeChannel,
+  Request_Room_PublishChannel,
+  Response_Room_PublishChannel,
 } from "./generated/protobuf/session";
 import {
   Request as RequestMixer,
@@ -113,6 +119,49 @@ export class Datachannel extends EventEmitter {
     const res = await this.request({ reqId, receiver: req });
     if (res.receiver) {
       return res.receiver;
+    } else {
+      throw Error("INVALID_SERVER_RESPONSE");
+    }
+  }
+
+  public async request_subscribe_channel(
+    req: Request_Room_SubscribeChannel,
+  ): Promise<Response_Room_SubscribeChannel> {
+    const reqId = this.gen_req_id();
+    const res = await this.request({ reqId, room: { subscribeChannel: req } });
+
+    if (res.room) {
+      return res.room;
+    } else {
+      throw Error("INVALID_SERVER_RESPONSE");
+    }
+  }
+
+  public async request_unsubscribe_channel(
+    req: Request_Room_UnsubscribeChannel,
+  ): Promise<Response_Room_UnsubscribeChannel> {
+    const reqId = this.gen_req_id();
+    const res = await this.request({
+      reqId,
+      room: { unsubscribeChannel: req },
+    });
+    if (res.room) {
+      return res.room;
+    } else {
+      throw Error("INVALID_SERVER_RESPONSE");
+    }
+  }
+
+  public async request_publish_channel(
+    req: Request_Room_PublishChannel,
+  ): Promise<Response_Room_PublishChannel> {
+    const reqId = this.gen_req_id();
+    const res = await this.request({
+      reqId,
+      room: { publishChannel: req },
+    });
+    if (res.room) {
+      return res.room;
     } else {
       throw Error("INVALID_SERVER_RESPONSE");
     }

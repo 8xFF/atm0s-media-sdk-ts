@@ -12,6 +12,7 @@ import {
   SessionEvent,
 } from "@atm0s-media-sdk/core/lib";
 import { env } from "../../env";
+import { VirtualDataChannelEvent } from "../../../../../packages/sdk-core/src/features/datachannel";
 
 interface Props {
   room: string;
@@ -34,6 +35,11 @@ export default function EchoFast({ room, peer, token }: Props) {
     const disconnect_btn = document.getElementById("disconnect")!;
     const view_btn = document.getElementById("view")!;
     const unview_btn = document.getElementById("unview")!;
+    const send_btn = document.getElementById("send")!;
+    const chat_input = document.getElementById(
+      "chat-input",
+    )! as HTMLInputElement;
+    const chat_container = document.getElementById("chat-container")!;
 
     async function connect(_e: any) {
       const session = new Session(env.GATEWAY_ENDPOINTS[0]!, {
@@ -122,6 +128,23 @@ export default function EchoFast({ room, peer, token }: Props) {
         session.disconnect();
       };
       await session.connect();
+      const datachannel = await session.createDataChannel("testing");
+      send_btn.onclick = () => {
+        const value = chat_input.value;
+        chat_input.value = "";
+
+        datachannel.publish(value);
+      };
+
+      datachannel.on("message", (e: VirtualDataChannelEvent) => {
+        const chatMessageEl = document.createElement("div");
+        const bold = document.createElement("b");
+        bold.innerText = e.peer + ": ";
+        const text = document.createTextNode(e.message as string);
+        chatMessageEl.appendChild(bold);
+        chatMessageEl.appendChild(text);
+        chat_container.appendChild(chatMessageEl);
+      });
     }
 
     connect_btn.onclick = connect;
@@ -173,6 +196,20 @@ export default function EchoFast({ room, peer, token }: Props) {
           <button id="disconnect" className="btn btn-warning">
             Disconnect
           </button>
+        </div>
+
+        <div className="flex flex-col w-[400px] h-[500px] p-3 border rounded mx-auto">
+          <div id="chat-container" className="flex-1 w-full bg-base-300 p-2">
+            <div className="text-xs">
+              <i>Chat echo through virtual datachannel, connect to start.</i>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <input id="chat-input" className="flex-1 p-2 rounded" />
+            <button id="send" className="btn">
+              Send
+            </button>
+          </div>
         </div>
       </div>
     </main>

@@ -1,6 +1,6 @@
 {
   "name": "@atm0s-media-sdk/core",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "exports": {
     "./lib": "./src/lib.ts"
   },

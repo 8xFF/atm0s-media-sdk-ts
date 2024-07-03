@@ -41,7 +41,7 @@ export interface RoomJoin {
 export interface Request {
   reqId: number;
   session?: Request_Session | undefined;
-  room?: Request_Rooom | undefined;
+  room?: Request_Room | undefined;
   sender?: Request_Sender | undefined;
   receiver?: Request_Receiver | undefined;
   features?: Request1 | undefined;
@@ -70,17 +70,33 @@ export interface Request_Session_UpdateSdp {
 export interface Request_Session_Disconnect {
 }
 
-export interface Request_Rooom {
-  subscribe?: Request_Rooom_SubscribePeer | undefined;
-  unsubscribe?: Request_Rooom_UnsubscribePeer | undefined;
+export interface Request_Room {
+  subscribe?: Request_Room_SubscribePeer | undefined;
+  unsubscribe?: Request_Room_UnsubscribePeer | undefined;
+  subscribeChannel?: Request_Room_SubscribeChannel | undefined;
+  unsubscribeChannel?: Request_Room_UnsubscribeChannel | undefined;
+  publishChannel?: Request_Room_PublishChannel | undefined;
 }
 
-export interface Request_Rooom_SubscribePeer {
+export interface Request_Room_SubscribePeer {
   peer: string;
 }
 
-export interface Request_Rooom_UnsubscribePeer {
+export interface Request_Room_UnsubscribePeer {
   peer: string;
+}
+
+export interface Request_Room_SubscribeChannel {
+  key: string;
+}
+
+export interface Request_Room_UnsubscribeChannel {
+  key: string;
+}
+
+export interface Request_Room_PublishChannel {
+  key: string;
+  message: Uint8Array;
 }
 
 export interface Request_Sender {
@@ -146,12 +162,24 @@ export interface Response_Session_Disconnect {
 export interface Response_Room {
   subscribe?: Response_Room_SubscribePeer | undefined;
   unsubscribe?: Response_Room_UnsubscribePeer | undefined;
+  subscribeChannel?: Response_Room_SubscribeChannel | undefined;
+  unsubscribeChannel?: Response_Room_UnsubscribeChannel | undefined;
+  publishChannel?: Response_Room_PublishChannel | undefined;
 }
 
 export interface Response_Room_SubscribePeer {
 }
 
 export interface Response_Room_UnsubscribePeer {
+}
+
+export interface Response_Room_SubscribeChannel {
+}
+
+export interface Response_Room_UnsubscribeChannel {
+}
+
+export interface Response_Room_PublishChannel {
 }
 
 export interface Response_Sender {
@@ -231,6 +259,7 @@ export interface ServerEvent_Room {
   trackStarted?: ServerEvent_Room_TrackStarted | undefined;
   trackUpdated?: ServerEvent_Room_TrackUpdated | undefined;
   trackStopped?: ServerEvent_Room_TrackStopped | undefined;
+  channelMessage?: ServerEvent_Room_ChannelMessage | undefined;
 }
 
 export interface ServerEvent_Room_PeerJoined {
@@ -265,6 +294,12 @@ export interface ServerEvent_Room_TrackStopped {
   peer: string;
   track: string;
   kind: Kind;
+}
+
+export interface ServerEvent_Room_ChannelMessage {
+  key: string;
+  peer: string;
+  message: Uint8Array;
 }
 
 export interface ServerEvent_Sender {
@@ -467,7 +502,7 @@ export const Request = {
       Request_Session.encode(message.session, writer.uint32(18).fork()).ldelim();
     }
     if (message.room !== undefined) {
-      Request_Rooom.encode(message.room, writer.uint32(26).fork()).ldelim();
+      Request_Room.encode(message.room, writer.uint32(26).fork()).ldelim();
     }
     if (message.sender !== undefined) {
       Request_Sender.encode(message.sender, writer.uint32(34).fork()).ldelim();
@@ -507,7 +542,7 @@ export const Request = {
             break;
           }
 
-          message.room = Request_Rooom.decode(reader, reader.uint32());
+          message.room = Request_Room.decode(reader, reader.uint32());
           continue;
         case 4:
           if (tag !== 34) {
@@ -543,7 +578,7 @@ export const Request = {
     return {
       reqId: isSet(object.reqId) ? globalThis.Number(object.reqId) : 0,
       session: isSet(object.session) ? Request_Session.fromJSON(object.session) : undefined,
-      room: isSet(object.room) ? Request_Rooom.fromJSON(object.room) : undefined,
+      room: isSet(object.room) ? Request_Room.fromJSON(object.room) : undefined,
       sender: isSet(object.sender) ? Request_Sender.fromJSON(object.sender) : undefined,
       receiver: isSet(object.receiver) ? Request_Receiver.fromJSON(object.receiver) : undefined,
       features: isSet(object.features) ? Request1.fromJSON(object.features) : undefined,
@@ -559,7 +594,7 @@ export const Request = {
       obj.session = Request_Session.toJSON(message.session);
     }
     if (message.room !== undefined) {
-      obj.room = Request_Rooom.toJSON(message.room);
+      obj.room = Request_Room.toJSON(message.room);
     }
     if (message.sender !== undefined) {
       obj.sender = Request_Sender.toJSON(message.sender);
@@ -583,7 +618,7 @@ export const Request = {
       ? Request_Session.fromPartial(object.session)
       : undefined;
     message.room = (object.room !== undefined && object.room !== null)
-      ? Request_Rooom.fromPartial(object.room)
+      ? Request_Room.fromPartial(object.room)
       : undefined;
     message.sender = (object.sender !== undefined && object.sender !== null)
       ? Request_Sender.fromPartial(object.sender)
@@ -946,25 +981,40 @@ export const Request_Session_Disconnect = {
   },
 };
 
-function createBaseRequest_Rooom(): Request_Rooom {
-  return { subscribe: undefined, unsubscribe: undefined };
+function createBaseRequest_Room(): Request_Room {
+  return {
+    subscribe: undefined,
+    unsubscribe: undefined,
+    subscribeChannel: undefined,
+    unsubscribeChannel: undefined,
+    publishChannel: undefined,
+  };
 }
 
-export const Request_Rooom = {
-  encode(message: Request_Rooom, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const Request_Room = {
+  encode(message: Request_Room, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.subscribe !== undefined) {
-      Request_Rooom_SubscribePeer.encode(message.subscribe, writer.uint32(10).fork()).ldelim();
+      Request_Room_SubscribePeer.encode(message.subscribe, writer.uint32(10).fork()).ldelim();
     }
     if (message.unsubscribe !== undefined) {
-      Request_Rooom_UnsubscribePeer.encode(message.unsubscribe, writer.uint32(18).fork()).ldelim();
+      Request_Room_UnsubscribePeer.encode(message.unsubscribe, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.subscribeChannel !== undefined) {
+      Request_Room_SubscribeChannel.encode(message.subscribeChannel, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.unsubscribeChannel !== undefined) {
+      Request_Room_UnsubscribeChannel.encode(message.unsubscribeChannel, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.publishChannel !== undefined) {
+      Request_Room_PublishChannel.encode(message.publishChannel, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Rooom {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Room {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRequest_Rooom();
+    const message = createBaseRequest_Room();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -973,14 +1023,35 @@ export const Request_Rooom = {
             break;
           }
 
-          message.subscribe = Request_Rooom_SubscribePeer.decode(reader, reader.uint32());
+          message.subscribe = Request_Room_SubscribePeer.decode(reader, reader.uint32());
           continue;
         case 2:
           if (tag !== 18) {
             break;
           }
 
-          message.unsubscribe = Request_Rooom_UnsubscribePeer.decode(reader, reader.uint32());
+          message.unsubscribe = Request_Room_UnsubscribePeer.decode(reader, reader.uint32());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.subscribeChannel = Request_Room_SubscribeChannel.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.unsubscribeChannel = Request_Room_UnsubscribeChannel.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.publishChannel = Request_Room_PublishChannel.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -991,55 +1062,82 @@ export const Request_Rooom = {
     return message;
   },
 
-  fromJSON(object: any): Request_Rooom {
+  fromJSON(object: any): Request_Room {
     return {
-      subscribe: isSet(object.subscribe) ? Request_Rooom_SubscribePeer.fromJSON(object.subscribe) : undefined,
-      unsubscribe: isSet(object.unsubscribe) ? Request_Rooom_UnsubscribePeer.fromJSON(object.unsubscribe) : undefined,
+      subscribe: isSet(object.subscribe) ? Request_Room_SubscribePeer.fromJSON(object.subscribe) : undefined,
+      unsubscribe: isSet(object.unsubscribe) ? Request_Room_UnsubscribePeer.fromJSON(object.unsubscribe) : undefined,
+      subscribeChannel: isSet(object.subscribeChannel)
+        ? Request_Room_SubscribeChannel.fromJSON(object.subscribeChannel)
+        : undefined,
+      unsubscribeChannel: isSet(object.unsubscribeChannel)
+        ? Request_Room_UnsubscribeChannel.fromJSON(object.unsubscribeChannel)
+        : undefined,
+      publishChannel: isSet(object.publishChannel)
+        ? Request_Room_PublishChannel.fromJSON(object.publishChannel)
+        : undefined,
     };
   },
 
-  toJSON(message: Request_Rooom): unknown {
+  toJSON(message: Request_Room): unknown {
     const obj: any = {};
     if (message.subscribe !== undefined) {
-      obj.subscribe = Request_Rooom_SubscribePeer.toJSON(message.subscribe);
+      obj.subscribe = Request_Room_SubscribePeer.toJSON(message.subscribe);
     }
     if (message.unsubscribe !== undefined) {
-      obj.unsubscribe = Request_Rooom_UnsubscribePeer.toJSON(message.unsubscribe);
+      obj.unsubscribe = Request_Room_UnsubscribePeer.toJSON(message.unsubscribe);
+    }
+    if (message.subscribeChannel !== undefined) {
+      obj.subscribeChannel = Request_Room_SubscribeChannel.toJSON(message.subscribeChannel);
+    }
+    if (message.unsubscribeChannel !== undefined) {
+      obj.unsubscribeChannel = Request_Room_UnsubscribeChannel.toJSON(message.unsubscribeChannel);
+    }
+    if (message.publishChannel !== undefined) {
+      obj.publishChannel = Request_Room_PublishChannel.toJSON(message.publishChannel);
     }
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Rooom>, I>>(base?: I): Request_Rooom {
-    return Request_Rooom.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<Request_Room>, I>>(base?: I): Request_Room {
+    return Request_Room.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Rooom>, I>>(object: I): Request_Rooom {
-    const message = createBaseRequest_Rooom();
+  fromPartial<I extends Exact<DeepPartial<Request_Room>, I>>(object: I): Request_Room {
+    const message = createBaseRequest_Room();
     message.subscribe = (object.subscribe !== undefined && object.subscribe !== null)
-      ? Request_Rooom_SubscribePeer.fromPartial(object.subscribe)
+      ? Request_Room_SubscribePeer.fromPartial(object.subscribe)
       : undefined;
     message.unsubscribe = (object.unsubscribe !== undefined && object.unsubscribe !== null)
-      ? Request_Rooom_UnsubscribePeer.fromPartial(object.unsubscribe)
+      ? Request_Room_UnsubscribePeer.fromPartial(object.unsubscribe)
+      : undefined;
+    message.subscribeChannel = (object.subscribeChannel !== undefined && object.subscribeChannel !== null)
+      ? Request_Room_SubscribeChannel.fromPartial(object.subscribeChannel)
+      : undefined;
+    message.unsubscribeChannel = (object.unsubscribeChannel !== undefined && object.unsubscribeChannel !== null)
+      ? Request_Room_UnsubscribeChannel.fromPartial(object.unsubscribeChannel)
+      : undefined;
+    message.publishChannel = (object.publishChannel !== undefined && object.publishChannel !== null)
+      ? Request_Room_PublishChannel.fromPartial(object.publishChannel)
       : undefined;
     return message;
   },
 };
 
-function createBaseRequest_Rooom_SubscribePeer(): Request_Rooom_SubscribePeer {
+function createBaseRequest_Room_SubscribePeer(): Request_Room_SubscribePeer {
   return { peer: "" };
 }
 
-export const Request_Rooom_SubscribePeer = {
-  encode(message: Request_Rooom_SubscribePeer, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const Request_Room_SubscribePeer = {
+  encode(message: Request_Room_SubscribePeer, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.peer !== "") {
       writer.uint32(10).string(message.peer);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Rooom_SubscribePeer {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Room_SubscribePeer {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRequest_Rooom_SubscribePeer();
+    const message = createBaseRequest_Room_SubscribePeer();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1059,11 +1157,11 @@ export const Request_Rooom_SubscribePeer = {
     return message;
   },
 
-  fromJSON(object: any): Request_Rooom_SubscribePeer {
+  fromJSON(object: any): Request_Room_SubscribePeer {
     return { peer: isSet(object.peer) ? globalThis.String(object.peer) : "" };
   },
 
-  toJSON(message: Request_Rooom_SubscribePeer): unknown {
+  toJSON(message: Request_Room_SubscribePeer): unknown {
     const obj: any = {};
     if (message.peer !== "") {
       obj.peer = message.peer;
@@ -1071,32 +1169,32 @@ export const Request_Rooom_SubscribePeer = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Rooom_SubscribePeer>, I>>(base?: I): Request_Rooom_SubscribePeer {
-    return Request_Rooom_SubscribePeer.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<Request_Room_SubscribePeer>, I>>(base?: I): Request_Room_SubscribePeer {
+    return Request_Room_SubscribePeer.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Rooom_SubscribePeer>, I>>(object: I): Request_Rooom_SubscribePeer {
-    const message = createBaseRequest_Rooom_SubscribePeer();
+  fromPartial<I extends Exact<DeepPartial<Request_Room_SubscribePeer>, I>>(object: I): Request_Room_SubscribePeer {
+    const message = createBaseRequest_Room_SubscribePeer();
     message.peer = object.peer ?? "";
     return message;
   },
 };
 
-function createBaseRequest_Rooom_UnsubscribePeer(): Request_Rooom_UnsubscribePeer {
+function createBaseRequest_Room_UnsubscribePeer(): Request_Room_UnsubscribePeer {
   return { peer: "" };
 }
 
-export const Request_Rooom_UnsubscribePeer = {
-  encode(message: Request_Rooom_UnsubscribePeer, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+export const Request_Room_UnsubscribePeer = {
+  encode(message: Request_Room_UnsubscribePeer, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
     if (message.peer !== "") {
       writer.uint32(10).string(message.peer);
     }
     return writer;
   },
 
-  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Rooom_UnsubscribePeer {
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Room_UnsubscribePeer {
     const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseRequest_Rooom_UnsubscribePeer();
+    const message = createBaseRequest_Room_UnsubscribePeer();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -1116,11 +1214,11 @@ export const Request_Rooom_UnsubscribePeer = {
     return message;
   },
 
-  fromJSON(object: any): Request_Rooom_UnsubscribePeer {
+  fromJSON(object: any): Request_Room_UnsubscribePeer {
     return { peer: isSet(object.peer) ? globalThis.String(object.peer) : "" };
   },
 
-  toJSON(message: Request_Rooom_UnsubscribePeer): unknown {
+  toJSON(message: Request_Room_UnsubscribePeer): unknown {
     const obj: any = {};
     if (message.peer !== "") {
       obj.peer = message.peer;
@@ -1128,14 +1226,204 @@ export const Request_Rooom_UnsubscribePeer = {
     return obj;
   },
 
-  create<I extends Exact<DeepPartial<Request_Rooom_UnsubscribePeer>, I>>(base?: I): Request_Rooom_UnsubscribePeer {
-    return Request_Rooom_UnsubscribePeer.fromPartial(base ?? ({} as any));
+  create<I extends Exact<DeepPartial<Request_Room_UnsubscribePeer>, I>>(base?: I): Request_Room_UnsubscribePeer {
+    return Request_Room_UnsubscribePeer.fromPartial(base ?? ({} as any));
   },
-  fromPartial<I extends Exact<DeepPartial<Request_Rooom_UnsubscribePeer>, I>>(
-    object: I,
-  ): Request_Rooom_UnsubscribePeer {
-    const message = createBaseRequest_Rooom_UnsubscribePeer();
+  fromPartial<I extends Exact<DeepPartial<Request_Room_UnsubscribePeer>, I>>(object: I): Request_Room_UnsubscribePeer {
+    const message = createBaseRequest_Room_UnsubscribePeer();
     message.peer = object.peer ?? "";
+    return message;
+  },
+};
+
+function createBaseRequest_Room_SubscribeChannel(): Request_Room_SubscribeChannel {
+  return { key: "" };
+}
+
+export const Request_Room_SubscribeChannel = {
+  encode(message: Request_Room_SubscribeChannel, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Room_SubscribeChannel {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRequest_Room_SubscribeChannel();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Request_Room_SubscribeChannel {
+    return { key: isSet(object.key) ? globalThis.String(object.key) : "" };
+  },
+
+  toJSON(message: Request_Room_SubscribeChannel): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Request_Room_SubscribeChannel>, I>>(base?: I): Request_Room_SubscribeChannel {
+    return Request_Room_SubscribeChannel.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Request_Room_SubscribeChannel>, I>>(
+    object: I,
+  ): Request_Room_SubscribeChannel {
+    const message = createBaseRequest_Room_SubscribeChannel();
+    message.key = object.key ?? "";
+    return message;
+  },
+};
+
+function createBaseRequest_Room_UnsubscribeChannel(): Request_Room_UnsubscribeChannel {
+  return { key: "" };
+}
+
+export const Request_Room_UnsubscribeChannel = {
+  encode(message: Request_Room_UnsubscribeChannel, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Room_UnsubscribeChannel {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRequest_Room_UnsubscribeChannel();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Request_Room_UnsubscribeChannel {
+    return { key: isSet(object.key) ? globalThis.String(object.key) : "" };
+  },
+
+  toJSON(message: Request_Room_UnsubscribeChannel): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Request_Room_UnsubscribeChannel>, I>>(base?: I): Request_Room_UnsubscribeChannel {
+    return Request_Room_UnsubscribeChannel.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Request_Room_UnsubscribeChannel>, I>>(
+    object: I,
+  ): Request_Room_UnsubscribeChannel {
+    const message = createBaseRequest_Room_UnsubscribeChannel();
+    message.key = object.key ?? "";
+    return message;
+  },
+};
+
+function createBaseRequest_Room_PublishChannel(): Request_Room_PublishChannel {
+  return { key: "", message: new Uint8Array(0) };
+}
+
+export const Request_Room_PublishChannel = {
+  encode(message: Request_Room_PublishChannel, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.message.length !== 0) {
+      writer.uint32(18).bytes(message.message);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Request_Room_PublishChannel {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseRequest_Room_PublishChannel();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.message = reader.bytes();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): Request_Room_PublishChannel {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      message: isSet(object.message) ? bytesFromBase64(object.message) : new Uint8Array(0),
+    };
+  },
+
+  toJSON(message: Request_Room_PublishChannel): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.message.length !== 0) {
+      obj.message = base64FromBytes(message.message);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Request_Room_PublishChannel>, I>>(base?: I): Request_Room_PublishChannel {
+    return Request_Room_PublishChannel.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Request_Room_PublishChannel>, I>>(object: I): Request_Room_PublishChannel {
+    const message = createBaseRequest_Room_PublishChannel();
+    message.key = object.key ?? "";
+    message.message = object.message ?? new Uint8Array(0);
     return message;
   },
 };
@@ -2068,7 +2356,13 @@ export const Response_Session_Disconnect = {
 };
 
 function createBaseResponse_Room(): Response_Room {
-  return { subscribe: undefined, unsubscribe: undefined };
+  return {
+    subscribe: undefined,
+    unsubscribe: undefined,
+    subscribeChannel: undefined,
+    unsubscribeChannel: undefined,
+    publishChannel: undefined,
+  };
 }
 
 export const Response_Room = {
@@ -2078,6 +2372,15 @@ export const Response_Room = {
     }
     if (message.unsubscribe !== undefined) {
       Response_Room_UnsubscribePeer.encode(message.unsubscribe, writer.uint32(18).fork()).ldelim();
+    }
+    if (message.subscribeChannel !== undefined) {
+      Response_Room_SubscribeChannel.encode(message.subscribeChannel, writer.uint32(26).fork()).ldelim();
+    }
+    if (message.unsubscribeChannel !== undefined) {
+      Response_Room_UnsubscribeChannel.encode(message.unsubscribeChannel, writer.uint32(34).fork()).ldelim();
+    }
+    if (message.publishChannel !== undefined) {
+      Response_Room_PublishChannel.encode(message.publishChannel, writer.uint32(42).fork()).ldelim();
     }
     return writer;
   },
@@ -2103,6 +2406,27 @@ export const Response_Room = {
 
           message.unsubscribe = Response_Room_UnsubscribePeer.decode(reader, reader.uint32());
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.subscribeChannel = Response_Room_SubscribeChannel.decode(reader, reader.uint32());
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.unsubscribeChannel = Response_Room_UnsubscribeChannel.decode(reader, reader.uint32());
+          continue;
+        case 5:
+          if (tag !== 42) {
+            break;
+          }
+
+          message.publishChannel = Response_Room_PublishChannel.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -2116,6 +2440,15 @@ export const Response_Room = {
     return {
       subscribe: isSet(object.subscribe) ? Response_Room_SubscribePeer.fromJSON(object.subscribe) : undefined,
       unsubscribe: isSet(object.unsubscribe) ? Response_Room_UnsubscribePeer.fromJSON(object.unsubscribe) : undefined,
+      subscribeChannel: isSet(object.subscribeChannel)
+        ? Response_Room_SubscribeChannel.fromJSON(object.subscribeChannel)
+        : undefined,
+      unsubscribeChannel: isSet(object.unsubscribeChannel)
+        ? Response_Room_UnsubscribeChannel.fromJSON(object.unsubscribeChannel)
+        : undefined,
+      publishChannel: isSet(object.publishChannel)
+        ? Response_Room_PublishChannel.fromJSON(object.publishChannel)
+        : undefined,
     };
   },
 
@@ -2126,6 +2459,15 @@ export const Response_Room = {
     }
     if (message.unsubscribe !== undefined) {
       obj.unsubscribe = Response_Room_UnsubscribePeer.toJSON(message.unsubscribe);
+    }
+    if (message.subscribeChannel !== undefined) {
+      obj.subscribeChannel = Response_Room_SubscribeChannel.toJSON(message.subscribeChannel);
+    }
+    if (message.unsubscribeChannel !== undefined) {
+      obj.unsubscribeChannel = Response_Room_UnsubscribeChannel.toJSON(message.unsubscribeChannel);
+    }
+    if (message.publishChannel !== undefined) {
+      obj.publishChannel = Response_Room_PublishChannel.toJSON(message.publishChannel);
     }
     return obj;
   },
@@ -2140,6 +2482,15 @@ export const Response_Room = {
       : undefined;
     message.unsubscribe = (object.unsubscribe !== undefined && object.unsubscribe !== null)
       ? Response_Room_UnsubscribePeer.fromPartial(object.unsubscribe)
+      : undefined;
+    message.subscribeChannel = (object.subscribeChannel !== undefined && object.subscribeChannel !== null)
+      ? Response_Room_SubscribeChannel.fromPartial(object.subscribeChannel)
+      : undefined;
+    message.unsubscribeChannel = (object.unsubscribeChannel !== undefined && object.unsubscribeChannel !== null)
+      ? Response_Room_UnsubscribeChannel.fromPartial(object.unsubscribeChannel)
+      : undefined;
+    message.publishChannel = (object.publishChannel !== undefined && object.publishChannel !== null)
+      ? Response_Room_PublishChannel.fromPartial(object.publishChannel)
       : undefined;
     return message;
   },
@@ -2227,6 +2578,139 @@ export const Response_Room_UnsubscribePeer = {
   },
   fromPartial<I extends Exact<DeepPartial<Response_Room_UnsubscribePeer>, I>>(_: I): Response_Room_UnsubscribePeer {
     const message = createBaseResponse_Room_UnsubscribePeer();
+    return message;
+  },
+};
+
+function createBaseResponse_Room_SubscribeChannel(): Response_Room_SubscribeChannel {
+  return {};
+}
+
+export const Response_Room_SubscribeChannel = {
+  encode(_: Response_Room_SubscribeChannel, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Room_SubscribeChannel {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseResponse_Room_SubscribeChannel();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): Response_Room_SubscribeChannel {
+    return {};
+  },
+
+  toJSON(_: Response_Room_SubscribeChannel): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Response_Room_SubscribeChannel>, I>>(base?: I): Response_Room_SubscribeChannel {
+    return Response_Room_SubscribeChannel.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Response_Room_SubscribeChannel>, I>>(_: I): Response_Room_SubscribeChannel {
+    const message = createBaseResponse_Room_SubscribeChannel();
+    return message;
+  },
+};
+
+function createBaseResponse_Room_UnsubscribeChannel(): Response_Room_UnsubscribeChannel {
+  return {};
+}
+
+export const Response_Room_UnsubscribeChannel = {
+  encode(_: Response_Room_UnsubscribeChannel, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Room_UnsubscribeChannel {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseResponse_Room_UnsubscribeChannel();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): Response_Room_UnsubscribeChannel {
+    return {};
+  },
+
+  toJSON(_: Response_Room_UnsubscribeChannel): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Response_Room_UnsubscribeChannel>, I>>(
+    base?: I,
+  ): Response_Room_UnsubscribeChannel {
+    return Response_Room_UnsubscribeChannel.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Response_Room_UnsubscribeChannel>, I>>(
+    _: I,
+  ): Response_Room_UnsubscribeChannel {
+    const message = createBaseResponse_Room_UnsubscribeChannel();
+    return message;
+  },
+};
+
+function createBaseResponse_Room_PublishChannel(): Response_Room_PublishChannel {
+  return {};
+}
+
+export const Response_Room_PublishChannel = {
+  encode(_: Response_Room_PublishChannel, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): Response_Room_PublishChannel {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseResponse_Room_PublishChannel();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): Response_Room_PublishChannel {
+    return {};
+  },
+
+  toJSON(_: Response_Room_PublishChannel): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<Response_Room_PublishChannel>, I>>(base?: I): Response_Room_PublishChannel {
+    return Response_Room_PublishChannel.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<Response_Room_PublishChannel>, I>>(_: I): Response_Room_PublishChannel {
+    const message = createBaseResponse_Room_PublishChannel();
     return message;
   },
 };
@@ -3317,6 +3801,7 @@ function createBaseServerEvent_Room(): ServerEvent_Room {
     trackStarted: undefined,
     trackUpdated: undefined,
     trackStopped: undefined,
+    channelMessage: undefined,
   };
 }
 
@@ -3339,6 +3824,9 @@ export const ServerEvent_Room = {
     }
     if (message.trackStopped !== undefined) {
       ServerEvent_Room_TrackStopped.encode(message.trackStopped, writer.uint32(50).fork()).ldelim();
+    }
+    if (message.channelMessage !== undefined) {
+      ServerEvent_Room_ChannelMessage.encode(message.channelMessage, writer.uint32(58).fork()).ldelim();
     }
     return writer;
   },
@@ -3392,6 +3880,13 @@ export const ServerEvent_Room = {
 
           message.trackStopped = ServerEvent_Room_TrackStopped.decode(reader, reader.uint32());
           continue;
+        case 7:
+          if (tag !== 58) {
+            break;
+          }
+
+          message.channelMessage = ServerEvent_Room_ChannelMessage.decode(reader, reader.uint32());
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3415,6 +3910,9 @@ export const ServerEvent_Room = {
       trackStopped: isSet(object.trackStopped)
         ? ServerEvent_Room_TrackStopped.fromJSON(object.trackStopped)
         : undefined,
+      channelMessage: isSet(object.channelMessage)
+        ? ServerEvent_Room_ChannelMessage.fromJSON(object.channelMessage)
+        : undefined,
     };
   },
 
@@ -3437,6 +3935,9 @@ export const ServerEvent_Room = {
     }
     if (message.trackStopped !== undefined) {
       obj.trackStopped = ServerEvent_Room_TrackStopped.toJSON(message.trackStopped);
+    }
+    if (message.channelMessage !== undefined) {
+      obj.channelMessage = ServerEvent_Room_ChannelMessage.toJSON(message.channelMessage);
     }
     return obj;
   },
@@ -3463,6 +3964,9 @@ export const ServerEvent_Room = {
       : undefined;
     message.trackStopped = (object.trackStopped !== undefined && object.trackStopped !== null)
       ? ServerEvent_Room_TrackStopped.fromPartial(object.trackStopped)
+      : undefined;
+    message.channelMessage = (object.channelMessage !== undefined && object.channelMessage !== null)
+      ? ServerEvent_Room_ChannelMessage.fromPartial(object.channelMessage)
       : undefined;
     return message;
   },
@@ -3972,6 +4476,97 @@ export const ServerEvent_Room_TrackStopped = {
     message.peer = object.peer ?? "";
     message.track = object.track ?? "";
     message.kind = object.kind ?? 0;
+    return message;
+  },
+};
+
+function createBaseServerEvent_Room_ChannelMessage(): ServerEvent_Room_ChannelMessage {
+  return { key: "", peer: "", message: new Uint8Array(0) };
+}
+
+export const ServerEvent_Room_ChannelMessage = {
+  encode(message: ServerEvent_Room_ChannelMessage, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.key !== "") {
+      writer.uint32(10).string(message.key);
+    }
+    if (message.peer !== "") {
+      writer.uint32(18).string(message.peer);
+    }
+    if (message.message.length !== 0) {
+      writer.uint32(26).bytes(message.message);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): ServerEvent_Room_ChannelMessage {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseServerEvent_Room_ChannelMessage();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.key = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.peer = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.message = reader.bytes();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): ServerEvent_Room_ChannelMessage {
+    return {
+      key: isSet(object.key) ? globalThis.String(object.key) : "",
+      peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
+      message: isSet(object.message) ? bytesFromBase64(object.message) : new Uint8Array(0),
+    };
+  },
+
+  toJSON(message: ServerEvent_Room_ChannelMessage): unknown {
+    const obj: any = {};
+    if (message.key !== "") {
+      obj.key = message.key;
+    }
+    if (message.peer !== "") {
+      obj.peer = message.peer;
+    }
+    if (message.message.length !== 0) {
+      obj.message = base64FromBytes(message.message);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<ServerEvent_Room_ChannelMessage>, I>>(base?: I): ServerEvent_Room_ChannelMessage {
+    return ServerEvent_Room_ChannelMessage.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<ServerEvent_Room_ChannelMessage>, I>>(
+    object: I,
+  ): ServerEvent_Room_ChannelMessage {
+    const message = createBaseServerEvent_Room_ChannelMessage();
+    message.key = object.key ?? "";
+    message.peer = object.peer ?? "";
+    message.message = object.message ?? new Uint8Array(0);
     return message;
   },
 };
@@ -4693,6 +5288,31 @@ export const ClientEvent = {
     return message;
   },
 };
+
+function bytesFromBase64(b64: string): Uint8Array {
+  if ((globalThis as any).Buffer) {
+    return Uint8Array.from(globalThis.Buffer.from(b64, "base64"));
+  } else {
+    const bin = globalThis.atob(b64);
+    const arr = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; ++i) {
+      arr[i] = bin.charCodeAt(i);
+    }
+    return arr;
+  }
+}
+
+function base64FromBytes(arr: Uint8Array): string {
+  if ((globalThis as any).Buffer) {
+    return globalThis.Buffer.from(arr).toString("base64");
+  } else {
+    const bin: string[] = [];
+    arr.forEach((byte) => {
+      bin.push(globalThis.String.fromCharCode(byte));
+    });
+    return globalThis.btoa(bin.join(""));
+  }
+}
 
 type Builtin = Date | Function | Uint8Array | string | number | boolean | undefined;
 

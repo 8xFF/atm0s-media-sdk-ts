@@ -23,3 +23,5 @@ export {
   Consumer,
 } from "./hooks/consumer";
 export type { ConsumerConfig } from "./hooks/consumer";
+
+export { useDataChannel } from "./hooks/datachannel";
