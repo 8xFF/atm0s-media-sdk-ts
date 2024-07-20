@@ -25,6 +25,7 @@ export interface TrackSenderConfig {
   priority: number;
   bitrate: BitrateControlMode;
   simulcast?: boolean;
+  metadata?: string;
 }
 
 export class TrackSender extends EventEmitter {
@@ -59,6 +60,7 @@ export class TrackSender extends EventEmitter {
         ? {
             id: this.track.id,
             screen: false, //TODO check if it is screen
+            metadata: cfg.metadata,
           }
         : undefined,
     };
@@ -111,7 +113,7 @@ export class TrackSender extends EventEmitter {
     );
   }
 
-  public async attach(track: MediaStreamTrack) {
+  public async attach(track: MediaStreamTrack, metadata?: string) {
     if (this.track) {
       throw new Error("This sender already attached");
     }
@@ -122,6 +124,7 @@ export class TrackSender extends EventEmitter {
     this.sender_state.source = {
       id: track.id,
       screen: false, //TODO check if it is screen
+      metadata,
     };
 
     //if we in prepare state, we dont need to access to server, just update local
