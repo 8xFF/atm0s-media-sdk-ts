@@ -41,6 +41,7 @@ export default function EchoFast({ room, peer, token }: Props) {
         join: {
           room,
           peer,
+          metadata: "Echo peer",
           publish: { peer: true, tracks: true },
           subscribe: { peers: true, tracks: true },
         },
@@ -58,7 +59,11 @@ export default function EchoFast({ room, peer, token }: Props) {
       let video_send_track = session.sender(
         "video_main",
         stream.getVideoTracks()[0]!,
-        { priority: 100, bitrate: BitrateControlMode.DYNAMIC_CONSUMERS },
+        {
+          priority: 100,
+          bitrate: BitrateControlMode.DYNAMIC_CONSUMERS,
+          metadata: "Video stream metadata",
+        },
       );
       console.log(audio_send_track, video_send_track);
       let audio_recv_track = session.receiver(Kind.AUDIO);

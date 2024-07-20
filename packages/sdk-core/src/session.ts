@@ -19,6 +19,7 @@ import { kind_to_string } from "./types";
 export interface JoinInfo {
   room: string;
   peer: string;
+  metadata?: string;
   publish: { peer: boolean; tracks: boolean };
   subscribe: { peers: boolean; tracks: boolean };
   features?: {
@@ -207,11 +208,11 @@ export class Session extends EventEmitter {
     const req = ConnectRequest.create({
       version: version || "pure-ts@0.0.0", //TODO auto get from package.json
       join: this.cfg.join && {
-        room: this.cfg.join?.room,
-        peer: this.cfg.join?.peer,
-        metadata: undefined,
-        publish: this.cfg.join?.publish,
-        subscribe: this.cfg.join?.subscribe,
+        room: this.cfg.join.room,
+        peer: this.cfg.join.peer,
+        metadata: this.cfg.join.metadata,
+        publish: this.cfg.join.publish,
+        subscribe: this.cfg.join.subscribe,
         features: { mixer: this.mixer?.state() },
       },
       tracks: {
@@ -247,12 +248,12 @@ export class Session extends EventEmitter {
     });
     const req = ConnectRequest.create({
       version: this.version || "pure-ts@0.0.0", //TODO auto get from package.json
-      join: {
-        room: this.cfg.join?.room,
-        peer: this.cfg.join?.peer,
-        metadata: undefined,
-        publish: this.cfg.join?.publish,
-        subscribe: this.cfg.join?.subscribe,
+      join: this.cfg.join && {
+        room: this.cfg.join.room,
+        peer: this.cfg.join.peer,
+        metadata: this.cfg.join.metadata,
+        publish: this.cfg.join.publish,
+        subscribe: this.cfg.join.subscribe,
         features: { mixer: this.mixer?.state() },
       },
       tracks: {
@@ -303,7 +304,7 @@ export class Session extends EventEmitter {
         info: {
           room: info.room,
           peer: info.peer,
-          metadata: undefined,
+          metadata: info.metadata,
           publish: info.publish,
           subscribe: info.subscribe,
           features: { mixer: this.mixer?.state() },

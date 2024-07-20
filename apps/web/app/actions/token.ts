@@ -6,14 +6,16 @@ export async function generate_token(
   room: string,
   peer: string,
 ): Promise<string> {
-  const rawResponse = await fetch(env.GATEWAY_ENDPOINTS[0]! + "/token/webrtc", {
+  const url = env.GATEWAY_ENDPOINTS[0]! + "/token/webrtc";
+  console.log("Creating token with url:", url);
+  const rawResponse = await fetch(url, {
     method: "POST",
     headers: {
       Authorization: "Bearer " + env.APP_SECRET,
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ room, peer, ttl: 7200 }),
+    body: JSON.stringify({ room, peer, record: false, ttl: 7200 }),
     cache: "no-cache",
   });
   if (rawResponse.status == 200) {
