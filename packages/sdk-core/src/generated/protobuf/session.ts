@@ -236,6 +236,7 @@ export interface ServerEvent_Room {
 export interface ServerEvent_Room_PeerJoined {
   peer: string;
   metadata?: string | undefined;
+  userdata?: string | undefined;
 }
 
 export interface ServerEvent_Room_PeerUpdated {
@@ -3469,7 +3470,7 @@ export const ServerEvent_Room = {
 };
 
 function createBaseServerEvent_Room_PeerJoined(): ServerEvent_Room_PeerJoined {
-  return { peer: "", metadata: undefined };
+  return { peer: "", metadata: undefined, userdata: undefined };
 }
 
 export const ServerEvent_Room_PeerJoined = {
@@ -3479,6 +3480,9 @@ export const ServerEvent_Room_PeerJoined = {
     }
     if (message.metadata !== undefined) {
       writer.uint32(18).string(message.metadata);
+    }
+    if (message.userdata !== undefined) {
+      writer.uint32(26).string(message.userdata);
     }
     return writer;
   },
@@ -3504,6 +3508,13 @@ export const ServerEvent_Room_PeerJoined = {
 
           message.metadata = reader.string();
           continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.userdata = reader.string();
+          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -3517,6 +3528,7 @@ export const ServerEvent_Room_PeerJoined = {
     return {
       peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
       metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : undefined,
+      userdata: isSet(object.userdata) ? globalThis.String(object.userdata) : undefined,
     };
   },
 
@@ -3528,6 +3540,9 @@ export const ServerEvent_Room_PeerJoined = {
     if (message.metadata !== undefined) {
       obj.metadata = message.metadata;
     }
+    if (message.userdata !== undefined) {
+      obj.userdata = message.userdata;
+    }
     return obj;
   },
 
@@ -3538,6 +3553,7 @@ export const ServerEvent_Room_PeerJoined = {
     const message = createBaseServerEvent_Room_PeerJoined();
     message.peer = object.peer ?? "";
     message.metadata = object.metadata ?? undefined;
+    message.userdata = object.userdata ?? undefined;
     return message;
   },
 };

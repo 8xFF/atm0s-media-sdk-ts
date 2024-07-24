@@ -15,7 +15,13 @@ export async function generate_token(
       Accept: "application/json",
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ room, peer, record: false, ttl: 7200 }),
+    body: JSON.stringify({
+      room,
+      peer,
+      record: false,
+      ttl: 7200,
+      userdata: "Created from server at " + new Date().getTime(),
+    }),
     cache: "no-cache",
   });
   if (rawResponse.status == 200) {
