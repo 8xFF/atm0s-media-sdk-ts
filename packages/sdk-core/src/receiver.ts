@@ -29,6 +29,7 @@ export class TrackReceiver extends EventEmitter {
   media_track?: MediaStreamTrack;
   receiver_state: Receiver_State = { config: undefined, source: undefined };
   _status?: TrackReceiverStatus;
+  _attachedSource?: Receiver_Source;
 
   constructor(
     private dc: Datachannel,
@@ -60,7 +61,11 @@ export class TrackReceiver extends EventEmitter {
   }
 
   public get status(): TrackReceiverStatus | undefined {
-    return this.status;
+    return this._status;
+  }
+
+  public get attachedSource() {
+    return this._attachedSource;
   }
 
   public setTrackReady() {
@@ -87,6 +92,7 @@ export class TrackReceiver extends EventEmitter {
   ) {
     this.receiver_state.config = config;
     this.receiver_state.source = source;
+    this._attachedSource = source;
     this._status = TrackReceiverStatus.WAITING;
     this.emit(TrackReceiverEvent.StatusUpdated, this._status);
 
