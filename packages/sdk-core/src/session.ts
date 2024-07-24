@@ -372,9 +372,9 @@ export class Session extends EventEmitter {
         await receiver.detach();
       }
     }
+    this.receivers = [];
 
     // local tracks
-    // first let's close all the remote tracks
     for (let i = 0; i < this.senders.length; i++) {
       const sender = this.senders[i];
       if (sender && sender.status === TrackSenderStatus.ACTIVE) {
@@ -382,6 +382,7 @@ export class Session extends EventEmitter {
         await sender.detach();
       }
     }
+    this.senders = [];
 
     // close peer
     this.peer.close();
