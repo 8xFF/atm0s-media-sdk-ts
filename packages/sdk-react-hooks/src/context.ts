@@ -12,7 +12,7 @@ import {
   TrackSender,
   BitrateControlMode,
   Sender_Config,
-  string_to_kind,
+  stringToKind,
   JoinInfo,
 } from "@atm0s-media-sdk/core/lib";
 
@@ -145,14 +145,14 @@ export class Context extends EventEmitter {
   ) {
     //TODO check if publisher already created with same name but wrong kind
     let publisher =
-      get_kind(media_or_kind) == Kind.AUDIO
+      getKind(media_or_kind) == Kind.AUDIO
         ? this.audio_publisher.get(name)
         : this.video_publisher.get(name);
 
     if (!publisher) {
       let sender = this.session.sender(name, media_or_kind, cfg);
       publisher = new Publisher(sender);
-      if (get_kind(media_or_kind) == Kind.AUDIO) {
+      if (getKind(media_or_kind) == Kind.AUDIO) {
         this.audio_publisher.set(name, publisher);
       } else {
         this.video_publisher.set(name, publisher);
@@ -184,9 +184,9 @@ export class Context extends EventEmitter {
   }
 }
 
-function get_kind(media_or_kind: Kind | MediaStreamTrack): Kind {
+function getKind(media_or_kind: Kind | MediaStreamTrack): Kind {
   if (media_or_kind instanceof MediaStreamTrack) {
-    return string_to_kind(media_or_kind.kind as any);
+    return stringToKind(media_or_kind.kind as any);
   } else {
     return media_or_kind;
   }

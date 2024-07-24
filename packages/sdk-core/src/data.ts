@@ -84,9 +84,7 @@ export class Datachannel extends EventEmitter {
     return this.waiter.waitReady();
   }
 
-  public async request_session(
-    req: Request_Session,
-  ): Promise<Response_Session> {
+  public async requestSession(req: Request_Session): Promise<Response_Session> {
     const reqId = this.gen_req_id();
     const res = await this.request({ reqId, session: req });
     if (res.session) {
@@ -96,7 +94,7 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_sender(req: Request_Sender): Promise<Response_Sender> {
+  public async requestSender(req: Request_Sender): Promise<Response_Sender> {
     const reqId = this.gen_req_id();
     const res = await this.request({ reqId, sender: req });
     if (res.sender) {
@@ -106,7 +104,7 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_receiver(
+  public async requestReceiver(
     req: Request_Receiver,
   ): Promise<Response_Receiver> {
     const reqId = this.gen_req_id();
@@ -118,7 +116,7 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_mixer(req: RequestMixer): Promise<ResponseMixer> {
+  public async requestMixer(req: RequestMixer): Promise<ResponseMixer> {
     const reqId = this.gen_req_id();
     const res = await this.request({ reqId, features: { mixer: req } });
     if (res.features?.mixer) {
