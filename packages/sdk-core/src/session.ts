@@ -384,7 +384,10 @@ export class Session extends EventEmitter {
     }
     this.senders = [];
 
-    // close peer
+    // leave from session
+    await this.leave();
+
+    // now close the peer
     this.peer.close();
     // finally emit event
     this.emit(SessionEvent.ROOM_DISCONNECTED);
