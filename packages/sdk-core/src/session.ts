@@ -176,15 +176,6 @@ export class Session extends EventEmitter {
     track_or_kind: MediaStreamTrack | Kind,
     cfg?: TrackSenderConfig,
   ) {
-    for (let i = 0; i < this.senders.length; i++) {
-      const sender = this.senders[i]
-      if (sender && sender.name === track_name) {
-        // we already have same sender track with track_name
-        // so, we'll just return it
-        return sender;
-      }
-    }
-
     const sender = new TrackSender(this.dc, track_name, track_or_kind, cfg);
     if (!this.prepareState) {
       sender.prepare(this.peer);
