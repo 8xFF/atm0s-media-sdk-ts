@@ -397,13 +397,11 @@ export class Session extends EventEmitter {
     // we'll look for this peer's medias & remove those
     for (let i = 0; i < this.receivers.length; i++) {
       const receiver = this.receivers[i];
-      if (
-          receiver &&
-          receiver.attachedSource?.peer === event.peer &&
-          receiver.status === Receiver_Status.ACTIVE
-      ) {
-        await receiver.detach();
-        receiver.leaveRoom();
+      if (receiver && receiver.attachedSource?.peer === event.peer) {
+        if (receiver.status === Receiver_Status.ACTIVE) {
+          await receiver.detach();
+          receiver.leaveRoom();
+        }
         this.receivers = this.receivers.splice(i, 1);
       }
     }
@@ -417,10 +415,11 @@ export class Session extends EventEmitter {
       if (
           receiver &&
           receiver.attachedSource?.peer === event.peer &&
-          receiver.attachedSource?.track === event.track &&
-          receiver.status === Receiver_Status.ACTIVE
+          receiver.attachedSource?.track === event.track
       ) {
-        await receiver.detach();
+        if (receiver.status === Receiver_Status.ACTIVE) {
+          await receiver.detach();
+        }
         this.receivers = this.receivers.splice(i, 1);
       }
     }
