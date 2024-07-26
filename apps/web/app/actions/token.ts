@@ -20,7 +20,7 @@ export async function generate_token(
       peer,
       record: false,
       ttl: 7200,
-      userdata: "Created from server at " + new Date().getTime(),
+      extra_data: "Created from server at " + new Date().getTime(),
     }),
     cache: "no-cache",
   });
