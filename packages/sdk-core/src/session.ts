@@ -351,8 +351,12 @@ export class Session extends EventEmitter {
     this.emit(SessionEvent.ROOM_CHANGED, undefined);
   }
 
-  disconnect() {
-    console.warn("Disconnect session", this.created_at);
+  async disconnect() {
+    console.warn("Disconnecting session", this.created_at);
+    await this.dc.requestSession({
+      disconnect: {},
+    });
+    console.warn("Disconnected session", this.created_at);
     this.peer.close();
   }
 }
