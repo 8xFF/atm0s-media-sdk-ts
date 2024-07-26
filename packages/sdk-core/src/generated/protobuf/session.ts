@@ -236,7 +236,7 @@ export interface ServerEvent_Room {
 export interface ServerEvent_Room_PeerJoined {
   peer: string;
   metadata?: string | undefined;
-  userdata?: string | undefined;
+  extraData?: string | undefined;
 }
 
 export interface ServerEvent_Room_PeerUpdated {
@@ -3470,7 +3470,7 @@ export const ServerEvent_Room = {
 };
 
 function createBaseServerEvent_Room_PeerJoined(): ServerEvent_Room_PeerJoined {
-  return { peer: "", metadata: undefined, userdata: undefined };
+  return { peer: "", metadata: undefined, extraData: undefined };
 }
 
 export const ServerEvent_Room_PeerJoined = {
@@ -3481,8 +3481,8 @@ export const ServerEvent_Room_PeerJoined = {
     if (message.metadata !== undefined) {
       writer.uint32(18).string(message.metadata);
     }
-    if (message.userdata !== undefined) {
-      writer.uint32(26).string(message.userdata);
+    if (message.extraData !== undefined) {
+      writer.uint32(26).string(message.extraData);
     }
     return writer;
   },
@@ -3513,7 +3513,7 @@ export const ServerEvent_Room_PeerJoined = {
             break;
           }
 
-          message.userdata = reader.string();
+          message.extraData = reader.string();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -3528,7 +3528,7 @@ export const ServerEvent_Room_PeerJoined = {
     return {
       peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
       metadata: isSet(object.metadata) ? globalThis.String(object.metadata) : undefined,
-      userdata: isSet(object.userdata) ? globalThis.String(object.userdata) : undefined,
+      extraData: isSet(object.extraData) ? globalThis.String(object.extraData) : undefined,
     };
   },
 
@@ -3540,8 +3540,8 @@ export const ServerEvent_Room_PeerJoined = {
     if (message.metadata !== undefined) {
       obj.metadata = message.metadata;
     }
-    if (message.userdata !== undefined) {
-      obj.userdata = message.userdata;
+    if (message.extraData !== undefined) {
+      obj.extraData = message.extraData;
     }
     return obj;
   },
@@ -3553,7 +3553,7 @@ export const ServerEvent_Room_PeerJoined = {
     const message = createBaseServerEvent_Room_PeerJoined();
     message.peer = object.peer ?? "";
     message.metadata = object.metadata ?? undefined;
-    message.userdata = object.userdata ?? undefined;
+    message.extraData = object.extraData ?? undefined;
     return message;
   },
 };
