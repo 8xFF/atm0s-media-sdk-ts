@@ -21,9 +21,10 @@ export type {
 export { AudioMixerEvent } from "./features/audio_mixer";
 
 export type {
-  VirtualDataChannel,
-  VirtualDataChannelConfig,
-} from "./features/datachannel";
+  MessageChannel,
+  MessageChannelConfig,
+  MessageChannelEvent,
+} from "./features/msg_channel";
 
 export {
   BitrateControlMode,

@@ -15,10 +15,7 @@ import {
 import * as mixer from "./features/audio_mixer";
 import { Kind } from "./generated/protobuf/shared";
 import { kind_to_string } from "./types";
-import {
-  VirtualDataChannel,
-  VirtualDataChannelConfig,
-} from "./features/datachannel";
+import { MessageChannel, MessageChannelConfig } from "./features/msg_channel";
 
 export interface JoinInfo {
   room: string;
@@ -55,7 +52,7 @@ export class Session extends EventEmitter {
   conn_id?: string;
   receivers: TrackReceiver[] = [];
   senders: TrackSender[] = [];
-  vdatachannels: VirtualDataChannel[] = [];
+  msgChannels: MessageChannel[] = [];
   _mixer?: mixer.AudioMixer;
 
   /// Prepaer state for flagging when ever this peer is created offer.
@@ -346,25 +343,25 @@ export class Session extends EventEmitter {
 
   /**
    *
-   * Create a new Virtual Datachannel for room based message passing
+   * Create a new MessageChannel for room based message passing
    *
    */
-  async createDataChannel(
+  async createMessageChannel(
     key: string,
-    config?: VirtualDataChannelConfig | undefined,
+    config?: MessageChannelConfig | undefined,
   ) {
     await this.dc.ready();
-    const datachannel = new VirtualDataChannel(key, this.dc, config);
-    await datachannel.init();
-    this.vdatachannels.push(datachannel);
-    return datachannel;
+    const msgChannel = new MessageChannel(key, this.dc, config);
+    await msgChannel.init();
+    this.msgChannels.push(msgChannel);
+    return msgChannel;
   }
 
   async leave() {
     //reset local here
     this.receivers.map((r) => r.leave_room());
     this.mixer?.leave_room();
-    this.vdatachannels.map((d) => d.opened ?? d.close());
+    this.msgChannels.map((d) => d.opened ?? d.close());
 
     await this.dc.request_session({
       leave: {},

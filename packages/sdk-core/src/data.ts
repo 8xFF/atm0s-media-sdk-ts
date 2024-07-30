@@ -9,12 +9,13 @@ import {
   Response_Sender,
   Request_Receiver,
   Response_Receiver,
-  Request_Room_SubscribeChannel,
-  Response_Room_SubscribeChannel,
-  Request_Room_UnsubscribeChannel,
-  Response_Room_UnsubscribeChannel,
-  Request_Room_PublishChannel,
-  Response_Room_PublishChannel,
+  Request_Room_ChannelControl_StartPublish,
+  Response_Room_ChannelControl_StartPublish,
+  Request_Room_ChannelControl,
+  Response_Room_ChannelControl_StopPublish,
+  Response_Room_ChannelControl_Subscribe,
+  Response_Room_ChannelControl_Unsubscribe,
+  Response_Room_ChannelControl_Publish,
 } from "./generated/protobuf/session";
 import {
   Request as RequestMixer,
@@ -124,26 +125,18 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_subscribe_channel(
-    req: Request_Room_SubscribeChannel,
-  ): Promise<Response_Room_SubscribeChannel> {
-    const reqId = this.gen_req_id();
-    const res = await this.request({ reqId, room: { subscribeChannel: req } });
-
-    if (res.room) {
-      return res.room;
-    } else {
-      throw Error("INVALID_SERVER_RESPONSE");
-    }
-  }
-
-  public async request_unsubscribe_channel(
-    req: Request_Room_UnsubscribeChannel,
-  ): Promise<Response_Room_UnsubscribeChannel> {
+  public async request_start_publish_channel(req: {
+    label: string;
+  }): Promise<Response_Room_ChannelControl_StartPublish> {
     const reqId = this.gen_req_id();
     const res = await this.request({
       reqId,
-      room: { unsubscribeChannel: req },
+      room: {
+        channelControl: {
+          label: req.label,
+          startPub: 1,
+        },
+      },
     });
     if (res.room) {
       return res.room;
@@ -152,13 +145,81 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_publish_channel(
-    req: Request_Room_PublishChannel,
-  ): Promise<Response_Room_PublishChannel> {
+  public async request_stop_publish_channel(req: {
+    label: string;
+  }): Promise<Response_Room_ChannelControl_StopPublish> {
     const reqId = this.gen_req_id();
     const res = await this.request({
       reqId,
-      room: { publishChannel: req },
+      room: {
+        channelControl: {
+          label: req.label,
+          stopPub: 1,
+        },
+      },
+    });
+    if (res.room) {
+      return res.room;
+    } else {
+      throw Error("INVALID_SERVER_RESPONSE");
+    }
+  }
+
+  public async request_subscribe_channel(req: {
+    label: string;
+  }): Promise<Response_Room_ChannelControl_Subscribe> {
+    const reqId = this.gen_req_id();
+    const res = await this.request({
+      reqId,
+      room: {
+        channelControl: {
+          label: req.label,
+          sub: 1,
+        },
+      },
+    });
+    if (res.room) {
+      return res.room;
+    } else {
+      throw Error("INVALID_SERVER_RESPONSE");
+    }
+  }
+
+  public async request_unsubscribe_channel(req: {
+    label: string;
+  }): Promise<Response_Room_ChannelControl_Unsubscribe> {
+    const reqId = this.gen_req_id();
+    const res = await this.request({
+      reqId,
+      room: {
+        channelControl: {
+          label: req.label,
+          unsub: 1,
+        },
+      },
+    });
+    if (res.room) {
+      return res.room;
+    } else {
+      throw Error("INVALID_SERVER_RESPONSE");
+    }
+  }
+
+  public async request_publish_data_channel(req: {
+    label: string;
+    data: Uint8Array;
+  }): Promise<Response_Room_ChannelControl_Publish> {
+    const reqId = this.gen_req_id();
+    const res = await this.request({
+      reqId,
+      room: {
+        channelControl: {
+          label: req.label,
+          pub: {
+            data: req.data,
+          },
+        },
+      },
     });
     if (res.room) {
       return res.room;

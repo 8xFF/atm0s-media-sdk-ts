@@ -10,12 +10,11 @@ import {
   RemoteTrack,
   useConsumerStatus,
   Atm0sMediaProvider,
-  useDataChannel,
+  useMessageChannel,
 } from "@atm0s-media-sdk/react-hooks/lib";
 
-import { Kind } from "@atm0s-media-sdk/core/lib";
+import { Kind, MessageChannelEvent } from "@atm0s-media-sdk/core/lib";
 import { env } from "../../env";
-import { VirtualDataChannelEvent } from "../../../../../packages/sdk-core/src/features/datachannel";
 
 function EchoViewer({ track }: { track: RemoteTrack }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -65,7 +64,7 @@ function EchoContent(): JSX.Element {
   const [view, setView] = useState(true);
 
   const video_tracks = useRemoteVideoTracks();
-  const datachannel = useDataChannel("test", (e: VirtualDataChannelEvent) => {
+  const datachannel = useMessageChannel("test", (e: MessageChannelEvent) => {
     setChats((chats) => [
       ...chats,
       { peer: e.peer, message: e.message as string },

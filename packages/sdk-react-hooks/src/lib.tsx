@@ -24,4 +24,4 @@ export {
 } from "./hooks/consumer";
 export type { ConsumerConfig } from "./hooks/consumer";
 
-export { useDataChannel } from "./hooks/datachannel";
+export { useMessageChannel } from "./hooks/msg_channel";
