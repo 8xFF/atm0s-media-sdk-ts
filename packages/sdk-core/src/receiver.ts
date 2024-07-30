@@ -7,7 +7,7 @@ import {
 } from "./generated/protobuf/shared";
 import { EventEmitter, ReadyWaiter } from "./utils";
 import { Datachannel, DatachannelEvent } from "./data";
-import { kind_to_string } from "./types";
+import { kindToString } from "./types";
 import { ServerEvent_Receiver } from "./generated/protobuf/session";
 import { TrackReceiverStatus } from "./lib";
 
@@ -26,6 +26,7 @@ export class TrackReceiver extends EventEmitter {
   transceiver?: RTCRtpTransceiver;
   waiter: ReadyWaiter = new ReadyWaiter();
   media_stream: MediaStream;
+  media_track?: MediaStreamTrack;
   receiver_state: Receiver_State = { config: undefined, source: undefined };
   _status?: TrackReceiverStatus;
 
@@ -54,24 +55,16 @@ export class TrackReceiver extends EventEmitter {
     return this._kind;
   }
 
-  public has_track() {
-    return this.media_stream.getTracks().length > 0;
+  public get webrtcTrackId() {
+    return this.media_track?.id;
   }
 
   public get status(): TrackReceiverStatus | undefined {
     return this.status;
   }
 
-  public set_track(track: MediaStreamTrack) {
-    if (this.media_stream.getTracks().length > 0) {
-      throw new Error("media_stream already set");
-    }
-
-    if (track.kind != kind_to_string(this._kind)) {
-      throw new Error("wrong track type");
-    }
+  public setTrackReady() {
     this.waiter.setReady();
-    this.media_stream.addTrack(track);
   }
 
   public async ready() {
@@ -81,9 +74,11 @@ export class TrackReceiver extends EventEmitter {
   /// We need lazy prepare for avoding error when sender track is changed before it connect.
   /// Config after init feature will be useful when complex application
   prepare(peer: RTCPeerConnection) {
-    this.transceiver = peer.addTransceiver(kind_to_string(this._kind), {
+    this.transceiver = peer.addTransceiver(kindToString(this._kind), {
       direction: "recvonly",
     });
+    this.media_stream.addTrack(this.transceiver.receiver.track);
+    this.media_track = this.transceiver.receiver.track;
   }
 
   public async attach(
@@ -103,7 +98,7 @@ export class TrackReceiver extends EventEmitter {
 
     await this.dc.ready();
     await this.ready();
-    await this.dc.request_receiver({
+    await this.dc.requestReceiver({
       name: this.track_name,
       attach: {
         source: this.receiver_state.source,
@@ -126,7 +121,7 @@ export class TrackReceiver extends EventEmitter {
 
     await this.dc.ready();
     await this.ready();
-    await this.dc.request_receiver({
+    await this.dc.requestReceiver({
       name: this.track_name,
       detach: {},
     });
@@ -143,14 +138,14 @@ export class TrackReceiver extends EventEmitter {
 
     await this.dc.ready();
     await this.ready();
-    await this.dc.request_receiver({
+    await this.dc.requestReceiver({
       name: this.track_name,
       config,
     });
   }
 
   // We need to reset local state when leave room
-  public leave_room() {
+  public leaveRoom() {
     this.receiver_state.source = undefined;
   }
 

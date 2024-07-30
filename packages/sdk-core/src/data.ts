@@ -9,9 +9,7 @@ import {
   Response_Sender,
   Request_Receiver,
   Response_Receiver,
-  Request_Room_ChannelControl_StartPublish,
   Response_Room_ChannelControl_StartPublish,
-  Request_Room_ChannelControl,
   Response_Room_ChannelControl_StopPublish,
   Response_Room_ChannelControl_Subscribe,
   Response_Room_ChannelControl_Unsubscribe,
@@ -91,9 +89,7 @@ export class Datachannel extends EventEmitter {
     return this.waiter.waitReady();
   }
 
-  public async request_session(
-    req: Request_Session,
-  ): Promise<Response_Session> {
+  public async requestSession(req: Request_Session): Promise<Response_Session> {
     const reqId = this.gen_req_id();
     const res = await this.request({ reqId, session: req });
     if (res.session) {
@@ -103,7 +99,7 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_sender(req: Request_Sender): Promise<Response_Sender> {
+  public async requestSender(req: Request_Sender): Promise<Response_Sender> {
     const reqId = this.gen_req_id();
     const res = await this.request({ reqId, sender: req });
     if (res.sender) {
@@ -113,7 +109,7 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_receiver(
+  public async requestReceiver(
     req: Request_Receiver,
   ): Promise<Response_Receiver> {
     const reqId = this.gen_req_id();
@@ -125,7 +121,7 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_start_publish_channel(req: {
+  public async requestStartPublishChannel(req: {
     label: string;
   }): Promise<Response_Room_ChannelControl_StartPublish> {
     const reqId = this.gen_req_id();
@@ -145,7 +141,7 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_stop_publish_channel(req: {
+  public async requestStopPublishChannel(req: {
     label: string;
   }): Promise<Response_Room_ChannelControl_StopPublish> {
     const reqId = this.gen_req_id();
@@ -165,7 +161,7 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_subscribe_channel(req: {
+  public async requestSubscribeChannel(req: {
     label: string;
   }): Promise<Response_Room_ChannelControl_Subscribe> {
     const reqId = this.gen_req_id();
@@ -185,7 +181,7 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_unsubscribe_channel(req: {
+  public async requestUnsubscribeChannel(req: {
     label: string;
   }): Promise<Response_Room_ChannelControl_Unsubscribe> {
     const reqId = this.gen_req_id();
@@ -205,7 +201,7 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_publish_data_channel(req: {
+  public async requestPublishDataChannel(req: {
     label: string;
     data: Uint8Array;
   }): Promise<Response_Room_ChannelControl_Publish> {
@@ -228,7 +224,7 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async request_mixer(req: RequestMixer): Promise<ResponseMixer> {
+  public async requestMixer(req: RequestMixer): Promise<ResponseMixer> {
     const reqId = this.gen_req_id();
     const res = await this.request({ reqId, features: { mixer: req } });
     if (res.features?.mixer) {

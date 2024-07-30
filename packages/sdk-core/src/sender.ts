@@ -6,7 +6,7 @@ import {
   Sender_Config,
 } from "./generated/protobuf/shared";
 import { Datachannel, DatachannelEvent } from "./data";
-import { kind_to_string, string_to_kind } from "./types";
+import { kindToString, stringToKind } from "./types";
 import { ServerEvent_Sender } from "./generated/protobuf/session";
 import { EventEmitter } from "./utils";
 import { TrackSenderStatus } from "./lib";
@@ -25,6 +25,7 @@ export interface TrackSenderConfig {
   priority: number;
   bitrate: BitrateControlMode;
   simulcast?: boolean;
+  metadata?: string;
 }
 
 export class TrackSender extends EventEmitter {
@@ -45,7 +46,7 @@ export class TrackSender extends EventEmitter {
     console.log("[TrackSender] created", track_name, dc, track_or_kind);
     if (track_or_kind instanceof MediaStreamTrack) {
       this.track = track_or_kind;
-      this.kind = string_to_kind(track_or_kind.kind as any);
+      this.kind = stringToKind(track_or_kind.kind as any);
     } else {
       this.kind = track_or_kind;
     }
@@ -59,6 +60,7 @@ export class TrackSender extends EventEmitter {
         ? {
             id: this.track.id,
             screen: false, //TODO check if it is screen
+            metadata: cfg.metadata,
           }
         : undefined,
     };
@@ -97,7 +99,7 @@ export class TrackSender extends EventEmitter {
   /// Config after init feature will be useful when complex application
   prepare(peer: RTCPeerConnection) {
     this.transceiver = peer.addTransceiver(
-      this.track || kind_to_string(this.kind),
+      this.track || kindToString(this.kind),
       {
         direction: "sendonly",
         sendEncodings: this.simulcast
@@ -111,17 +113,18 @@ export class TrackSender extends EventEmitter {
     );
   }
 
-  public async attach(track: MediaStreamTrack) {
+  public async attach(track: MediaStreamTrack, metadata?: string) {
     if (this.track) {
       throw new Error("This sender already attached");
     }
-    if (track.kind != kind_to_string(this.kind)) {
+    if (track.kind != kindToString(this.kind)) {
       throw new Error("Wrong track kind");
     }
     this.track = track;
     this.sender_state.source = {
       id: track.id,
       screen: false, //TODO check if it is screen
+      metadata,
     };
 
     //if we in prepare state, we dont need to access to server, just update local
@@ -134,7 +137,7 @@ export class TrackSender extends EventEmitter {
     this.emit(TrackSenderEvent.StatusUpdated, this._status);
     await this.dc.ready();
     await this.transceiver.sender.replaceTrack(track);
-    return await this.dc.request_sender({
+    return await this.dc.requestSender({
       name: this.track_name,
       attach: {
         config: this.sender_state.config,
@@ -157,7 +160,7 @@ export class TrackSender extends EventEmitter {
     this.sender_state.config = config;
 
     await this.dc.ready();
-    return await this.dc.request_sender({
+    return await this.dc.requestSender({
       name: this.track_name,
       config,
     });
@@ -180,7 +183,7 @@ export class TrackSender extends EventEmitter {
 
     await this.dc.ready();
     await this.transceiver.sender.replaceTrack(null);
-    return await this.dc.request_sender({
+    return await this.dc.requestSender({
       name: this.track_name,
       detach: {},
     });

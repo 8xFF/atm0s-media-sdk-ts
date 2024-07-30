@@ -10,7 +10,7 @@ export interface ResponseParse<Response> {
   decode(message: Uint8Array): Response;
 }
 
-export async function post_protobuf<Request, Response>(
+export async function postProtobuf<Request, Response>(
   req_ser: RequestBuilder<Request>,
   res_parse: ResponseParse<Response>,
   url: string,

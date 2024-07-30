@@ -95,7 +95,7 @@ export class AudioMixer extends EventEmitter {
         req_srcs.push(source);
       }
     }
-    return this.dc.request_mixer({
+    return this.dc.requestMixer({
       attach: {
         sources: req_srcs,
       },
@@ -115,7 +115,7 @@ export class AudioMixer extends EventEmitter {
       }
     }
 
-    return this.dc.request_mixer({
+    return this.dc.requestMixer({
       detach: {
         sources: req_srcs,
       },
