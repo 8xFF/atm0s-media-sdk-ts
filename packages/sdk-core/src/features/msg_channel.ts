@@ -35,7 +35,7 @@ export interface MessageChannelEvent {
  * everyone that subscribes to this channel that are in the same room, will have 2-way communication.
  *
  **/
-export class MessageChannel extends EventEmitter {
+export class RoomMessageChannel extends EventEmitter {
   opened: boolean = false;
   textEncoder = new TextEncoder();
   textDecoder = new TextDecoder();
@@ -76,7 +76,7 @@ export class MessageChannel extends EventEmitter {
     if (this.config.publish) {
       throw new Error("Already publishing");
     }
-    await this.dc.request_start_publish_channel({ label: this.label });
+    await this.dc.requestStartPublishChannel({ label: this.label });
     this.config.publish = true;
   }
 
@@ -86,16 +86,16 @@ export class MessageChannel extends EventEmitter {
     }
     if (!this.config.publish) {
       throw new Error("Not publishing");
-    }
-    await this.dc.request_stop_publish_channel({ label: this.label });
+  }
+    await this.dc.requestStopPublishChannel({ label: this.label });
     this.config.publish = false;
   }
 
   async init() {
     await this.dc.ready();
-    await this.dc.request_subscribe_channel({ label: this.label });
+    await this.dc.requestSubscribeChannel({ label: this.label });
     if (this.config?.publish) {
-      await this.dc.request_start_publish_channel({ label: this.label });
+      await this.dc.requestStartPublishChannel({ label: this.label });
     }
 
     this.emit("opened");
@@ -110,7 +110,7 @@ export class MessageChannel extends EventEmitter {
     if (!this.config.publish) {
       throw new Error("Channel not publishing");
     }
-    return this.dc.request_publish_data_channel({
+    return this.dc.requestPublishDataChannel({
       label: this.label,
       data:
         typeof message === "string"
@@ -120,8 +120,8 @@ export class MessageChannel extends EventEmitter {
   }
 
   async close() {
-    await this.dc.request_unsubscribe_channel({ label: this.label });
-    await this.dc.request_stop_publish_channel({ label: this.label });
+    await this.dc.requestUnsubscribeChannel({ label: this.label });
+    await this.dc.requestStopPublishChannel({ label: this.label });
     this.emit("closed");
     this.opened = false;
   }

@@ -2,7 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { Atm0sMediaContext } from "../provider";
 import {
   MessageChannelConfig,
-  MessageChannel,
+  RoomMessageChannel,
 } from "@atm0s-media-sdk/core/lib";
 
 export function useMessageChannel(
@@ -15,7 +15,7 @@ export function useMessageChannel(
   config?: MessageChannelConfig,
 ) {
   const ctx = useContext(Atm0sMediaContext);
-  const [channel, setChannel] = useState<MessageChannel | null>(null);
+  const [channel, setChannel] = useState<RoomMessageChannel | null>(null);
   useEffect(() => {
     ctx.session.createMessageChannel(key, config).then((_chan) => {
       _chan.on("message", callback);

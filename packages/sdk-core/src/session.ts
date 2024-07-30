@@ -14,7 +14,7 @@ import {
 } from "./generated/protobuf/session";
 import * as mixer from "./features/audio_mixer";
 import { Kind } from "./generated/protobuf/shared";
-import { MessageChannel, MessageChannelConfig } from "./features/msg_channel";
+import { RoomMessageChannel, MessageChannelConfig } from "./features/msg_channel";
 import { kindToString } from "./types";
 
 export interface JoinInfo {
@@ -53,7 +53,7 @@ export class Session extends EventEmitter {
   conn_id?: string;
   receivers: TrackReceiver[] = [];
   senders: TrackSender[] = [];
-  msgChannels: MessageChannel[] = [];
+  msgChannels: RoomMessageChannel[] = [];
   _mixer?: mixer.AudioMixer;
 
   /// Prepaer state for flagging when ever this peer is created offer.
@@ -352,7 +352,7 @@ export class Session extends EventEmitter {
     config?: MessageChannelConfig | undefined,
   ) {
     await this.dc.ready();
-    const msgChannel = new MessageChannel(key, this.dc, config);
+    const msgChannel = new RoomMessageChannel(key, this.dc, config);
     await msgChannel.init();
     this.msgChannels.push(msgChannel);
     return msgChannel;

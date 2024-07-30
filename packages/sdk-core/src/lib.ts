@@ -21,7 +21,7 @@ export type {
 export { AudioMixerEvent } from "./features/audio_mixer";
 
 export type {
-  MessageChannel,
+  RoomMessageChannel,
   MessageChannelConfig,
   MessageChannelEvent,
 } from "./features/msg_channel";

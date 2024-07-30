@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import {
   BitrateControlMode,
   Kind,
+  MessageChannelEvent,
   RoomPeerJoined,
   RoomPeerLeaved,
   RoomTrackStarted,
@@ -12,7 +13,6 @@ import {
   SessionEvent,
 } from "@atm0s-media-sdk/core/lib";
 import { env } from "../../env";
-import { VirtualDataChannelEvent } from "../../../../../packages/sdk-core/src/features/datachannel";
 
 interface Props {
   room: string;
@@ -133,7 +133,7 @@ export default function EchoFast({ room, peer, token }: Props) {
         session.disconnect();
       };
       await session.connect();
-      const datachannel = await session.createDataChannel("testing");
+      const datachannel = await session.createMessageChannel("testing");
       send_btn.onclick = () => {
         const value = chat_input.value;
         chat_input.value = "";
@@ -141,7 +141,7 @@ export default function EchoFast({ room, peer, token }: Props) {
         datachannel.publish(value);
       };
 
-      datachannel.on("message", (e: VirtualDataChannelEvent) => {
+      datachannel.on("message", (e: MessageChannelEvent) => {
         const chatMessageEl = document.createElement("div");
         const bold = document.createElement("b");
         bold.innerText = e.peer + ": ";
