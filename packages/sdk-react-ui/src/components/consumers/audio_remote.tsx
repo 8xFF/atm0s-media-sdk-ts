@@ -2,7 +2,7 @@ import {
   RemoteTrack,
   useConsumer,
   useConsumerVoiceActivity,
-} from "@atm0s-media-sdk/react-hooks/lib";
+} from "@atm0s-media-sdk/react-hooks";
 import { useEffect, useRef } from "react";
 
 interface Props {

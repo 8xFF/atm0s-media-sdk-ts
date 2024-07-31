@@ -8,7 +8,7 @@ import {
   TrackReceiverEvent,
   TrackReceiverStatus,
   TrackReceiverVoiceActivity,
-} from "@atm0s-media-sdk/core/lib";
+} from "@atm0s-media-sdk/core";
 
 export interface ConsumerConfig {
   priority: number;

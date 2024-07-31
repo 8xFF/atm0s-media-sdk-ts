@@ -2,7 +2,7 @@ import {
   Kind,
   TrackSenderEvent,
   TrackSenderStatus,
-} from "@atm0s-media-sdk/core/lib";
+} from "@atm0s-media-sdk/core";
 import { Publisher, PublisherConfig } from "../context";
 import { Atm0sMediaContext } from "../provider";
 import { useContext, useEffect, useMemo, useState } from "react";

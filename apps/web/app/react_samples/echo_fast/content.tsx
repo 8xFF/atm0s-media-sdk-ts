@@ -10,9 +10,9 @@ import {
   RemoteTrack,
   useConsumerStatus,
   Atm0sMediaProvider,
-} from "@atm0s-media-sdk/react-hooks/lib";
+} from "@atm0s-media-sdk/react-hooks";
 
-import { Kind } from "@atm0s-media-sdk/core/lib";
+import { Kind } from "@atm0s-media-sdk/core";
 import { env } from "../../env";
 
 function EchoViewer({ track }: { track: RemoteTrack }) {

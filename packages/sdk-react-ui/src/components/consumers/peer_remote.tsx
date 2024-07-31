@@ -2,7 +2,7 @@ import {
   RemotePeer,
   useRemoteAudioTracks,
   useRemoteVideoTracks,
-} from "@atm0s-media-sdk/react-hooks/lib";
+} from "@atm0s-media-sdk/react-hooks";
 import { AudioRemote } from "./audio_remote";
 import { VideoRemote } from "./video_remote";
 import { AudioMixerSpeaking } from "../uis/audio_mixer_speaking";

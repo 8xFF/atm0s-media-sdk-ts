@@ -8,9 +8,9 @@ import {
   Kind,
   Session,
   SessionEvent,
-} from "@atm0s-media-sdk/core/lib";
+} from "@atm0s-media-sdk/core";
 import { env } from "../../env";
-import { RemoteTrack } from "@atm0s-media-sdk/react-hooks/lib";
+import { RemoteTrack } from "@atm0s-media-sdk/react-hooks";
 
 interface Props {
   room: string;
