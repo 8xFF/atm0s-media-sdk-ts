@@ -12,7 +12,7 @@ import {
   SessionEvent,
   TrackReceiverEvent,
   TrackReceiverStatus,
-} from "@atm0s-media-sdk/core/lib";
+} from "@atm0s-media-sdk/core";
 import { env } from "../../env";
 
 interface Props {

@@ -1,8 +1,8 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { usePublisher } from "@atm0s-media-sdk/react-hooks/lib";
+import { usePublisher } from "@atm0s-media-sdk/react-hooks";
 import { useDeviceStream } from "../../hooks";
 import { Atm0sMediaUIContext } from "../../provider";
-import { BitrateControlMode, Kind } from "@atm0s-media-sdk/core/lib";
+import { BitrateControlMode, Kind } from "@atm0s-media-sdk/core";
 import { CameraIcon, CameraOffIcon } from "../icons/camera";
 
 interface CameraPreviewProps {

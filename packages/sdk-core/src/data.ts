@@ -33,6 +33,7 @@ export class Datachannel extends EventEmitter {
 
   constructor(private dc: RTCDataChannel) {
     super();
+    dc.binaryType = "arraybuffer";
     dc.onopen = () => {
       console.log("[Datachannel] on open");
       this.waiter.setReady();

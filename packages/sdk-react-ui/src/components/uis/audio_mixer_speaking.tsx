@@ -1,4 +1,4 @@
-import { useMixerPeerVoiceActivity } from "@atm0s-media-sdk/react-hooks/lib";
+import { useMixerPeerVoiceActivity } from "@atm0s-media-sdk/react-hooks";
 import { useState, useEffect, ReactNode } from "react";
 
 interface Props {
