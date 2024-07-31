@@ -64,7 +64,7 @@ function EchoContent(): JSX.Element {
   const [view, setView] = useState(true);
 
   const video_tracks = useRemoteVideoTracks();
-  const datachannel = useMessageChannel("test", (e: MessageChannelEvent) => {
+  const msgChannel = useMessageChannel("test", (e: MessageChannelEvent) => {
     setChats((chats) => [
       ...chats,
       { peer: e.peer, message: e.message as string },
@@ -161,7 +161,7 @@ function EchoContent(): JSX.Element {
             className="btn"
             onClick={() => {
               if (chatInputRef.current?.value) {
-                datachannel?.publish(chatInputRef.current.value);
+                msgChannel?.publish(chatInputRef.current.value);
                 chatInputRef.current.value = "";
               }
             }}

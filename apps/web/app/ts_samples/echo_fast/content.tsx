@@ -133,15 +133,15 @@ export default function EchoFast({ room, peer, token }: Props) {
         session.disconnect();
       };
       await session.connect();
-      const datachannel = await session.createMessageChannel("testing");
+      const msgChannel = await session.createMessageChannel("testing");
       send_btn.onclick = () => {
         const value = chat_input.value;
         chat_input.value = "";
 
-        datachannel.publish(value);
+        msgChannel.publish(value);
       };
 
-      datachannel.on("message", (e: MessageChannelEvent) => {
+      msgChannel.on("message", (e: MessageChannelEvent) => {
         const chatMessageEl = document.createElement("div");
         const bold = document.createElement("b");
         bold.innerText = e.peer + ": ";
