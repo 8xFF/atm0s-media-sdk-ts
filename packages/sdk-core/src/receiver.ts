@@ -81,6 +81,19 @@ export class TrackReceiver extends EventEmitter {
     this.media_track = this.transceiver.receiver.track;
   }
 
+  /// We need update stream with newest track
+  afterRestartIce() {
+    let old_track = this.media_stream.getTracks()[0]!;
+    let new_track = this.transceiver!.receiver.track;
+    console.log(
+      "[TrackReceiver] restartIce => change track",
+      old_track.id,
+      new_track.id,
+    );
+    this.media_stream.removeTrack(old_track);
+    this.media_stream.addTrack(new_track);
+  }
+
   public async attach(
     source: Receiver_Source,
     config: Receiver_Config = DEFAULT_CFG,
