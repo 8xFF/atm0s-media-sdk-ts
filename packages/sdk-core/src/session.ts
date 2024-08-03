@@ -16,6 +16,7 @@ import * as mixer from "./features/audio_mixer";
 import { Kind } from "./generated/protobuf/shared";
 import { RoomMessageChannel, MessageChannelConfig } from "./features/msg_channel";
 import { kindToString } from "./types";
+import config from "../package.json";
 
 export interface JoinInfo {
   room: string;
@@ -48,6 +49,7 @@ export class Session extends EventEmitter {
   dc: Datachannel;
 
   ice_lite: boolean = false;
+  restarting_ice: boolean = false;
   created_at: number;
   version?: string;
   conn_id?: string;
@@ -69,7 +71,7 @@ export class Session extends EventEmitter {
     console.warn("Create session", this.created_at);
     this.peer = new RTCPeerConnection();
     this.dc = new Datachannel(
-      this.peer.createDataChannel("data", { negotiated: true, id: 1000 }),
+      this.peer.createDataChannel("data", { negotiated: true, id: 0 }),
     );
     this.dc.on(DatachannelEvent.ROOM, (event: ServerEvent_Room) => {
       if (event.peerJoined) {
@@ -88,8 +90,9 @@ export class Session extends EventEmitter {
     });
 
     //TODO add await to throtle for avoiding too much update in short time
-    this.peer.onnegotiationneeded = () => {
-      if (this.dc.connected)
+    this.peer.onnegotiationneeded = (event) => {
+      console.log("[Session] RTCPeer negotiation needed", event);
+      if (this.dc.connected && !this.restarting_ice)
         this.syncSdp().then(console.log).catch(console.error);
     };
 
@@ -209,7 +212,7 @@ export class Session extends EventEmitter {
       offerToReceiveVideo: true,
     });
     const req = ConnectRequest.create({
-      version: version || "pure-ts@0.0.0", //TODO auto get from package.json
+      version: version || "pure-ts@" + config.version,
       join: this.cfg.join && {
         room: this.cfg.join.room,
         peer: this.cfg.join.peer,
@@ -245,12 +248,14 @@ export class Session extends EventEmitter {
 
   async restartIce() {
     //TODO detect disconnect state and call restart-ice
+    this.restarting_ice = true;
+    this.peer.restartIce();
     const local_desc = await this.peer.createOffer({
       offerToReceiveAudio: true,
       offerToReceiveVideo: true,
     });
     const req = ConnectRequest.create({
-      version: this.version || "pure-ts@0.0.0", //TODO auto get from package.json
+      version: this.version || "pure-ts@" + config.version,
       join: this.cfg.join && {
         room: this.cfg.join.room,
         peer: this.cfg.join.peer,
@@ -284,11 +289,12 @@ export class Session extends EventEmitter {
       );
       this.conn_id = res.connId;
       this.receivers.map((r) => {
-        r.media_stream.removeTrack(r.media_stream.getTracks()[0]!);
+        r.afterRestartIce();
       }, []);
     }
     await this.peer.setLocalDescription(local_desc);
     await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
+    this.restarting_ice = false;
   }
 
   async join(info: JoinInfo, token: string) {

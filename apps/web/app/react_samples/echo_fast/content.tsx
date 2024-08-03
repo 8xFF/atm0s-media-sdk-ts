@@ -11,9 +11,9 @@ import {
   useConsumerStatus,
   Atm0sMediaProvider,
   useMessageChannel,
-} from "@atm0s-media-sdk/react-hooks/lib";
+} from "@atm0s-media-sdk/react-hooks";
 
-import { Kind, MessageChannelEvent } from "@atm0s-media-sdk/core/lib";
+import { Kind, MessageChannelEvent } from "@atm0s-media-sdk/core";
 import { env } from "../../env";
 import { GatewaySelectorUrl } from "../../components/GatewaySelector";
 import { useRouter } from "next/navigation";

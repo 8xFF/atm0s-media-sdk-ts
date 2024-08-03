@@ -1,29 +1,38 @@
 {
   "name": "@atm0s-media-sdk/react-ui",
-  "version": "1.0.0-alpha.2",
-  "exports": {
-    "./lib": "./src/lib.tsx"
-  },
-  "scripts": {
-    "lint": "eslint . --max-warnings 0",
-    "generate:component": "turbo gen react-component"
-  },
+  "version": "1.0.0-alpha.4",
+  "main": "./dist/lib.js",
+  "module": "./dist/lib.mjs",
+  "types": "./dist/lib.d.ts",
+  "files": [
+    "dist/*",
+    "src/*"
+  ],
   "dependencies": {
-    "@atm0s-media-sdk/core": "workspace:*",
-    "@atm0s-media-sdk/react-hooks": "workspace:*",
     "@emotion/react": "^11.11.4",
-    "@emotion/styled": "^11.11.5"
+    "@emotion/styled": "^11.11.5",
+    "@atm0s-media-sdk/core": "1.0.0-alpha.4",
+    "@atm0s-media-sdk/react-hooks": "1.0.0-alpha.5"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
   },
   "devDependencies": {
-    "@atm0s-media-sdk/eslint-config": "workspace:*",
-    "@atm0s-media-sdk/typescript-config": "workspace:*",
     "@turbo/gen": "^1.12.4",
     "@types/eslint": "^8.56.5",
     "@types/node": "^20.11.24",
     "@types/react": "^18.2.61",
     "@types/react-dom": "^18.2.19",
     "eslint": "^8.57.0",
-    "react": "^18.2.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "tsup": "^8.1.0",
+    "@atm0s-media-sdk/eslint-config": "0.0.0",
+    "@atm0s-media-sdk/typescript-config": "0.0.0"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "build": "tsup src/lib.tsx --format cjs,esm --dts",
+    "dev": "tsup src/lib.tsx --format cjs,esm --dts --watch",
+    "generate:component": "turbo gen react-component"
   }
 }

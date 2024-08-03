@@ -1,23 +1,30 @@
 {
   "name": "@atm0s-media-sdk/core",
-  "version": "1.0.0-alpha.2",
-  "exports": {
-    "./lib": "./src/lib.ts"
-  },
-  "scripts": {
-    "lint": "eslint . --max-warnings 0"
-  },
+  "version": "1.0.0-alpha.4",
+  "main": "./dist/lib.js",
+  "module": "./dist/lib.mjs",
+  "types": "./dist/lib.d.ts",
+  "files": [
+    "dist/*",
+    "src/*"
+  ],
   "devDependencies": {
-    "@atm0s-media-sdk/eslint-config": "workspace:*",
-    "@atm0s-media-sdk/typescript-config": "workspace:*",
     "@turbo/gen": "^1.12.4",
     "@types/eslint": "^8.56.5",
     "@types/node": "^20.11.24",
     "eslint": "^8.57.0",
     "ts-proto": "^1.174.0",
-    "typescript": "^5.3.3"
+    "tsup": "^8.1.0",
+    "typescript": "^5.3.3",
+    "@atm0s-media-sdk/typescript-config": "0.0.0",
+    "@atm0s-media-sdk/eslint-config": "0.0.0"
   },
   "dependencies": {
     "protobufjs": "^7.3.0"
+  },
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "build": "tsup src/lib.ts --format cjs,esm --dts",
+    "dev": "tsup src/lib.ts --format cjs,esm --dts --watch"
   }
 }

@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Atm0sMediaContext } from "../provider";
 import { Context, ContextEvent } from "../context";
-import { JoinInfo } from "@atm0s-media-sdk/core/lib";
+import { JoinInfo } from "@atm0s-media-sdk/core";
 
 const VERSION = "react@0.0.0"; //TODO auto version
 

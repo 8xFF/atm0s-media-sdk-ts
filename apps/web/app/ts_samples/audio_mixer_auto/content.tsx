@@ -6,7 +6,7 @@ import {
   AudioMixerMode,
   AudioMixerOutputChanged,
   Session,
-} from "@atm0s-media-sdk/core/lib";
+} from "@atm0s-media-sdk/core";
 import { env } from "../../env";
 
 interface Props {
