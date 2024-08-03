@@ -3,7 +3,7 @@ import { Atm0sMediaContext } from "../provider";
 import {
   MessageChannelConfig,
   RoomMessageChannel,
-} from "@atm0s-media-sdk/core/lib";
+} from "@atm0s-media-sdk/core";
 
 export function useMessageChannel(
   key: string,
@@ -12,7 +12,7 @@ export function useMessageChannel(
     peer: string;
     message: Uint8Array | string;
   }) => void,
-  config?: MessageChannelConfig,
+  config?: MessageChannelConfig
 ) {
   const ctx = useContext(Atm0sMediaContext);
   const [channel, setChannel] = useState<RoomMessageChannel | null>(null);
