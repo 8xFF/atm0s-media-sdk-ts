@@ -9,11 +9,8 @@ import {
   Response_Sender,
   Request_Receiver,
   Response_Receiver,
-  Response_Room_ChannelControl_StartPublish,
-  Response_Room_ChannelControl_StopPublish,
-  Response_Room_ChannelControl_Subscribe,
-  Response_Room_ChannelControl_Unsubscribe,
-  Response_Room_ChannelControl_Publish,
+  Request_MessageChannel,
+  Response_MessageChannel,
 } from "./generated/protobuf/session";
 import {
   Request as RequestMixer,
@@ -27,6 +24,7 @@ export enum DatachannelEvent {
   SENDER = "event.sender.",
   RECEIVER = "event.receiver.",
   FEATURE_MIXER = "event.features.mixer",
+  MESSAGE_CHANNEL = "event.message_channel",
 }
 
 export class Datachannel extends EventEmitter {
@@ -54,6 +52,8 @@ export class Datachannel extends EventEmitter {
         this.emit(DatachannelEvent.SENDER + msg.sender.name, msg.sender);
       } else if (msg.receiver) {
         this.emit(DatachannelEvent.RECEIVER + msg.receiver.name, msg.receiver);
+      } else if (msg.messageChannel) {
+        this.emit(DatachannelEvent.MESSAGE_CHANNEL, msg.messageChannel);
       } else if (msg.features) {
         if (msg.features.mixer) {
           this.emit(DatachannelEvent.FEATURE_MIXER, msg.features.mixer);
@@ -67,7 +67,7 @@ export class Datachannel extends EventEmitter {
         } else {
           console.warn(
             "[Datachannel] unknown request with response",
-            msg.response,
+            msg.response
           );
         }
       }
@@ -110,7 +110,7 @@ export class Datachannel extends EventEmitter {
   }
 
   public async requestReceiver(
-    req: Request_Receiver,
+    req: Request_Receiver
   ): Promise<Response_Receiver> {
     const reqId = this.gen_req_id();
     const res = await this.request({ reqId, receiver: req });
@@ -121,104 +121,13 @@ export class Datachannel extends EventEmitter {
     }
   }
 
-  public async requestStartPublishChannel(req: {
-    label: string;
-  }): Promise<Response_Room_ChannelControl_StartPublish> {
+  public async requestMessageChannel(
+    req: Request_MessageChannel
+  ): Promise<Response_MessageChannel> {
     const reqId = this.gen_req_id();
-    const res = await this.request({
-      reqId,
-      room: {
-        channelControl: {
-          label: req.label,
-          startPub: 1,
-        },
-      },
-    });
-    if (res.room) {
-      return res.room;
-    } else {
-      throw Error("INVALID_SERVER_RESPONSE");
-    }
-  }
-
-  public async requestStopPublishChannel(req: {
-    label: string;
-  }): Promise<Response_Room_ChannelControl_StopPublish> {
-    const reqId = this.gen_req_id();
-    const res = await this.request({
-      reqId,
-      room: {
-        channelControl: {
-          label: req.label,
-          stopPub: 1,
-        },
-      },
-    });
-    if (res.room) {
-      return res.room;
-    } else {
-      throw Error("INVALID_SERVER_RESPONSE");
-    }
-  }
-
-  public async requestSubscribeChannel(req: {
-    label: string;
-  }): Promise<Response_Room_ChannelControl_Subscribe> {
-    const reqId = this.gen_req_id();
-    const res = await this.request({
-      reqId,
-      room: {
-        channelControl: {
-          label: req.label,
-          sub: 1,
-        },
-      },
-    });
-    if (res.room) {
-      return res.room;
-    } else {
-      throw Error("INVALID_SERVER_RESPONSE");
-    }
-  }
-
-  public async requestUnsubscribeChannel(req: {
-    label: string;
-  }): Promise<Response_Room_ChannelControl_Unsubscribe> {
-    const reqId = this.gen_req_id();
-    const res = await this.request({
-      reqId,
-      room: {
-        channelControl: {
-          label: req.label,
-          unsub: 1,
-        },
-      },
-    });
-    if (res.room) {
-      return res.room;
-    } else {
-      throw Error("INVALID_SERVER_RESPONSE");
-    }
-  }
-
-  public async requestPublishDataChannel(req: {
-    label: string;
-    data: Uint8Array;
-  }): Promise<Response_Room_ChannelControl_Publish> {
-    const reqId = this.gen_req_id();
-    const res = await this.request({
-      reqId,
-      room: {
-        channelControl: {
-          label: req.label,
-          pub: {
-            data: req.data,
-          },
-        },
-      },
-    });
-    if (res.room) {
-      return res.room;
+    const res = await this.request({ reqId, messageChannel: req });
+    if (res.messageChannel) {
+      return res.messageChannel;
     } else {
       throw Error("INVALID_SERVER_RESPONSE");
     }

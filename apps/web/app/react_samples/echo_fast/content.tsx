@@ -15,6 +15,8 @@ import {
 
 import { Kind, MessageChannelEvent } from "@atm0s-media-sdk/core/lib";
 import { env } from "../../env";
+import { GatewaySelectorUrl } from "../../components/GatewaySelector";
+import { useRouter } from "next/navigation";
 
 function EchoViewer({ track }: { track: RemoteTrack }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -58,6 +60,7 @@ interface Message {
 function EchoContent(): JSX.Element {
   const previewVideoRef = useRef<HTMLVideoElement>(null);
   const session = useSession();
+  const router = useRouter();
   const audio_sender = usePublisher("audio_main", Kind.AUDIO);
   const video_sender = usePublisher("video_main", Kind.VIDEO);
   const [chats, setChats] = useState<Message[]>([]);
@@ -92,6 +95,10 @@ function EchoContent(): JSX.Element {
 
   const chatInputRef = useRef<HTMLInputElement>(null);
 
+  const onChanged = (server: string) => {
+    router.push('?server=' + server);
+  };
+
   return (
     <div className="p-6">
       <div className="p-4 w-full text-center">
@@ -120,6 +127,7 @@ function EchoContent(): JSX.Element {
       </div>
       {/* This is for control buttons */}
       <div className="flex flex-row justify-center p-4 space-x-2 w-full">
+        <GatewaySelectorUrl onChanged={onChanged} />
         <button id="connect" onClick={connect} className="btn btn-success">
           Connect
         </button>

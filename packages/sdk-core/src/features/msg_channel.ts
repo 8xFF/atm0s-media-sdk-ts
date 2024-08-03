@@ -1,5 +1,5 @@
 import { Datachannel, DatachannelEvent } from "../data";
-import { ServerEvent_Room } from "../generated/protobuf/session";
+import { ServerEvent_MessageChannel } from "../generated/protobuf/session";
 import { EventEmitter } from "../utils";
 
 export interface MessageChannelConfig {
@@ -37,32 +37,32 @@ export interface MessageChannelEvent {
  **/
 export class RoomMessageChannel extends EventEmitter {
   opened: boolean = false;
-  textEncoder = new TextEncoder();
-  textDecoder = new TextDecoder();
+  private textEncoder = new TextEncoder();
+  private textDecoder = new TextDecoder();
   config = DefaultConfig;
   constructor(
     public label: string,
     private dc: Datachannel,
-    _config?: MessageChannelConfig | undefined,
+    _config?: MessageChannelConfig | undefined
   ) {
     super();
     this.config = { ...this.config, ..._config };
-    this.dc.on(DatachannelEvent.ROOM, (roomEvent: ServerEvent_Room) => {
-      if (
-        roomEvent.channelMessage &&
-        roomEvent.channelMessage.label === this.label
-      ) {
-        const message = this.config?.raw
-          ? roomEvent.channelMessage!.message
-          : this.textDecoder.decode(roomEvent.channelMessage!.message);
+    this.dc.on(
+      DatachannelEvent.MESSAGE_CHANNEL,
+      (msgChanEvent: ServerEvent_MessageChannel) => {
+        if (msgChanEvent.label === this.label && msgChanEvent.message) {
+          const message = this.config?.raw
+            ? msgChanEvent.message.message
+            : this.textDecoder.decode(msgChanEvent.message.message);
 
-        const newEvent = {
-          ...roomEvent.channelMessage,
-          message,
-        };
-        this.emit("message", newEvent);
+          const newEvent = {
+            ...msgChanEvent.message,
+            message,
+          };
+          this.emit("message", newEvent);
+        }
       }
-    });
+    );
   }
 
   get canPublish() {
@@ -76,7 +76,7 @@ export class RoomMessageChannel extends EventEmitter {
     if (this.config.publish) {
       throw new Error("Already publishing");
     }
-    await this.dc.requestStartPublishChannel({ label: this.label });
+    await this.dc.requestMessageChannel({ label: this.label, startPub: {} });
     this.config.publish = true;
   }
 
@@ -86,16 +86,16 @@ export class RoomMessageChannel extends EventEmitter {
     }
     if (!this.config.publish) {
       throw new Error("Not publishing");
-  }
-    await this.dc.requestStopPublishChannel({ label: this.label });
+    }
+    await this.dc.requestMessageChannel({ label: this.label, stopPub: {} });
     this.config.publish = false;
   }
 
   async init() {
     await this.dc.ready();
-    await this.dc.requestSubscribeChannel({ label: this.label });
+    await this.dc.requestMessageChannel({ label: this.label, sub: {} });
     if (this.config?.publish) {
-      await this.dc.requestStartPublishChannel({ label: this.label });
+      await this.dc.requestMessageChannel({ label: this.label, startPub: {} });
     }
 
     this.emit("opened");
@@ -110,18 +110,20 @@ export class RoomMessageChannel extends EventEmitter {
     if (!this.config.publish) {
       throw new Error("Channel not publishing");
     }
-    return this.dc.requestPublishDataChannel({
+    return this.dc.requestMessageChannel({
       label: this.label,
-      data:
-        typeof message === "string"
-          ? this.textEncoder.encode(message)
-          : message,
+      pub: {
+        data:
+          typeof message === "string"
+            ? this.textEncoder.encode(message)
+            : message,
+      },
     });
   }
 
   async close() {
-    await this.dc.requestUnsubscribeChannel({ label: this.label });
-    await this.dc.requestStopPublishChannel({ label: this.label });
+    await this.dc.requestMessageChannel({ label: this.label, stopPub: {} });
+    await this.dc.requestMessageChannel({ label: this.label, unsub: {} });
     this.emit("closed");
     this.opened = false;
   }
