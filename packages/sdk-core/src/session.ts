@@ -55,7 +55,7 @@ export class Session extends EventEmitter {
   conn_id?: string;
   receivers: TrackReceiver[] = [];
   senders: TrackSender[] = [];
-  msgChannels: RoomMessageChannel[] = [];
+  msgChannels: Map<string ,RoomMessageChannel> = new Map();
   _mixer?: mixer.AudioMixer;
 
   /// Prepaer state for flagging when ever this peer is created offer.
@@ -350,7 +350,7 @@ export class Session extends EventEmitter {
 
   /**
    *
-   * Create a new MessageChannel for room based message passing
+   * Create a new MessageChannel for room based message passing. If a channel already exist with the same key, it will return the existing channel.
    *
    */
   async createMessageChannel(
@@ -358,9 +358,18 @@ export class Session extends EventEmitter {
     config?: MessageChannelConfig | undefined,
   ) {
     await this.dc.ready();
+    console.warn("[MessageChannel] creating a new channel:", key);
+    if (this.msgChannels.has(key)) {
+      console.warn("[MessageChannel] a channel already exist with key:", key);
+      return this.msgChannels.get(key)!;
+    }
     const msgChannel = new RoomMessageChannel(key, this.dc, config);
+    msgChannel.on("close", () => {
+      console.log("[MessageChannel] a channel has closed, removing from registry:", key);
+      this.msgChannels.delete(key);
+    })
     await msgChannel.init();
-    this.msgChannels.push(msgChannel);
+    this.msgChannels.set(key, msgChannel);
     return msgChannel;
   }
 
@@ -368,7 +377,7 @@ export class Session extends EventEmitter {
     //reset local here
     this.receivers.map((r) => r.leaveRoom());
     this.mixer?.leave_room();
-    this.msgChannels.map((d) => d.opened ?? d.close());
+    this.msgChannels.forEach((d) => d.opened ?? d.close());
 
     await this.dc.requestSession({
       leave: {},

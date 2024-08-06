@@ -21,6 +21,13 @@ export function useMessageChannel(
       _chan.on("message", callback);
       setChannel(_chan);
     });
+
+    return () => {
+      if (channel) {
+        channel.off("message", callback);
+        channel.close();
+      }
+    }
   }, [key, config]);
 
   return channel;
