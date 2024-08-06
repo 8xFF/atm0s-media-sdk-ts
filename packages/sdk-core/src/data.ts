@@ -54,7 +54,7 @@ export class Datachannel extends EventEmitter {
       } else if (msg.receiver) {
         this.emit(DatachannelEvent.RECEIVER + msg.receiver.name, msg.receiver);
       } else if (msg.messageChannel) {
-        this.emit(DatachannelEvent.MESSAGE_CHANNEL, msg.messageChannel);
+        this.emit(DatachannelEvent.MESSAGE_CHANNEL + msg.messageChannel.label, msg.messageChannel);
       } else if (msg.features) {
         if (msg.features.mixer) {
           this.emit(DatachannelEvent.FEATURE_MIXER, msg.features.mixer);
@@ -79,6 +79,7 @@ export class Datachannel extends EventEmitter {
     };
     dc.onclose = () => {
       console.log("[Datachannel] on close");
+      // TODO: Cleanup all requests
     };
   }
 
@@ -158,7 +159,7 @@ export class Datachannel extends EventEmitter {
       setTimeout(() => {
         if (this.reqs.has(reqId)) {
           this.reqs.delete(reqId);
-          reject(new Error("TIMEOUT"));
+          reject(new Error("REQUEST_TIMEOUT with reqId: " + reqId));
         }
       }, 5000);
     });

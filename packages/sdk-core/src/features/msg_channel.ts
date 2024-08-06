@@ -48,7 +48,7 @@ export class RoomMessageChannel extends EventEmitter {
     super();
     this.config = { ...this.config, ..._config };
     this.dc.on(
-      DatachannelEvent.MESSAGE_CHANNEL,
+      DatachannelEvent.MESSAGE_CHANNEL + this.label,
       (msgChanEvent: ServerEvent_MessageChannel) => {
         if (msgChanEvent.label === this.label && msgChanEvent.message) {
           const message = this.config?.raw
@@ -122,6 +122,9 @@ export class RoomMessageChannel extends EventEmitter {
   }
 
   async close() {
+    if (!this.opened) {
+      return;
+    }
     await this.dc.requestMessageChannel({ label: this.label, stopPub: {} });
     await this.dc.requestMessageChannel({ label: this.label, unsub: {} });
     this.emit("closed");
