@@ -5,8 +5,9 @@ import { env } from "../env";
 export async function generate_token(
   room: string,
   peer: string,
+  server?: string
 ): Promise<string> {
-  const url = env.GATEWAY_ENDPOINTS[0]! + "/token/webrtc";
+  const url = (server ?? env.GATEWAY_ENDPOINTS[0]!) + "/token/webrtc";
   console.log("Creating token with url:", url);
   const rawResponse = await fetch(url, {
     method: "POST",
@@ -39,9 +40,9 @@ export async function generate_token(
   }
 }
 
-export async function generate_random_token() {
+export async function generate_random_token(server?: string) {
   const now = new Date().getTime();
   const room = "room-" + now;
   const peer = "peer-" + now;
-  return [room, peer, await generate_token(room, peer)];
+  return [room, peer, await generate_token(room, peer, server)];
 }

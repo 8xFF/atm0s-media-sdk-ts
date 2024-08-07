@@ -20,6 +20,12 @@ export type {
 
 export { AudioMixerEvent } from "./features/audio_mixer";
 
+export type {
+  RoomMessageChannel,
+  MessageChannelConfig,
+  MessageChannelEvent,
+} from "./features/msg_channel";
+
 export {
   BitrateControlMode,
   Sender_Config,

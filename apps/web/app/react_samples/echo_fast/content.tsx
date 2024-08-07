@@ -10,10 +10,13 @@ import {
   RemoteTrack,
   useConsumerStatus,
   Atm0sMediaProvider,
+  useMessageChannel,
 } from "@atm0s-media-sdk/react-hooks";
 
-import { Kind } from "@atm0s-media-sdk/core";
+import { Kind, MessageChannelEvent } from "@atm0s-media-sdk/core";
 import { env } from "../../env";
+import { GatewaySelectorUrl } from "../../components/GatewaySelector";
+import { useRouter } from "next/navigation";
 
 function EchoViewer({ track }: { track: RemoteTrack }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -49,14 +52,27 @@ function EchoViewer({ track }: { track: RemoteTrack }) {
   );
 }
 
+interface Message {
+  peer: string;
+  message: string;
+}
+
 function EchoContent(): JSX.Element {
   const previewVideoRef = useRef<HTMLVideoElement>(null);
   const session = useSession();
+  const router = useRouter();
   const audio_sender = usePublisher("audio_main", Kind.AUDIO);
   const video_sender = usePublisher("video_main", Kind.VIDEO);
+  const [chats, setChats] = useState<Message[]>([]);
   const [view, setView] = useState(true);
 
   const video_tracks = useRemoteVideoTracks();
+  const msgChannel = useMessageChannel("test", (e: MessageChannelEvent) => {
+    setChats((chats) => [
+      ...chats,
+      { peer: e.peer, message: e.message as string },
+    ]);
+  });
 
   const connect = useCallback(async () => {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -76,6 +92,12 @@ function EchoContent(): JSX.Element {
     previewVideoRef.current!.srcObject = null;
     session.disconnect();
   }, [session]);
+
+  const chatInputRef = useRef<HTMLInputElement>(null);
+
+  const onChanged = (server: string) => {
+    router.push('?server=' + server);
+  };
 
   return (
     <div className="p-6">
@@ -105,6 +127,7 @@ function EchoContent(): JSX.Element {
       </div>
       {/* This is for control buttons */}
       <div className="flex flex-row justify-center p-4 space-x-2 w-full">
+        <GatewaySelectorUrl onChanged={onChanged} />
         <button id="connect" onClick={connect} className="btn btn-success">
           Connect
         </button>
@@ -121,6 +144,39 @@ function EchoContent(): JSX.Element {
         >
           Disconnect
         </button>
+      </div>
+
+      <div className="flex flex-col w-[400px] h-[500px] p-3 border rounded mx-auto">
+        <div id="chat-container" className="flex-1 w-full bg-base-300 p-2">
+          <div className="text-xs">
+            <i>Chat echo through virtual datachannel, connect to start.</i>
+          </div>
+
+          {chats.map((c, i) => (
+            <div key={i}>
+              <b>{c.peer}:</b> {c.message}
+            </div>
+          ))}
+        </div>
+        <div className="flex gap-2">
+          <input
+            id="chat-input"
+            className="flex-1 p-2 rounded"
+            ref={chatInputRef}
+          />
+          <button
+            id="send"
+            className="btn"
+            onClick={() => {
+              if (chatInputRef.current?.value) {
+                msgChannel?.publish(chatInputRef.current.value);
+                chatInputRef.current.value = "";
+              }
+            }}
+          >
+            Send
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -8,8 +8,8 @@ export default function Page(): JSX.Element {
       <div>
         Gateways:
         <div className="p-2">
-          {env.GATEWAY_ENDPOINTS.map((g) => (
-            <div>{g}</div>
+          {env.GATEWAY_ENDPOINTS.map((g, i) => (
+            <div key={i}>{g}</div>
           ))}
         </div>
       </div>
