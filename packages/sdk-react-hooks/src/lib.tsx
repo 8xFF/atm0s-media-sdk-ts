@@ -25,3 +25,5 @@ export {
 export type { ConsumerConfig } from "./hooks/consumer";
 
 export { useMessageChannel } from "./hooks/msg_channel";
+
+export { useSipOutgoingCallStatus } from "./hooks/sip_gateway";

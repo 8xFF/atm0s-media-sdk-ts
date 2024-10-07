@@ -6,12 +6,12 @@ import { BitrateControlMode, Kind } from "@atm0s-media-sdk/core";
 import { CameraIcon, CameraOffIcon } from "../icons/camera";
 
 interface CameraPreviewProps {
-  source_name: string;
+  trackName: string;
 }
 
-export function CameraPreview({ source_name }: CameraPreviewProps) {
+export function CameraPreview({ trackName }: CameraPreviewProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const stream = useDeviceStream(source_name);
+  const stream = useDeviceStream(trackName);
   useEffect(() => {
     if (stream && videoRef.current) {
       videoRef.current.srcObject = stream;
@@ -38,8 +38,8 @@ export function CameraPreview({ source_name }: CameraPreviewProps) {
 }
 
 interface CameraSelectionProps {
-  source_name: string;
-  first_page?: boolean;
+  trackName: string;
+  defaultEnable?: boolean;
 }
 
 const PublisherConfig = {
@@ -49,18 +49,18 @@ const PublisherConfig = {
 };
 
 export function CameraSelection({
-  source_name,
-  first_page,
+  trackName,
+  defaultEnable,
 }: CameraSelectionProps) {
-  const publisher = usePublisher(source_name, Kind.VIDEO, PublisherConfig);
+  const publisher = usePublisher(trackName, Kind.VIDEO, PublisherConfig);
   const [devices, setDevices] = useState<{ id: string; label: string }[]>([]);
   const ctx = useContext(Atm0sMediaUIContext);
-  const stream = useDeviceStream(source_name);
+  const stream = useDeviceStream(trackName);
 
   useEffect(() => {
     const init = async () => {
-      if (first_page) {
-        await ctx.requestDevice(source_name, "video");
+      if (defaultEnable) {
+        await ctx.requestDevice(trackName, "video");
       }
       const devices = await navigator.mediaDevices.enumerateDevices();
       console.log(devices);
@@ -74,7 +74,7 @@ export function CameraSelection({
     };
 
     init();
-  }, [ctx, source_name, setDevices, first_page]);
+  }, [ctx, trackName, setDevices, defaultEnable]);
 
   useEffect(() => {
     let track = stream?.getVideoTracks()[0];
@@ -87,10 +87,10 @@ export function CameraSelection({
 
   const onToggle = useCallback(() => {
     if (stream) {
-      ctx.turnOffDevice(source_name);
+      ctx.turnOffDevice(trackName);
     } else {
       ctx
-        .requestDevice(source_name, "video")
+        .requestDevice(trackName, "video")
         .then(console.log)
         .catch(console.error);
     }
@@ -99,7 +99,7 @@ export function CameraSelection({
   const onChange = useCallback((event: any) => {
     let selected = event.target.options[event.target.selectedIndex].value;
     ctx
-      .requestDevice(source_name, "video", selected)
+      .requestDevice(trackName, "video", selected)
       .then(console.log)
       .catch(console.error);
   }, []);

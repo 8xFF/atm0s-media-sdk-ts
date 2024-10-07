@@ -10,3 +10,4 @@ export { PeersPanel } from "./panels/peers_panel";
 export { DevicesSelection } from "./panels/devices_selection";
 export { ControlsPanel } from "./panels/controls_panel";
 export { ChatPanel } from "./panels/chat_panel";
+export { SipOutgoingCall } from "./panels/sip_outgoing";
