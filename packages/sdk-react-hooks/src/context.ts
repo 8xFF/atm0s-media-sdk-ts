@@ -1,4 +1,8 @@
 import {
+  MediaStreamTrack,
+} from 'react-native-webrtc';
+
+import {
   Session,
   SessionConfig,
   EventEmitter,
@@ -30,7 +34,7 @@ export interface PublisherConfig {
 }
 
 export class Publisher {
-  constructor(private _sender: TrackSender) {}
+  constructor(private _sender: TrackSender) { }
 
   get sender() {
     return this._sender;

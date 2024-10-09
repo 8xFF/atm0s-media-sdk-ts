@@ -1,6 +1,10 @@
 {
   "name": "atm0s-media-sdk-ts-monorepo",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
@@ -8,12 +12,10 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\""
   },
   "devDependencies": {
-    "@atm0s-media-sdk/eslint-config": "workspace:*",
-    "@atm0s-media-sdk/typescript-config": "workspace:*",
     "prettier": "^3.2.5",
     "turbo": "latest"
   },
-  "packageManager": "pnpm@8.9.0",
+  "packageManager": "yarn@1.22.19",
   "engines": {
     "node": ">=18"
   }

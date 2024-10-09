@@ -1,5 +1,4 @@
 {
-  "extends": "@atm0s-media-sdk/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "dist"
   },

@@ -10,6 +10,12 @@ import { Datachannel, DatachannelEvent } from "./data";
 import { kindToString } from "./types";
 import { ServerEvent_Receiver } from "./generated/protobuf/session";
 import { TrackReceiverStatus } from "./lib";
+import {
+  RTCPeerConnection,
+  MediaStream,
+  MediaStreamTrack,
+  RTCRtpTransceiver
+} from 'react-native-webrtc';
 
 const DEFAULT_CFG = {
   priority: 1,

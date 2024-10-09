@@ -10,7 +10,9 @@ import { TrackReceiver, TrackReceiverEvent } from "../receiver";
 import { Session } from "../session";
 import { Kind } from "../types";
 import { EventEmitter } from "../utils";
-
+import {
+  MediaStream,
+} from 'react-native-webrtc';
 export enum AudioMixerEvent {
   OUTPUT_CHANGED = "features.mixer.output_changed",
   VOICE_ACTIVITY = "feature.mixer.voice_activity",

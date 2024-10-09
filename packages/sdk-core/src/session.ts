@@ -17,6 +17,10 @@ import { Kind } from "./generated/protobuf/shared";
 import { RoomMessageChannel, MessageChannelConfig } from "./features/msg_channel";
 import { kindToString } from "./types";
 import config from "../package.json";
+import {
+  RTCPeerConnection,
+  MediaStreamTrack,
+} from 'react-native-webrtc';
 
 export interface JoinInfo {
   room: string;
@@ -55,7 +59,7 @@ export class Session extends EventEmitter {
   conn_id?: string;
   receivers: TrackReceiver[] = [];
   senders: TrackSender[] = [];
-  msgChannels: Map<string ,RoomMessageChannel> = new Map();
+  msgChannels: Map<string, RoomMessageChannel> = new Map();
   _mixer?: mixer.AudioMixer;
 
   /// Prepaer state for flagging when ever this peer is created offer.
@@ -70,9 +74,8 @@ export class Session extends EventEmitter {
     this.created_at = new Date().getTime();
     console.warn("Create session", this.created_at);
     this.peer = new RTCPeerConnection();
-    this.dc = new Datachannel(
-      this.peer.createDataChannel("data", { negotiated: true, id: 0 }),
-    );
+    let dataChannel = this.peer.createDataChannel("datachannel");
+    this.dc = new Datachannel(dataChannel as any);
     this.dc.on(DatachannelEvent.ROOM, (event: ServerEvent_Room) => {
       if (event.peerJoined) {
         this.emit(SessionEvent.ROOM_PEER_JOINED, event.peerJoined);
@@ -89,44 +92,13 @@ export class Session extends EventEmitter {
       }
     });
 
-    //TODO add await to throtle for avoiding too much update in short time
-    this.peer.onnegotiationneeded = (event) => {
-      console.log("[Session] RTCPeer negotiation needed", event);
-      if (this.dc.connected && !this.restarting_ice)
-        this.syncSdp().then(console.log).catch(console.error);
-    };
-
-    this.peer.onconnectionstatechange = (_event) => {
+    this.peer.addEventListener('connectionstatechange', event => {
       console.log(
-        "[Session] RTCPeer connection state changed",
+        "[Session] RTCPeer connectionstatechange",
         this.peer.connectionState,
       );
-    };
-
-    this.peer.oniceconnectionstatechange = (_event) => {
-      console.log(
-        "[Session] RTCPeer ice state changed",
-        this.peer.iceConnectionState,
-      );
-    };
-
-    this.peer.ontrack = (event) => {
-      for (let i = 0; i < this.receivers.length; i++) {
-        const receiver = this.receivers[i]!;
-        if (receiver.webrtcTrackId == event.track.id) {
-          console.log(
-            "[Session] found receiver for track",
-            receiver.name,
-            event.track,
-          );
-          receiver.setTrackReady();
-          return;
-        }
-      }
-      console.warn("[Session] not found receiver for track", event.track);
-    };
-
-    this.peer.onicecandidate = async (event) => {
+    });
+    this.peer.addEventListener('icecandidate', async event => {
       if (event.candidate && !this.ice_lite) {
         const req = RemoteIceRequest.create({
           candidates: [event.candidate.candidate],
@@ -143,7 +115,108 @@ export class Session extends EventEmitter {
         );
         console.log("Sent ice-candidate", res);
       }
-    };
+    });
+    this.peer.addEventListener('icecandidateerror', event => {
+      console.log(
+        "[Session] RTCPeer icecandidateerror",
+        this.peer.connectionState,
+      );
+    });
+    this.peer.addEventListener('iceconnectionstatechange', event => {
+      console.log(
+        "[Session] RTCPeer connection state changed",
+        this.peer.connectionState,
+      );
+    });
+    this.peer.addEventListener('icegatheringstatechange', event => {
+      console.log(
+        "[Session] RTCPeer icegatheringstatechange",
+        this.peer.connectionState,
+      );
+    });
+    this.peer.addEventListener('negotiationneeded', event => {
+      console.log(
+        "[Session] RTCPeer negotiationneeded",
+        this.peer.connectionState,
+      );
+    });
+    this.peer.addEventListener('signalingstatechange', event => {
+      console.log(
+        "[Session] RTCPeer signalingstatechange",
+        this.peer.connectionState,
+      );
+    });
+    this.peer.addEventListener('track', event => {
+      for (let i = 0; i < this.receivers.length; i++) {
+        const receiver = this.receivers[i]!;
+        if (receiver.webrtcTrackId == event.track.id) {
+          console.log(
+            "[Session] found receiver for track",
+            receiver.name,
+            event.track,
+          );
+          receiver.setTrackReady();
+          return;
+        }
+      }
+    });
+
+    //TODO:web
+    // //TODO add await to throtle for avoiding too much update in short time
+    // this.peer.onnegotiationneeded = (event) => {
+    //   console.log("[Session] RTCPeer negotiation needed", event);
+    //   if (this.dc.connected && !this.restarting_ice)
+    //     this.syncSdp().then(console.log).catch(console.error);
+    // };
+
+    // this.peer.onconnectionstatechange = (_event) => {
+    //   console.log(
+    //     "[Session] RTCPeer connection state changed",
+    //     this.peer.connectionState,
+    //   );
+    // };
+
+    // this.peer.oniceconnectionstatechange = (_event) => {
+    //   console.log(
+    //     "[Session] RTCPeer ice state changed",
+    //     this.peer.iceConnectionState,
+    //   );
+    // };
+
+    // this.peer.ontrack = (event) => {
+    //   for (let i = 0; i < this.receivers.length; i++) {
+    //     const receiver = this.receivers[i]!;
+    //     if (receiver.webrtcTrackId == event.track.id) {
+    //       console.log(
+    //         "[Session] found receiver for track",
+    //         receiver.name,
+    //         event.track,
+    //       );
+    //       receiver.setTrackReady();
+    //       return;
+    //     }
+    //   }
+    //   console.warn("[Session] not found receiver for track", event.track);
+    // };
+
+    // this.peer.onicecandidate = async (event) => {
+    //   if (event.candidate && !this.ice_lite) {
+    //     const req = RemoteIceRequest.create({
+    //       candidates: [event.candidate.candidate],
+    //     });
+    //     console.log("Send ice-candidate", event.candidate.candidate);
+    //     const res = await postProtobuf(
+    //       RemoteIceRequest,
+    //       RemoteIceResponse,
+    //       this.gateway + "/webrtc/" + this.conn_id + "/ice-candidate",
+    //       req,
+    //       {
+    //         "Content-Type": "application/grpc",
+    //       },
+    //     );
+    //     console.log("Sent ice-candidate", res);
+    //   }
+    // };
 
     //init audios
     if (cfg.join?.features?.mixer) {
@@ -190,60 +263,65 @@ export class Session extends EventEmitter {
   }
 
   async connect(version?: string) {
-    if (!this.prepareState) {
-      throw new Error("Not in prepare state");
+    try {
+      if (!this.prepareState) {
+        throw new Error("Not in prepare state");
+      }
+      this.prepareState = false;
+      this.version = version;
+      console.warn("Prepare senders and receivers to connect");
+      //prepare for senders. We need to lazy prepare because some transceiver dont allow update before connected
+      for (let i = 0; i < this.senders.length; i++) {
+        console.log("Prepare sender ", this.senders[i]!.name);
+        this.senders[i]!.prepare(this.peer);
+      }
+      //prepare for receivers. We need to lazy prepare because some transceiver dont allow update before connected
+      for (let i = 0; i < this.receivers.length; i++) {
+        console.log("Prepare receiver ", this.receivers[i]!.name);
+        this.receivers[i]!.prepare(this.peer);
+      }
+      console.log("Prepare offer for connect");
+      const local_desc = await this.peer.createOffer({
+        offerToReceiveAudio: true,
+        offerToReceiveVideo: true,
+      });
+      const req = ConnectRequest.create({
+        version: version || "pure-ts@" + config.version,
+        join: this.cfg.join && {
+          room: this.cfg.join.room,
+          peer: this.cfg.join.peer,
+          metadata: this.cfg.join.metadata,
+          publish: this.cfg.join.publish,
+          subscribe: this.cfg.join.subscribe,
+          features: { mixer: this.mixer?.state() },
+        },
+        tracks: {
+          receivers: this.receivers.map((r) => r.state),
+          senders: this.senders.map((r) => r.state),
+        },
+        sdp: local_desc.sdp,
+      });
+      console.log("Connecting");
+      const res = await postProtobuf(
+        ConnectRequest,
+        ConnectResponse,
+        this.gateway + "/webrtc/connect",
+        req,
+        {
+          Authorization: "Bearer " + this.cfg.token,
+          "Content-Type": "application/grpc",
+        },
+      );
+      console.log("res postProtobuf", res);
+      this.conn_id = res.connId;
+      this.ice_lite = res.iceLite;
+      await this.peer.setLocalDescription(local_desc);
+      await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
+      await this.dc.ready();
+      console.log("Connected");
+    } catch (e) {
+      console.log("Error in connect", e);
     }
-    this.prepareState = false;
-    this.version = version;
-    console.warn("Prepare senders and receivers to connect");
-    //prepare for senders. We need to lazy prepare because some transceiver dont allow update before connected
-    for (let i = 0; i < this.senders.length; i++) {
-      console.log("Prepare sender ", this.senders[i]!.name);
-      this.senders[i]!.prepare(this.peer);
-    }
-    //prepare for receivers. We need to lazy prepare because some transceiver dont allow update before connected
-    for (let i = 0; i < this.receivers.length; i++) {
-      console.log("Prepare receiver ", this.receivers[i]!.name);
-      this.receivers[i]!.prepare(this.peer);
-    }
-    console.log("Prepare offer for connect");
-    const local_desc = await this.peer.createOffer({
-      offerToReceiveAudio: true,
-      offerToReceiveVideo: true,
-    });
-    const req = ConnectRequest.create({
-      version: version || "pure-ts@" + config.version,
-      join: this.cfg.join && {
-        room: this.cfg.join.room,
-        peer: this.cfg.join.peer,
-        metadata: this.cfg.join.metadata,
-        publish: this.cfg.join.publish,
-        subscribe: this.cfg.join.subscribe,
-        features: { mixer: this.mixer?.state() },
-      },
-      tracks: {
-        receivers: this.receivers.map((r) => r.state),
-        senders: this.senders.map((r) => r.state),
-      },
-      sdp: local_desc.sdp,
-    });
-    console.log("Connecting");
-    const res = await postProtobuf(
-      ConnectRequest,
-      ConnectResponse,
-      this.gateway + "/webrtc/connect",
-      req,
-      {
-        Authorization: "Bearer " + this.cfg.token,
-        "Content-Type": "application/grpc",
-      },
-    );
-    this.conn_id = res.connId;
-    this.ice_lite = res.iceLite;
-    await this.peer.setLocalDescription(local_desc);
-    await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
-    await this.dc.ready();
-    console.log("Connected");
   }
 
   async restartIce() {
