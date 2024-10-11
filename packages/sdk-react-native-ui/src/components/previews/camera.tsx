@@ -76,7 +76,7 @@ export function CameraSelection({
       if (first_page) {
         await ctx.requestDevice(source_name, "video");
       }
-      const devices = await mediaDevices.enumerateDevices();
+      const devices: any = await mediaDevices.enumerateDevices();
       console.log(devices);
       setDevices(
         devices

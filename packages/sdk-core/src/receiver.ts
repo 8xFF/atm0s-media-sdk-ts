@@ -83,21 +83,19 @@ export class TrackReceiver extends EventEmitter {
     this.transceiver = peer.addTransceiver(kindToString(this._kind), {
       direction: "recvonly",
     });
-    this.media_stream.addTrack(this.transceiver.receiver.track);
-    this.media_track = this.transceiver.receiver.track;
+    if (this.transceiver.receiver.track)
+      this.media_stream.addTrack(this.transceiver.receiver.track);
+    if (this.transceiver.receiver.track)
+      this.media_track = this.transceiver.receiver.track;
   }
 
   /// We need update stream with newest track
   afterRestartIce() {
     let old_track = this.media_stream.getTracks()[0]!;
     let new_track = this.transceiver!.receiver.track;
-    console.log(
-      "[TrackReceiver] restartIce => change track",
-      old_track.id,
-      new_track.id,
-    );
     this.media_stream.removeTrack(old_track);
-    this.media_stream.addTrack(new_track);
+    if (new_track)
+      this.media_stream.addTrack(new_track);
   }
 
   public async attach(

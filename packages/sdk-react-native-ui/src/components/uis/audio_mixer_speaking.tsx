@@ -10,17 +10,20 @@ export function AudioMixerSpeaking({ peer, children }: Props) {
   const [speaking, setSpeaking] = useState(false);
   const voiceActivity = useMixerPeerVoiceActivity(peer);
   useEffect(() => {
+    let timeout: NodeJS.Timeout;
     if (voiceActivity?.active) {
       setSpeaking(true);
-      const timeout = setTimeout(() => {
+      timeout = setTimeout(() => {
         setSpeaking(false);
       }, 1000);
-      return () => {
-        clearTimeout(timeout);
-      };
     } else {
       setSpeaking(false);
     }
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
   }, [setSpeaking, voiceActivity]);
 
   return speaking ? children : <></>;

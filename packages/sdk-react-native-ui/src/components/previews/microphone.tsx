@@ -3,8 +3,7 @@ import { useDeviceStream } from "../../hooks";
 import { Atm0sMediaUIContext } from "../../provider";
 import { usePublisher } from "@atm0s-media-sdk/react-hooks";
 import { Kind } from "@atm0s-media-sdk/core";
-import { MicIcon, MicOffIcon } from "../icons/microphone";
-import { mediaDevices, RTCView } from "react-native-webrtc";
+import { mediaDevices, MediaStream, RTCView } from "react-native-webrtc";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -14,27 +13,29 @@ interface MicrophonePreviewProps {
 }
 
 export function MicrophonePreview({ source_name }: MicrophonePreviewProps) {
-  const audioRef = useRef<any>(null);
   const stream = useDeviceStream(source_name);
+  const [localStream, setLocalStream] = useState<MediaStream | undefined>(undefined);
+
   useEffect(() => {
-    if (stream && audioRef.current) {
-      audioRef.current.srcObject = stream;
-      return () => {
-        if (audioRef.current?.srcObject) {
-          audioRef.current!.srcObject = null;
-        }
-      };
+    if (stream) {
+      setLocalStream(stream);
     }
-  }, [stream, audioRef.current]);
+  }, [stream]);
 
   return (
     <View style={{ width: "100%", height: '100%' }}>
-      <RTCView
-        ref={audioRef}
-        mirror={true}
-        objectFit={'cover'}
-        zOrder={0}
-      />
+      {localStream &&
+        <RTCView
+          mirror={true}
+          objectFit={'cover'}
+          streamURL={localStream.toURL()}
+          zOrder={0}
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+        />
+      }
     </View>
   );
 }
@@ -58,7 +59,7 @@ export function MicrophoneSelection({
       if (first_page) {
         await ctx.requestDevice(source_name, "audio");
       }
-      const devices = await mediaDevices.enumerateDevices();
+      const devices: any = await mediaDevices.enumerateDevices();
       console.log(devices);
       setDevices(
         devices

@@ -86,9 +86,9 @@ export class AudioMixer extends EventEmitter {
   }
 
   public attach(sources: AudioMixerSource[]) {
-    const req_srcs = [];
+    const req_srcs: AudioMixerSource[] = [];
     for (const i in sources) {
-      const source = sources[i]!;
+      const source: AudioMixerSource = sources[i]!;
       const existed = this.sources.find((s) => {
         return s.peer == source.peer && s.track == source.track;
       });
@@ -105,9 +105,9 @@ export class AudioMixer extends EventEmitter {
   }
 
   public detach(sources: AudioMixerSource[]) {
-    const req_srcs = [];
+    const req_srcs: AudioMixerSource[] = [];
     for (const i in sources) {
-      const source = sources[i]!;
+      const source: AudioMixerSource = sources[i]!;
       const existed = this.sources.findIndex((s) => {
         return s.peer == source.peer && s.track == source.track;
       });

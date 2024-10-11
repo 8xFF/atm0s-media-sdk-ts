@@ -1,7 +1,9 @@
 {
   "name": "@atm0s-media-sdk/core",
   "version": "1.0.0-alpha.4",
-  "main": "./index.ts",
+  "main": "./dist/lib.js",
+  "module": "./dist/lib.mjs",
+  "types": "./dist/lib.d.ts",
   "files": [
     "dist/*",
     "src/*"

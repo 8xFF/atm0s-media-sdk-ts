@@ -149,7 +149,7 @@ export class Session extends EventEmitter {
     this.peer.addEventListener('track', event => {
       for (let i = 0; i < this.receivers.length; i++) {
         const receiver = this.receivers[i]!;
-        if (receiver.webrtcTrackId == event.track.id) {
+        if (receiver.webrtcTrackId == event.track?.id) {
           console.log(
             "[Session] found receiver for track",
             receiver.name,

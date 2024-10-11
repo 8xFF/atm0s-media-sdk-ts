@@ -1,7 +1,9 @@
 {
   "name": "@atm0s-media-sdk/react-native-ui",
   "version": "1.0.0-alpha.4",
-  "main": "./index.ts",
+  "main": "./dist/lib.js",
+  "module": "./dist/lib.mjs",
+  "types": "./dist/lib.d.ts",
   "files": [
     "dist/*",
     "src/*"
@@ -10,7 +12,9 @@
     "@atm0s-media-sdk/core": "1.0.0-alpha.4",
     "@atm0s-media-sdk/react-hooks": "1.0.0-alpha.4",
     "react-native": "0.75.4",
-    "react-native-webrtc": "^124.0.4"
+    "react-native-webrtc": "^124.0.4",
+    "react-native-vector-icons":"10.2.0",
+    "@react-native-picker/picker": "^2.8.1"
   },
   "peerDependencies": {
     "react": "^18.2.0"
