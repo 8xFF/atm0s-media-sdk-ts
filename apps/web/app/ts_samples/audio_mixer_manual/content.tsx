@@ -60,9 +60,9 @@ export default function AudioMixerManualContent({ room, peer, token }: Props) {
       });
 
       const mixer_streams = session.mixer!.streams();
-      audio_mixer1!.srcObject = mixer_streams[0]!;
-      audio_mixer2!.srcObject = mixer_streams[1]!;
-      audio_mixer3!.srcObject = mixer_streams[2]!;
+      audio_mixer1!.srcObject = mixer_streams[0] as any;
+      audio_mixer2!.srcObject = mixer_streams[1] as any;
+      audio_mixer3!.srcObject = mixer_streams[2] as any;
 
       session.mixer!.on(
         AudioMixerEvent.OUTPUT_CHANGED,
@@ -86,7 +86,7 @@ export default function AudioMixerManualContent({ room, peer, token }: Props) {
         }
       });
 
-      const stream = await navigator.mediaDevices.getUserMedia({
+      const stream: any = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: false,
       });
