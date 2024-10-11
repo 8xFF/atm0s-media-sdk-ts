@@ -9,7 +9,7 @@ export interface SipOutgoingCallProps {
     onEnd: () => void;
 }
 
-export function SipOutgoingCall(props: SipOutgoingCallProps): JSX.Element {
+export function SipOutgoingCallWidget(props: SipOutgoingCallProps): JSX.Element {
     const [status, callErr] = useSipOutgoingCallStatus(props.sipWs);
     const session = useSession();
 
@@ -30,7 +30,7 @@ export function SipOutgoingCall(props: SipOutgoingCallProps): JSX.Element {
             {/* WebSocket Status Indicator */}
             <div className={`w-4 h-4 rounded-full ${status.wsState === 'WsConnected' ? 'bg-green-500' : 'bg-red-500'}`} />
             <p className={`text-lg ${status.sipState === 'Accepted' ? 'text-green-600' : 'text-red-600'}`}>
-                SIP Status: {status.sipState} {status.sipCodeStr && '/ ' + status.sipCodeStr}
+                SIP Status: {callErr || status.sipState} {status.sipCodeStr && '/ ' + status.sipCodeStr}
             </p>
 
             {/* Time Counting */}

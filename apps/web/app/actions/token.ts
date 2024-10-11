@@ -40,7 +40,7 @@ export async function generate_token(
   }
 }
 
-export async function generate_random_token(server?: string) {
+export async function generate_random_token(server?: string): Promise<[string, string, string]> {
   const now = new Date().getTime();
   const room = "room-" + now;
   const peer = "peer-" + now;

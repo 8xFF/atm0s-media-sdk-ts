@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { EventEmitter } from "./utils";
 
-interface OutgoingSipCallStatus {
+export interface OutgoingSipCallStatus {
     wsState: "WsConnecting" | "WsConnected" | "WsClosed",
     sipState?: "Provisional" | "Early" | "Accepted" | "Failure" | "Bye",
     sipCode?: number,
@@ -17,61 +17,65 @@ interface WsEvent {
     message?: string,
 }
 
-export function useSipOutgoingCallStatus(
-    ws: string,
-): [OutgoingSipCallStatus, string | null] {
-    const [status, setStatus] = useState<OutgoingSipCallStatus>({ wsState: "WsConnecting" });
-    const [err, setErr] = useState<string | null>(null);
-    useEffect(() => {
-        let status: OutgoingSipCallStatus = { wsState: "WsConnecting" };
-        const wsConn = new WebSocket(ws);
-        wsConn.onopen = () => {
-            status = {
-                ...status,
+export class SipOutgoingCall extends EventEmitter {
+    _status: OutgoingSipCallStatus = { wsState: "WsConnecting" }
+    wsConn: WebSocket;
+    constructor(sipWs: string) {
+        super()
+        this.wsConn = new WebSocket(sipWs);
+        this.wsConn.onopen = () => {
+            this._status = {
+                ...this._status,
                 wsState: "WsConnected",
             };
-            setStatus(status)
+            this.emit("status", this._status)
         };
-        wsConn.onmessage = (msg) => {
+        this.wsConn.onmessage = (msg) => {
             const json: WsEvent = JSON.parse(msg.data);
             switch (json.type) {
                 case "Sip":
-                    status = {
-                        ...status,
+                    this._status = {
+                        ...this._status,
                         sipState: json.content?.type,
                         sipCode: json.content?.code,
                         sipCodeStr: json.content?.code ? (sipStatusCodes[json.content?.code] || 'Code ' + json.content.code) : undefined,
                     };
 
                     if (json.content?.type == 'Accepted') {
-                        status.startedAt = Date.now();
+                        this._status.startedAt = Date.now();
                     }
-                    setStatus(status)
+                    this.emit("status", this._status)
                     break;
                 case "Error":
-                    setErr(json.message || 'Unknown error')
+                    this.emit("error", json.message || 'Unknown error')
                     break;
                 case "Destroyed":
                     break;
             }
         };
-        wsConn.onerror = (e) => {
-            setErr("WsConnectError");
+        this.wsConn.onerror = (e) => {
+            this.emit("error", "WsConnectError");
         };
-        wsConn.onclose = () => {
-            status = {
-                ...status,
+        this.wsConn.onclose = () => {
+            this._status = {
+                ...this._status,
                 wsState: "WsClosed",
             };
-            setStatus(status)
+            this.emit("status", this._status)
         };
+    }
 
-        return () => {
-            wsConn.close();
-        };
-    }, [ws]);
+    get status(): OutgoingSipCallStatus {
+        return this._status;
+    }
 
-    return [status, err];
+    end() {
+        this.wsConn.close();
+    }
+
+    disconnect() {
+        this.wsConn.close();
+    }
 }
 
 const sipStatusCodes: Record<number, string> = {

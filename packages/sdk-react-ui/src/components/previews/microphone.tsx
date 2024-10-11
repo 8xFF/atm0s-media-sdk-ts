@@ -61,6 +61,11 @@ export function MicrophoneSelection({
     };
 
     init();
+    return () => {
+      if (defaultEnable) { //TODO more better way
+        ctx.turnOffDevice(trackName);
+      }
+    }
   }, [ctx, trackName, setDevices, defaultEnable]);
 
   useEffect(() => {

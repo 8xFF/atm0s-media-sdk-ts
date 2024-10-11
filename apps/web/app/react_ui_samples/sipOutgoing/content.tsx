@@ -2,8 +2,8 @@
 
 import { AudioMixerMode } from "@atm0s-media-sdk/core";
 import { Atm0sMediaProvider } from "@atm0s-media-sdk/react-hooks";
-import { Atm0sMediaUIProvider, SipOutgoingCall } from "@atm0s-media-sdk/react-ui";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Atm0sMediaUIProvider, SipOutgoingCallWidget } from "@atm0s-media-sdk/react-ui";
+import { useCallback, useState } from "react";
 import { env } from "../../env";
 
 export interface OutgoingCallPanelProps {
@@ -16,9 +16,15 @@ export interface OutgoingCallPanelProps {
 }
 
 export default function PageContent({ room, peer, token, callTo, sipWs, onEnd }: OutgoingCallPanelProps) {
+  const [active, setActive] = useState(true);
+  const hangUp = useCallback(() => {
+    setActive(false);
+    onEnd && onEnd();
+  }, [onEnd])
+
   return (
     <main>
-      <Atm0sMediaProvider
+      {active && <Atm0sMediaProvider
         gateway={env.GATEWAY_ENDPOINTS[0]!}
         cfg={{
           token,
@@ -37,20 +43,9 @@ export default function PageContent({ room, peer, token, callTo, sipWs, onEnd }:
         }}
       >
         <Atm0sMediaUIProvider>
-          <Inner callTo={callTo} sipWs={sipWs} onEnd={onEnd} />
+          <SipOutgoingCallWidget callTo={callTo} sipWs={sipWs} onEnd={hangUp} />
         </Atm0sMediaUIProvider>
-      </Atm0sMediaProvider>
+      </Atm0sMediaProvider>}
     </main>
   );
-}
-
-function Inner({ sipWs, callTo, onEnd }: { sipWs: string, callTo: string, onEnd?: () => void }) {
-  const [active, setActive] = useState(true);
-  const hangUp = useCallback(() => {
-    setActive(false);
-    onEnd && onEnd();
-  }, [onEnd])
-  return <div>
-    {active && <SipOutgoingCall callTo={callTo} sipWs={sipWs} onEnd={hangUp} />}
-  </div>
 }

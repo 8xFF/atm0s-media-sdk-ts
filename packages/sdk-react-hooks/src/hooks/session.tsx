@@ -6,7 +6,7 @@ import { JoinInfo } from "@atm0s-media-sdk/core";
 const VERSION = "react@0.0.0"; //TODO auto version
 
 class SessionWrap {
-  constructor(private ctx: Context) {}
+  constructor(private ctx: Context) { }
   connect = () => {
     return this.ctx.connect(VERSION);
   };
