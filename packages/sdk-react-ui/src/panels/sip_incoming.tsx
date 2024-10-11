@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useSession, useSipIncomingCallStatus } from "@atm0s-media-sdk/react-hooks";
 import { AudioMixerPlayer, MicrophoneSelection } from "../lib";
 import { ClockTimer } from "../components/uis/clock_timer";
@@ -11,8 +11,13 @@ export interface SipIncomingCallProps {
     onEnd: () => void;
 }
 
+type AcceptState = "Connecting" | "Accepting" | "Accepted";
+type AcceptError = "MediaFailed" | "SipFailed";
+
 export function SipIncomingCallWidget(props: SipIncomingCallProps): JSX.Element {
     const [status, callErr, call] = useSipIncomingCallStatus(props.sipWs);
+    const [acceptState, setAcceptState] = useState<AcceptState | null>(null);
+    const [acceptError, setAcceptError] = useState<AcceptError | null>(null);
     const session = useSession();
 
     const showAccept = !status.sipState;
@@ -26,8 +31,14 @@ export function SipIncomingCallWidget(props: SipIncomingCallProps): JSX.Element 
     }, [session]);
 
     const accept = useCallback(() => {
-        session.connect();
-        call.accept(props.room, props.callFrom, props.record)
+        setAcceptState("Connecting")
+        session.connect().then(() => {
+            setAcceptState("Accepting")
+            return call.accept(props.room, props.callFrom, props.record).then(() => {
+                setAcceptState("Accepted")
+            }).catch(() => setAcceptError("SipFailed"))
+        }).catch(() => setAcceptError("MediaFailed"))
+
     }, [call]);
 
     const reject = useCallback(() => {
@@ -41,7 +52,7 @@ export function SipIncomingCallWidget(props: SipIncomingCallProps): JSX.Element 
             {/* WebSocket Status Indicator */}
             <div className={`w-4 h-4 rounded-full ${status.wsState === 'WsConnected' ? 'bg-green-500' : 'bg-red-500'}`} />
             <p className={`text-lg ${status.sipState === 'Accepted' ? 'text-green-600' : 'text-red-600'}`}>
-                SIP Status: {callErr || status.sipState}
+                Status: {acceptError || callErr || status.sipState || acceptState}
             </p>
 
             {/* Time Counting */}

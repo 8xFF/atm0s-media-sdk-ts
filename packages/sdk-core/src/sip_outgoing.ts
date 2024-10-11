@@ -17,6 +17,11 @@ interface WsEvent {
     message?: string,
 }
 
+interface WsMessage {
+    type: "Event",
+    content: WsEvent,
+}
+
 export class SipOutgoingCall extends EventEmitter {
     _status: OutgoingSipCallStatus = { wsState: "WsConnecting" }
     wsConn: WebSocket;
@@ -31,25 +36,33 @@ export class SipOutgoingCall extends EventEmitter {
             this.emit("status", this._status)
         };
         this.wsConn.onmessage = (msg) => {
-            const json: WsEvent = JSON.parse(msg.data);
+            const json: WsMessage = JSON.parse(msg.data);
             switch (json.type) {
-                case "Sip":
-                    this._status = {
-                        ...this._status,
-                        sipState: json.content?.type,
-                        sipCode: json.content?.code,
-                        sipCodeStr: json.content?.code ? (sipStatusCodes[json.content?.code] || 'Code ' + json.content.code) : undefined,
-                    };
+                case "Event":
+                    const event = json.content as WsEvent;
+                    switch (event.type) {
+                        case "Sip":
+                            this._status = {
+                                ...this._status,
+                                sipState: event.content?.type,
+                                sipCode: event.content?.code,
+                                sipCodeStr: event.content?.code ? (sipStatusCodes[event.content?.code] || 'Code ' + event.content.code) : undefined,
+                            };
 
-                    if (json.content?.type == 'Accepted') {
-                        this._status.startedAt = Date.now();
+                            if (event.content?.type == 'Accepted') {
+                                this._status.startedAt = Date.now();
+                            }
+                            this.emit("status", this._status)
+                            break;
+                        case "Error":
+                            this.emit("error", event.message || 'Unknown error')
+                            break;
+                        case "Destroyed":
+                            break;
                     }
-                    this.emit("status", this._status)
                     break;
-                case "Error":
-                    this.emit("error", json.message || 'Unknown error')
-                    break;
-                case "Destroyed":
+                default:
+                    console.error("Invalid message:", json.type);
                     break;
             }
         };

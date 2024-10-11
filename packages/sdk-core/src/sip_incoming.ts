@@ -18,6 +18,13 @@ interface WsRequest {
     }
 }
 
+interface WsResponse {
+    request_id?: number,
+    success: boolean,
+    message?: string,
+    response?: {},
+}
+
 interface WsEvent {
     type: "Accepted" | "Sip" | "Destroyed" | "Error",
     content?: {
@@ -27,10 +34,16 @@ interface WsEvent {
     message?: string,
 }
 
+interface WsMessage {
+    type: "Event" | "Request" | "Response",
+    content: WsRequest | WsResponse | WsEvent
+}
+
 export class SipIncomingCall extends EventEmitter {
     _status: IncomingSipCallStatus = { wsState: "WsConnecting" }
     wsConn: WebSocket;
-    reqIdSeed = 0;
+    reqIdSeed = 1;
+    reqs: Map<number, [() => void, (err: Error) => void]> = new Map();
 
     constructor(private sipWs: string) {
         super()
@@ -43,27 +56,49 @@ export class SipIncomingCall extends EventEmitter {
             this.emit("status", this._status)
         };
         this.wsConn.onmessage = (msg) => {
-            const json: WsEvent = JSON.parse(msg.data);
+            const json: WsMessage = JSON.parse(msg.data);
             switch (json.type) {
-                case "Accepted":
-                    this._status = {
-                        ...this._status,
-                        sipState: "Accepted",
-                        startedAt: Date.now(),
-                    };
-                    this.emit("status", this._status)
+                case "Event":
+                    const event = json.content as WsEvent;
+                    switch (event.type) {
+                        case "Accepted":
+                            this._status = {
+                                ...this._status,
+                                sipState: "Accepted",
+                                startedAt: Date.now(),
+                            };
+                            this.emit("status", this._status)
+                            break;
+                        case "Sip":
+                            this._status = {
+                                ...this._status,
+                                sipState: event.content?.type,
+                            };
+                            this.emit("status", this._status)
+                            break;
+                        case "Error":
+                            this.emit("error", event.message || 'Unknown error')
+                            break;
+                        case "Destroyed":
+                            break;
+                    }
                     break;
-                case "Sip":
-                    this._status = {
-                        ...this._status,
-                        sipState: json.content?.type,
-                    };
-                    this.emit("status", this._status)
+                case "Response":
+                    const response = json.content as WsResponse;
+                    if (response.request_id && this.reqs.has(response.request_id)) {
+                        let [resolve, reject] = this.reqs.get(response.request_id)!;
+                        this.reqs.delete(response.request_id);
+                        if (response.success) {
+                            resolve()
+                        } else {
+                            reject(new Error(response.message))
+                        }
+                    } else {
+                        console.error("Invalid response:", json);
+                    }
                     break;
-                case "Error":
-                    this.emit("error", json.message || 'Unknown error')
-                    break;
-                case "Destroyed":
+                default:
+                    console.error("Invalid message:", json);
                     break;
             }
         };
@@ -84,19 +119,25 @@ export class SipIncomingCall extends EventEmitter {
     }
 
     async accept(room: string, peer: string, record: boolean) {
-        const cmd: WsRequest = {
-            request_id: this.reqIdSeed,
-            request: {
-                action: "Accept",
-                stream: {
-                    room,
-                    peer,
-                    record
+        return new Promise<void>((resolve, reject) => {
+            const cmd: WsMessage = {
+                type: "Request",
+                content: {
+                    request_id: this.reqIdSeed,
+                    request: {
+                        action: "Accept",
+                        stream: {
+                            room,
+                            peer,
+                            record
+                        }
+                    }
                 }
-            }
-        };
-        this.reqIdSeed += 1;
-        this.wsConn.send(JSON.stringify(cmd));
+            };
+            this.reqs.set(this.reqIdSeed, [resolve, reject]);
+            this.reqIdSeed += 1;
+            this.wsConn.send(JSON.stringify(cmd));
+        });
     }
 
     reject() {
