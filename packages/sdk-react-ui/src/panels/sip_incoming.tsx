@@ -5,7 +5,7 @@ import { ClockTimer } from "../components/uis/clock_timer";
 
 export interface SipIncomingCallProps {
     callFrom: string,
-    sipWs: string;
+    callWs: string;
     room: string,
     record: boolean,
     onEnd: () => void;
@@ -15,7 +15,7 @@ type AcceptState = "Connecting" | "Accepting" | "Accepted";
 type AcceptError = "MediaFailed" | "SipFailed";
 
 export function SipIncomingCallWidget(props: SipIncomingCallProps): JSX.Element {
-    const [status, callErr, call] = useSipIncomingCallStatus(props.sipWs);
+    const [status, callErr, call] = useSipIncomingCallStatus(props.callWs);
     const [acceptState, setAcceptState] = useState<AcceptState | null>(null);
     const [acceptError, setAcceptError] = useState<AcceptError | null>(null);
     const session = useSession();

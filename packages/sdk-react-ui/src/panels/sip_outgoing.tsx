@@ -5,12 +5,12 @@ import { ClockTimer } from "../components/uis/clock_timer";
 
 export interface SipOutgoingCallProps {
     callTo: string,
-    sipWs: string;
+    callWs: string;
     onEnd: () => void;
 }
 
 export function SipOutgoingCallWidget(props: SipOutgoingCallProps): JSX.Element {
-    const [status, callErr] = useSipOutgoingCallStatus(props.sipWs);
+    const [status, callErr] = useSipOutgoingCallStatus(props.callWs);
     const session = useSession();
 
     useEffect(() => {

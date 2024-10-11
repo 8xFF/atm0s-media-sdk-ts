@@ -11,11 +11,11 @@ export interface OutgoingCallPanelProps {
   peer: string;
   token: string;
   callTo: string,
-  sipWs: string;
+  callWs: string;
   onEnd?: () => void;
 }
 
-export default function PageContent({ room, peer, token, callTo, sipWs, onEnd }: OutgoingCallPanelProps) {
+export default function PageContent({ room, peer, token, callTo, callWs, onEnd }: OutgoingCallPanelProps) {
   const [active, setActive] = useState(true);
   const hangUp = useCallback(() => {
     setActive(false);
@@ -43,7 +43,7 @@ export default function PageContent({ room, peer, token, callTo, sipWs, onEnd }:
         }}
       >
         <Atm0sMediaUIProvider>
-          <SipOutgoingCallWidget callTo={callTo} sipWs={sipWs} onEnd={hangUp} />
+          <SipOutgoingCallWidget callTo={callTo} callWs={callWs} onEnd={hangUp} />
         </Atm0sMediaUIProvider>
       </Atm0sMediaProvider>}
     </main>

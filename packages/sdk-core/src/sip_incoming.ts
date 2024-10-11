@@ -45,9 +45,9 @@ export class SipIncomingCall extends EventEmitter {
     reqIdSeed = 1;
     reqs: Map<number, [() => void, (err: Error) => void]> = new Map();
 
-    constructor(private sipWs: string) {
+    constructor(private callWs: string) {
         super()
-        this.wsConn = new WebSocket(sipWs);
+        this.wsConn = new WebSocket(callWs);
         this.wsConn.onopen = () => {
             this._status = {
                 ...this._status,

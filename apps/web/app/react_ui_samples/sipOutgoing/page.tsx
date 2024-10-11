@@ -32,7 +32,7 @@ export default function SipOutgoing({
       to_number: sipTo,
       hook: sipHook,
     });
-    // Logic to display the outgoing call with sipWs and streamingToken
+    // Logic to display the outgoing call with callWs and streamingToken
     setOutgoingProps(props)
   };
 

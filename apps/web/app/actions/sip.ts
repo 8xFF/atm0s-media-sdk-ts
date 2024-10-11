@@ -17,9 +17,10 @@ interface MakeCallParams {
 interface MakeCallResponse {
     status: boolean,
     data?: {
+        gateway: string,
         call_id: string,
         call_token: string,
-        ws: string
+        call_ws: string
     },
     error?: string
 }
@@ -53,7 +54,7 @@ export async function make_outgoing_call(params: MakeCallParams) {
             peer: peer!,
             token: token!,
             callTo: params.to_number,
-            sipWs: env.SIP_GATEWAY + content.data.ws,
+            callWs: content.data.call_ws,
         }
     } else {
         throw new Error(content.error);

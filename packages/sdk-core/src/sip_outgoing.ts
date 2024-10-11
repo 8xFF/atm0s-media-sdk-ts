@@ -25,9 +25,9 @@ interface WsMessage {
 export class SipOutgoingCall extends EventEmitter {
     _status: OutgoingSipCallStatus = { wsState: "WsConnecting" }
     wsConn: WebSocket;
-    constructor(sipWs: string) {
+    constructor(callWs: string) {
         super()
-        this.wsConn = new WebSocket(sipWs);
+        this.wsConn = new WebSocket(callWs);
         this.wsConn.onopen = () => {
             this._status = {
                 ...this._status,
