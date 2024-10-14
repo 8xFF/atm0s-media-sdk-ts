@@ -1,7 +1,7 @@
 {
   "name": "@atm0s-media-sdk/react-native-ui",
   "version": "1.0.0-alpha.4",
-  "main": "./dist/lib.js",
+  "main": "./index.ts",
   "module": "./dist/lib.mjs",
   "types": "./dist/lib.d.ts",
   "files": [
@@ -9,8 +9,6 @@
     "src/*"
   ],
   "dependencies": {
-    "@atm0s-media-sdk/core": "1.0.0-alpha.4",
-    "@atm0s-media-sdk/react-hooks": "1.0.0-alpha.4",
     "react-native": "0.75.4",
     "react-native-webrtc": "^124.0.4",
     "react-native-vector-icons":"10.2.0",
