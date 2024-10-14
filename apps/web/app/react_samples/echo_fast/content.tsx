@@ -20,7 +20,7 @@ import { useRouter } from "next/navigation";
 
 function EchoViewer({ track }: { track: RemoteTrack }) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const consumer = useConsumer(track);
+  const consumer: any = useConsumer(track);
   const consumerStatus = useConsumerStatus(consumer);
   useEffect(() => {
     videoRef.current!.srcObject = consumer.stream;
@@ -75,7 +75,7 @@ function EchoContent(): JSX.Element {
   });
 
   const connect = useCallback(async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({
+    const stream: any = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: true,
     });

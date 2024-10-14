@@ -1,0 +1,16 @@
+{
+  "extends": "@react-native/typescript-config/tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@atm0s-media-sdk/core": [
+        "../../packages/@atm0s-media-sdk/core"
+      ],
+      "@atm0s-media-sdk/react-hooks": [
+        "../../packages/@atm0s-media-sdk/react-hooks"
+      ],
+      "@atm0s-media-sdk/react-native-ui": [
+        "../../packages/@atm0s-media-sdk/react-native-ui"
+      ],
+    }, /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
+  }
+}

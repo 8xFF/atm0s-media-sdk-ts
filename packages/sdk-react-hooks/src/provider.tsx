@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { SessionConfig } from "@atm0s-media-sdk/core";
 import { Context } from "./context";
 
@@ -39,6 +39,6 @@ export function Atm0sMediaProvider({
       {children}
     </Atm0sMediaContext.Provider>
   ) : (
-    <div></div>
+    <></>
   );
 }

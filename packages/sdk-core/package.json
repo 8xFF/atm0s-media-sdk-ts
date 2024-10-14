@@ -1,7 +1,7 @@
 {
   "name": "@atm0s-media-sdk/core",
   "version": "1.0.0-alpha.4",
-  "main": "./dist/lib.js",
+  "main": "./index.ts",
   "module": "./dist/lib.mjs",
   "types": "./dist/lib.d.ts",
   "files": [
@@ -15,12 +15,11 @@
     "eslint": "^8.57.0",
     "ts-proto": "^1.174.0",
     "tsup": "^8.1.0",
-    "typescript": "^5.3.3",
-    "@atm0s-media-sdk/typescript-config": "0.0.0",
-    "@atm0s-media-sdk/eslint-config": "0.0.0"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
-    "protobufjs": "^7.3.0"
+    "protobufjs": "^7.3.0",
+    "react-native-webrtc": "^124.0.4"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

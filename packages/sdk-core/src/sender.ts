@@ -10,6 +10,11 @@ import { kindToString, stringToKind } from "./types";
 import { ServerEvent_Sender } from "./generated/protobuf/session";
 import { EventEmitter } from "./utils";
 import { TrackSenderStatus } from "./lib";
+import {
+  RTCPeerConnection,
+  MediaStreamTrack,
+  RTCRtpTransceiver
+} from 'react-native-webrtc';
 
 const DEFAULT_CFG = {
   priority: 1,
@@ -58,10 +63,10 @@ export class TrackSender extends EventEmitter {
       },
       source: this.track
         ? {
-            id: this.track.id,
-            screen: false, //TODO check if it is screen
-            metadata: cfg.metadata,
-          }
+          id: this.track.id,
+          screen: false, //TODO check if it is screen
+          metadata: cfg.metadata,
+        }
         : undefined,
     };
     this.dc.on(
@@ -104,10 +109,10 @@ export class TrackSender extends EventEmitter {
         direction: "sendonly",
         sendEncodings: this.simulcast
           ? [
-              { rid: "0", active: true },
-              { rid: "1", active: true },
-              { rid: "2", active: true },
-            ]
+            { rid: "0", active: true },
+            { rid: "1", active: true },
+            { rid: "2", active: true },
+          ]
           : undefined,
       },
     );

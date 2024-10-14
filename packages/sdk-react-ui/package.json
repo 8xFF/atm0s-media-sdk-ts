@@ -25,9 +25,7 @@
     "@types/react-dom": "^18.2.19",
     "eslint": "^8.57.0",
     "typescript": "^5.3.3",
-    "tsup": "^8.1.0",
-    "@atm0s-media-sdk/eslint-config": "0.0.0",
-    "@atm0s-media-sdk/typescript-config": "0.0.0"
+    "tsup": "^8.1.0"
   },
   "scripts": {
     "lint": "eslint . --max-warnings 0",

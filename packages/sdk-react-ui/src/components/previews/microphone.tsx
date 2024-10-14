@@ -15,12 +15,12 @@ export function MicrophonePreview({ source_name }: MicrophonePreviewProps) {
   useEffect(() => {
     if (stream && audioRef.current) {
       audioRef.current.srcObject = stream;
-      return () => {
-        if (audioRef.current?.srcObject) {
-          audioRef.current!.srcObject = null;
-        }
-      };
     }
+    return () => {
+      if (audioRef.current?.srcObject) {
+        audioRef.current!.srcObject = null;
+      }
+    };
   }, [stream, audioRef.current]);
 
   return (

@@ -40,7 +40,7 @@ export default function PageContent({ room, peer, token }: Props) {
         },
       });
 
-      const stream = await navigator.mediaDevices.getUserMedia({
+      const stream: any = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true,
       });
@@ -90,7 +90,7 @@ export default function PageContent({ room, peer, token }: Props) {
         }
 
         console.log("add video element");
-        const video = document.createElement("video");
+        const video: any = document.createElement("video");
         video.width = 500;
         video.height = 500;
         video.autoplay = true;

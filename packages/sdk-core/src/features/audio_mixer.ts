@@ -10,7 +10,9 @@ import { TrackReceiver, TrackReceiverEvent } from "../receiver";
 import { Session } from "../session";
 import { Kind } from "../types";
 import { EventEmitter } from "../utils";
-
+import {
+  MediaStream,
+} from 'react-native-webrtc';
 export enum AudioMixerEvent {
   OUTPUT_CHANGED = "features.mixer.output_changed",
   VOICE_ACTIVITY = "feature.mixer.voice_activity",
@@ -84,9 +86,9 @@ export class AudioMixer extends EventEmitter {
   }
 
   public attach(sources: AudioMixerSource[]) {
-    const req_srcs = [];
+    const req_srcs: AudioMixerSource[] = [];
     for (const i in sources) {
-      const source = sources[i]!;
+      const source: AudioMixerSource = sources[i]!;
       const existed = this.sources.find((s) => {
         return s.peer == source.peer && s.track == source.track;
       });
@@ -103,9 +105,9 @@ export class AudioMixer extends EventEmitter {
   }
 
   public detach(sources: AudioMixerSource[]) {
-    const req_srcs = [];
+    const req_srcs: AudioMixerSource[] = [];
     for (const i in sources) {
-      const source = sources[i]!;
+      const source: AudioMixerSource = sources[i]!;
       const existed = this.sources.findIndex((s) => {
         return s.peer == source.peer && s.track == source.track;
       });

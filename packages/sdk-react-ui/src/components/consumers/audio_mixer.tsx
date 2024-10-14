@@ -9,19 +9,19 @@ export function AudioMixerPlayer() {
 
   useEffect(() => {
     if (audio1Ref.current && mixer) {
-      audio1Ref.current.srcObject = mixer.streams()[0] || null;
+      audio1Ref.current.srcObject = mixer.streams()[0] as any || null;
     }
   }, [mixer, audio1Ref.current]);
 
   useEffect(() => {
     if (audio2Ref.current && mixer) {
-      audio2Ref.current.srcObject = mixer.streams()[1] || null;
+      audio2Ref.current.srcObject = mixer.streams()[1] as any || null;
     }
   }, [mixer, audio1Ref.current]);
 
   useEffect(() => {
     if (audio3Ref.current && mixer) {
-      audio3Ref.current.srcObject = mixer.streams()[2] || null;
+      audio3Ref.current.srcObject = mixer.streams()[2] as any || null;
     }
   }, [mixer, audio3Ref.current]);
 

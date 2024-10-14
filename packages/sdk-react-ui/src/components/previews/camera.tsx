@@ -15,12 +15,12 @@ export function CameraPreview({ source_name }: CameraPreviewProps) {
   useEffect(() => {
     if (stream && videoRef.current) {
       videoRef.current.srcObject = stream;
-      return () => {
-        if (videoRef.current?.srcObject) {
-          videoRef.current!.srcObject = null;
-        }
-      };
     }
+    return () => {
+      if (videoRef.current?.srcObject) {
+        videoRef.current!.srcObject = null;
+      }
+    };
   }, [stream, videoRef.current]);
 
   return (
