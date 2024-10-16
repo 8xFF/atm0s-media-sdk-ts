@@ -3,5 +3,5 @@ export const env = {
     (process.env.NEXT_PUBLIC_GATEWAYS as string) || "http://localhost:3001"
   ).split(";"),
   SIP_GATEWAY: (process.env.NEXT_PUBLIC_SIP_GATEWAY as string) || "http://localhost:3001",
-  APP_SECRET: (process.env.APP_SECRET as string) || "insecure",
+  APP_SECRET: (process.env.APP_SECRET as string) || "zsz94nsrj3xvmbu555nmu25hwqo6shiq",
 };

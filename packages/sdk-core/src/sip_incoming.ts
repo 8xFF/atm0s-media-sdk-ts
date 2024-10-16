@@ -1,42 +1,10 @@
+import { IncomingCallData } from "./generated/protobuf/sip_gateway";
 import { EventEmitter } from "./utils";
 
 export interface IncomingSipCallStatus {
     wsState: "WsConnecting" | "WsConnected" | "WsClosed",
     sipState?: "Accepted" | "Cancelled" | "Bye",
     startedAt?: number,
-}
-
-interface WsRequest {
-    request_id: number,
-    request: {
-        action: "Accept" | "Reject",
-        stream?: {
-            room: string,
-            peer: string,
-            record: boolean
-        }
-    }
-}
-
-interface WsResponse {
-    request_id?: number,
-    success: boolean,
-    message?: string,
-    response?: {},
-}
-
-interface WsEvent {
-    type: "Accepted" | "Sip" | "Destroyed" | "Error",
-    content?: {
-        type: "Cancelled" | "Bye",
-        code?: number
-    },
-    message?: string,
-}
-
-interface WsMessage {
-    type: "Event" | "Request" | "Response",
-    content: WsRequest | WsResponse | WsEvent
 }
 
 export class SipIncomingCall extends EventEmitter {
@@ -48,6 +16,7 @@ export class SipIncomingCall extends EventEmitter {
     constructor(private callWs: string) {
         super()
         this.wsConn = new WebSocket(callWs);
+        this.wsConn.binaryType = "arraybuffer";
         this.wsConn.onopen = () => {
             this._status = {
                 ...this._status,
@@ -56,50 +25,50 @@ export class SipIncomingCall extends EventEmitter {
             this.emit("status", this._status)
         };
         this.wsConn.onmessage = (msg) => {
-            const json: WsMessage = JSON.parse(msg.data);
-            switch (json.type) {
-                case "Event":
-                    const event = json.content as WsEvent;
-                    switch (event.type) {
-                        case "Accepted":
-                            this._status = {
-                                ...this._status,
-                                sipState: "Accepted",
-                                startedAt: Date.now(),
-                            };
-                            this.emit("status", this._status)
-                            break;
-                        case "Sip":
-                            this._status = {
-                                ...this._status,
-                                sipState: event.content?.type,
-                            };
-                            this.emit("status", this._status)
-                            break;
-                        case "Error":
-                            this.emit("error", event.message || 'Unknown error')
-                            break;
-                        case "Destroyed":
-                            break;
+            let data = IncomingCallData.decode(new Uint8Array(msg.data));
+            if (data.event) {
+                let event = data.event;
+                if (event.accepted) {
+                    this._status = {
+                        ...this._status,
+                        sipState: "Accepted",
+                        startedAt: Date.now(),
+                    };
+                    this.emit("status", this._status)
+                } else if (event.ended) {
+
+                } else if (event.err) {
+                    this.emit("error", event.err.message)
+                } else if (event.sip) {
+                    if (event.sip.cancelled) {
+                        this._status = {
+                            ...this._status,
+                            sipState: "Cancelled",
+                        };
+                        this.emit("status", this._status)
+                    } else if (event.sip.bye) {
+                        this._status = {
+                            ...this._status,
+                            sipState: "Bye",
+                        };
+                        this.emit("status", this._status)
                     }
-                    break;
-                case "Response":
-                    const response = json.content as WsResponse;
-                    if (response.request_id && this.reqs.has(response.request_id)) {
-                        let [resolve, reject] = this.reqs.get(response.request_id)!;
-                        this.reqs.delete(response.request_id);
-                        if (response.success) {
-                            resolve()
-                        } else {
-                            reject(new Error(response.message))
-                        }
+                }
+            } else if (data.request) {
+
+            } else if (data.response) {
+                const response = data.response;
+                if (response.reqId && this.reqs.has(response.reqId)) {
+                    let [resolve, reject] = this.reqs.get(response.reqId)!;
+                    this.reqs.delete(response.reqId);
+                    if (response.error) {
+                        reject(new Error(response.error.message))
                     } else {
-                        console.error("Invalid response:", json);
+                        resolve()
                     }
-                    break;
-                default:
-                    console.error("Invalid message:", json);
-                    break;
+                } else {
+                    console.error("Invalid response:", response);
+                }
             }
         };
         this.wsConn.onerror = (e) => {
@@ -120,32 +89,48 @@ export class SipIncomingCall extends EventEmitter {
 
     async accept(room: string, peer: string, record: boolean) {
         return new Promise<void>((resolve, reject) => {
-            const cmd: WsMessage = {
-                type: "Request",
-                content: {
-                    request_id: this.reqIdSeed,
-                    request: {
-                        action: "Accept",
-                        stream: {
-                            room,
-                            peer,
-                            record
-                        }
+            const buf = IncomingCallData.encode({
+                request: {
+                    reqId: this.reqIdSeed,
+                    accept: {
+                        room,
+                        peer,
+                        record
                     }
                 }
-            };
+            }).finish();
             this.reqs.set(this.reqIdSeed, [resolve, reject]);
             this.reqIdSeed += 1;
-            this.wsConn.send(JSON.stringify(cmd));
+            this.wsConn.send(buf);
         });
     }
 
-    reject() {
-        this.wsConn.close();
+    async reject() {
+        return new Promise<void>((resolve, reject) => {
+            const buf = IncomingCallData.encode({
+                request: {
+                    reqId: this.reqIdSeed,
+                    end: {}
+                }
+            }).finish();
+            this.reqs.set(this.reqIdSeed, [resolve, reject]);
+            this.reqIdSeed += 1;
+            this.wsConn.send(buf);
+        });
     }
 
-    end() {
-        this.wsConn.close();
+    async end() {
+        return new Promise<void>((resolve, reject) => {
+            const buf = IncomingCallData.encode({
+                request: {
+                    reqId: this.reqIdSeed,
+                    end: {}
+                }
+            }).finish();
+            this.reqs.set(this.reqIdSeed, [resolve, reject]);
+            this.reqIdSeed += 1;
+            this.wsConn.send(buf);
+        });
     }
 
     disconnect() {

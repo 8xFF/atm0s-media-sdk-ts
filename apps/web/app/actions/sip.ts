@@ -28,7 +28,7 @@ interface MakeCallResponse {
 export async function make_outgoing_call(params: MakeCallParams) {
     console.log("Creating webrtc token");
     const [room, peer, token] = await generate_random_token();
-    const url = env.SIP_GATEWAY + "/call";
+    const url = env.SIP_GATEWAY + "/call/outgoing";
     const rawResponse = await fetch(url, {
         method: "POST",
         headers: {
@@ -54,7 +54,7 @@ export async function make_outgoing_call(params: MakeCallParams) {
             peer: peer!,
             token: token!,
             callTo: params.to_number,
-            callWs: content.data.call_ws,
+            callWs: env.SIP_GATEWAY + content.data.call_ws,
         }
     } else {
         throw new Error(content.error);

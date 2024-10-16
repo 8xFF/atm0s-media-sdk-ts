@@ -1,3 +1,4 @@
+import { OutgoingCallData } from "./generated/protobuf/sip_gateway";
 import { EventEmitter } from "./utils";
 
 export interface OutgoingSipCallStatus {
@@ -25,9 +26,13 @@ interface WsMessage {
 export class SipOutgoingCall extends EventEmitter {
     _status: OutgoingSipCallStatus = { wsState: "WsConnecting" }
     wsConn: WebSocket;
+    reqIdSeed = 1;
+    reqs: Map<number, [() => void, (err: Error) => void]> = new Map();
+
     constructor(callWs: string) {
         super()
         this.wsConn = new WebSocket(callWs);
+        this.wsConn.binaryType = "arraybuffer";
         this.wsConn.onopen = () => {
             this._status = {
                 ...this._status,
@@ -36,34 +41,71 @@ export class SipOutgoingCall extends EventEmitter {
             this.emit("status", this._status)
         };
         this.wsConn.onmessage = (msg) => {
-            const json: WsMessage = JSON.parse(msg.data);
-            switch (json.type) {
-                case "Event":
-                    const event = json.content as WsEvent;
-                    switch (event.type) {
-                        case "Sip":
-                            this._status = {
-                                ...this._status,
-                                sipState: event.content?.type,
-                                sipCode: event.content?.code,
-                                sipCodeStr: event.content?.code ? (sipStatusCodes[event.content?.code] || 'Code ' + event.content.code) : undefined,
-                            };
-
-                            if (event.content?.type == 'Accepted') {
-                                this._status.startedAt = Date.now();
-                            }
-                            this.emit("status", this._status)
-                            break;
-                        case "Error":
-                            this.emit("error", event.message || 'Unknown error')
-                            break;
-                        case "Destroyed":
-                            break;
+            console.log(msg.data);
+            const data = OutgoingCallData.decode(new Uint8Array(msg.data));
+            if (data.event) {
+                const event = data.event;
+                if (event.sip) {
+                    if (event.sip.provisional) {
+                        this._status = {
+                            ...this._status,
+                            sipState: "Provisional",
+                            sipCode: event.sip.provisional.code,
+                            sipCodeStr: (sipStatusCodes[event.sip.provisional.code] || 'Code ' + event.sip.provisional.code),
+                        };
+                    } else if (event.sip.early) {
+                        this._status = {
+                            ...this._status,
+                            sipState: "Early",
+                            sipCode: event.sip.early.code,
+                            sipCodeStr: (sipStatusCodes[event.sip.early.code] || 'Code ' + event.sip.early.code),
+                        };
+                    } else if (event.sip.failure) {
+                        this._status = {
+                            ...this._status,
+                            sipState: "Failure",
+                            sipCode: event.sip.failure.code,
+                            sipCodeStr: (sipStatusCodes[event.sip.failure.code] || 'Code ' + event.sip.failure.code),
+                        };
+                    } else if (event.sip.accepted) {
+                        this._status = {
+                            ...this._status,
+                            startedAt: Date.now(),
+                            sipState: "Accepted",
+                            sipCode: event.sip.accepted.code,
+                            sipCodeStr: (sipStatusCodes[event.sip.accepted.code] || 'Code ' + event.sip.accepted.code),
+                        };
+                    } else if (event.sip.bye) {
+                        this._status = {
+                            ...this._status,
+                            sipState: "Bye",
+                            sipCode: undefined,
+                            sipCodeStr: undefined,
+                        };
+                    } else {
+                        console.warn("Invalid sip event", event.sip);
                     }
-                    break;
-                default:
-                    console.error("Invalid message:", json.type);
-                    break;
+                    this.emit("status", this._status)
+                } else if (event.ended) {
+
+                } else if (event.err) {
+                    this.emit("error", event.err.message || 'Unknown error')
+                }
+            } else if (data.request) {
+
+            } else if (data.response) {
+                const response = data.response;
+                if (response.reqId && this.reqs.has(response.reqId)) {
+                    let [resolve, reject] = this.reqs.get(response.reqId)!;
+                    this.reqs.delete(response.reqId);
+                    if (response.error) {
+                        reject(new Error(response.error.message))
+                    } else {
+                        resolve()
+                    }
+                } else {
+                    console.error("Invalid response:", response);
+                }
             }
         };
         this.wsConn.onerror = (e) => {
@@ -82,8 +124,18 @@ export class SipOutgoingCall extends EventEmitter {
         return this._status;
     }
 
-    end() {
-        this.wsConn.close();
+    async end() {
+        return new Promise<void>((resolve, reject) => {
+            const buf = OutgoingCallData.encode({
+                request: {
+                    reqId: this.reqIdSeed,
+                    end: {}
+                }
+            }).finish();
+            this.reqs.set(this.reqIdSeed, [resolve, reject]);
+            this.reqIdSeed += 1;
+            this.wsConn.send(buf);
+        });
     }
 
     disconnect() {
