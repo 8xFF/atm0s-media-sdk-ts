@@ -9,6 +9,26 @@ import * as _m0 from "protobufjs/minimal";
 
 export const protobufPackage = "sip_gateway";
 
+export interface IncomingCallNotify {
+  callId: string;
+  arrived?: IncomingCallNotify_CallArrived | undefined;
+  cancelled?: IncomingCallNotify_CallCancelled | undefined;
+  accepted?: IncomingCallNotify_CallAccepted | undefined;
+}
+
+export interface IncomingCallNotify_CallArrived {
+  callToken: string;
+  callWs: string;
+  from: string;
+  to: string;
+}
+
+export interface IncomingCallNotify_CallCancelled {
+}
+
+export interface IncomingCallNotify_CallAccepted {
+}
+
 export interface IncomingCallData {
   event?: IncomingCallData_IncomingCallEvent | undefined;
   request?: IncomingCallData_IncomingCallRequest | undefined;
@@ -47,6 +67,7 @@ export interface IncomingCallData_IncomingCallRequest {
   reqId: number;
   ring?: IncomingCallData_IncomingCallRequest_Ring | undefined;
   accept?: IncomingCallData_IncomingCallRequest_Accept | undefined;
+  accept2?: IncomingCallData_IncomingCallRequest_Accept2 | undefined;
   end?: IncomingCallData_IncomingCallRequest_End | undefined;
 }
 
@@ -59,6 +80,9 @@ export interface IncomingCallData_IncomingCallRequest_Accept {
   record: boolean;
 }
 
+export interface IncomingCallData_IncomingCallRequest_Accept2 {
+}
+
 export interface IncomingCallData_IncomingCallRequest_End {
 }
 
@@ -67,6 +91,7 @@ export interface IncomingCallData_IncomingCallResponse {
   error?: IncomingCallData_IncomingCallResponse_Error | undefined;
   ring?: IncomingCallData_IncomingCallResponse_Ring | undefined;
   accept?: IncomingCallData_IncomingCallResponse_Accept | undefined;
+  accept2?: IncomingCallData_IncomingCallResponse_Accept2 | undefined;
   end?: IncomingCallData_IncomingCallResponse_End | undefined;
 }
 
@@ -74,6 +99,12 @@ export interface IncomingCallData_IncomingCallResponse_Ring {
 }
 
 export interface IncomingCallData_IncomingCallResponse_Accept {
+}
+
+export interface IncomingCallData_IncomingCallResponse_Accept2 {
+  room: string;
+  peer: string;
+  token: string;
 }
 
 export interface IncomingCallData_IncomingCallResponse_End {
@@ -149,6 +180,312 @@ export interface OutgoingCallData_OutgoingCallResponse_End {
 export interface OutgoingCallData_OutgoingCallResponse_Error {
   message: string;
 }
+
+function createBaseIncomingCallNotify(): IncomingCallNotify {
+  return { callId: "", arrived: undefined, cancelled: undefined, accepted: undefined };
+}
+
+export const IncomingCallNotify = {
+  encode(message: IncomingCallNotify, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.callId !== "") {
+      writer.uint32(10).string(message.callId);
+    }
+    if (message.arrived !== undefined) {
+      IncomingCallNotify_CallArrived.encode(message.arrived, writer.uint32(82).fork()).ldelim();
+    }
+    if (message.cancelled !== undefined) {
+      IncomingCallNotify_CallCancelled.encode(message.cancelled, writer.uint32(90).fork()).ldelim();
+    }
+    if (message.accepted !== undefined) {
+      IncomingCallNotify_CallAccepted.encode(message.accepted, writer.uint32(98).fork()).ldelim();
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): IncomingCallNotify {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseIncomingCallNotify();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.callId = reader.string();
+          continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.arrived = IncomingCallNotify_CallArrived.decode(reader, reader.uint32());
+          continue;
+        case 11:
+          if (tag !== 90) {
+            break;
+          }
+
+          message.cancelled = IncomingCallNotify_CallCancelled.decode(reader, reader.uint32());
+          continue;
+        case 12:
+          if (tag !== 98) {
+            break;
+          }
+
+          message.accepted = IncomingCallNotify_CallAccepted.decode(reader, reader.uint32());
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): IncomingCallNotify {
+    return {
+      callId: isSet(object.callId) ? globalThis.String(object.callId) : "",
+      arrived: isSet(object.arrived) ? IncomingCallNotify_CallArrived.fromJSON(object.arrived) : undefined,
+      cancelled: isSet(object.cancelled) ? IncomingCallNotify_CallCancelled.fromJSON(object.cancelled) : undefined,
+      accepted: isSet(object.accepted) ? IncomingCallNotify_CallAccepted.fromJSON(object.accepted) : undefined,
+    };
+  },
+
+  toJSON(message: IncomingCallNotify): unknown {
+    const obj: any = {};
+    if (message.callId !== "") {
+      obj.callId = message.callId;
+    }
+    if (message.arrived !== undefined) {
+      obj.arrived = IncomingCallNotify_CallArrived.toJSON(message.arrived);
+    }
+    if (message.cancelled !== undefined) {
+      obj.cancelled = IncomingCallNotify_CallCancelled.toJSON(message.cancelled);
+    }
+    if (message.accepted !== undefined) {
+      obj.accepted = IncomingCallNotify_CallAccepted.toJSON(message.accepted);
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<IncomingCallNotify>, I>>(base?: I): IncomingCallNotify {
+    return IncomingCallNotify.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<IncomingCallNotify>, I>>(object: I): IncomingCallNotify {
+    const message = createBaseIncomingCallNotify();
+    message.callId = object.callId ?? "";
+    message.arrived = (object.arrived !== undefined && object.arrived !== null)
+      ? IncomingCallNotify_CallArrived.fromPartial(object.arrived)
+      : undefined;
+    message.cancelled = (object.cancelled !== undefined && object.cancelled !== null)
+      ? IncomingCallNotify_CallCancelled.fromPartial(object.cancelled)
+      : undefined;
+    message.accepted = (object.accepted !== undefined && object.accepted !== null)
+      ? IncomingCallNotify_CallAccepted.fromPartial(object.accepted)
+      : undefined;
+    return message;
+  },
+};
+
+function createBaseIncomingCallNotify_CallArrived(): IncomingCallNotify_CallArrived {
+  return { callToken: "", callWs: "", from: "", to: "" };
+}
+
+export const IncomingCallNotify_CallArrived = {
+  encode(message: IncomingCallNotify_CallArrived, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.callToken !== "") {
+      writer.uint32(10).string(message.callToken);
+    }
+    if (message.callWs !== "") {
+      writer.uint32(18).string(message.callWs);
+    }
+    if (message.from !== "") {
+      writer.uint32(26).string(message.from);
+    }
+    if (message.to !== "") {
+      writer.uint32(34).string(message.to);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): IncomingCallNotify_CallArrived {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseIncomingCallNotify_CallArrived();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.callToken = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.callWs = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.from = reader.string();
+          continue;
+        case 4:
+          if (tag !== 34) {
+            break;
+          }
+
+          message.to = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): IncomingCallNotify_CallArrived {
+    return {
+      callToken: isSet(object.callToken) ? globalThis.String(object.callToken) : "",
+      callWs: isSet(object.callWs) ? globalThis.String(object.callWs) : "",
+      from: isSet(object.from) ? globalThis.String(object.from) : "",
+      to: isSet(object.to) ? globalThis.String(object.to) : "",
+    };
+  },
+
+  toJSON(message: IncomingCallNotify_CallArrived): unknown {
+    const obj: any = {};
+    if (message.callToken !== "") {
+      obj.callToken = message.callToken;
+    }
+    if (message.callWs !== "") {
+      obj.callWs = message.callWs;
+    }
+    if (message.from !== "") {
+      obj.from = message.from;
+    }
+    if (message.to !== "") {
+      obj.to = message.to;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<IncomingCallNotify_CallArrived>, I>>(base?: I): IncomingCallNotify_CallArrived {
+    return IncomingCallNotify_CallArrived.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<IncomingCallNotify_CallArrived>, I>>(
+    object: I,
+  ): IncomingCallNotify_CallArrived {
+    const message = createBaseIncomingCallNotify_CallArrived();
+    message.callToken = object.callToken ?? "";
+    message.callWs = object.callWs ?? "";
+    message.from = object.from ?? "";
+    message.to = object.to ?? "";
+    return message;
+  },
+};
+
+function createBaseIncomingCallNotify_CallCancelled(): IncomingCallNotify_CallCancelled {
+  return {};
+}
+
+export const IncomingCallNotify_CallCancelled = {
+  encode(_: IncomingCallNotify_CallCancelled, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): IncomingCallNotify_CallCancelled {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseIncomingCallNotify_CallCancelled();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): IncomingCallNotify_CallCancelled {
+    return {};
+  },
+
+  toJSON(_: IncomingCallNotify_CallCancelled): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<IncomingCallNotify_CallCancelled>, I>>(
+    base?: I,
+  ): IncomingCallNotify_CallCancelled {
+    return IncomingCallNotify_CallCancelled.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<IncomingCallNotify_CallCancelled>, I>>(
+    _: I,
+  ): IncomingCallNotify_CallCancelled {
+    const message = createBaseIncomingCallNotify_CallCancelled();
+    return message;
+  },
+};
+
+function createBaseIncomingCallNotify_CallAccepted(): IncomingCallNotify_CallAccepted {
+  return {};
+}
+
+export const IncomingCallNotify_CallAccepted = {
+  encode(_: IncomingCallNotify_CallAccepted, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): IncomingCallNotify_CallAccepted {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseIncomingCallNotify_CallAccepted();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): IncomingCallNotify_CallAccepted {
+    return {};
+  },
+
+  toJSON(_: IncomingCallNotify_CallAccepted): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<IncomingCallNotify_CallAccepted>, I>>(base?: I): IncomingCallNotify_CallAccepted {
+    return IncomingCallNotify_CallAccepted.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<IncomingCallNotify_CallAccepted>, I>>(_: I): IncomingCallNotify_CallAccepted {
+    const message = createBaseIncomingCallNotify_CallAccepted();
+    return message;
+  },
+};
 
 function createBaseIncomingCallData(): IncomingCallData {
   return { event: undefined, request: undefined, response: undefined };
@@ -701,7 +1038,7 @@ export const IncomingCallData_IncomingCallEvent_Error = {
 };
 
 function createBaseIncomingCallData_IncomingCallRequest(): IncomingCallData_IncomingCallRequest {
-  return { reqId: 0, ring: undefined, accept: undefined, end: undefined };
+  return { reqId: 0, ring: undefined, accept: undefined, accept2: undefined, end: undefined };
 }
 
 export const IncomingCallData_IncomingCallRequest = {
@@ -715,8 +1052,11 @@ export const IncomingCallData_IncomingCallRequest = {
     if (message.accept !== undefined) {
       IncomingCallData_IncomingCallRequest_Accept.encode(message.accept, writer.uint32(90).fork()).ldelim();
     }
+    if (message.accept2 !== undefined) {
+      IncomingCallData_IncomingCallRequest_Accept2.encode(message.accept2, writer.uint32(98).fork()).ldelim();
+    }
     if (message.end !== undefined) {
-      IncomingCallData_IncomingCallRequest_End.encode(message.end, writer.uint32(98).fork()).ldelim();
+      IncomingCallData_IncomingCallRequest_End.encode(message.end, writer.uint32(106).fork()).ldelim();
     }
     return writer;
   },
@@ -754,6 +1094,13 @@ export const IncomingCallData_IncomingCallRequest = {
             break;
           }
 
+          message.accept2 = IncomingCallData_IncomingCallRequest_Accept2.decode(reader, reader.uint32());
+          continue;
+        case 13:
+          if (tag !== 106) {
+            break;
+          }
+
           message.end = IncomingCallData_IncomingCallRequest_End.decode(reader, reader.uint32());
           continue;
       }
@@ -770,6 +1117,9 @@ export const IncomingCallData_IncomingCallRequest = {
       reqId: isSet(object.reqId) ? globalThis.Number(object.reqId) : 0,
       ring: isSet(object.ring) ? IncomingCallData_IncomingCallRequest_Ring.fromJSON(object.ring) : undefined,
       accept: isSet(object.accept) ? IncomingCallData_IncomingCallRequest_Accept.fromJSON(object.accept) : undefined,
+      accept2: isSet(object.accept2)
+        ? IncomingCallData_IncomingCallRequest_Accept2.fromJSON(object.accept2)
+        : undefined,
       end: isSet(object.end) ? IncomingCallData_IncomingCallRequest_End.fromJSON(object.end) : undefined,
     };
   },
@@ -784,6 +1134,9 @@ export const IncomingCallData_IncomingCallRequest = {
     }
     if (message.accept !== undefined) {
       obj.accept = IncomingCallData_IncomingCallRequest_Accept.toJSON(message.accept);
+    }
+    if (message.accept2 !== undefined) {
+      obj.accept2 = IncomingCallData_IncomingCallRequest_Accept2.toJSON(message.accept2);
     }
     if (message.end !== undefined) {
       obj.end = IncomingCallData_IncomingCallRequest_End.toJSON(message.end);
@@ -806,6 +1159,9 @@ export const IncomingCallData_IncomingCallRequest = {
       : undefined;
     message.accept = (object.accept !== undefined && object.accept !== null)
       ? IncomingCallData_IncomingCallRequest_Accept.fromPartial(object.accept)
+      : undefined;
+    message.accept2 = (object.accept2 !== undefined && object.accept2 !== null)
+      ? IncomingCallData_IncomingCallRequest_Accept2.fromPartial(object.accept2)
       : undefined;
     message.end = (object.end !== undefined && object.end !== null)
       ? IncomingCallData_IncomingCallRequest_End.fromPartial(object.end)
@@ -954,6 +1310,53 @@ export const IncomingCallData_IncomingCallRequest_Accept = {
   },
 };
 
+function createBaseIncomingCallData_IncomingCallRequest_Accept2(): IncomingCallData_IncomingCallRequest_Accept2 {
+  return {};
+}
+
+export const IncomingCallData_IncomingCallRequest_Accept2 = {
+  encode(_: IncomingCallData_IncomingCallRequest_Accept2, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): IncomingCallData_IncomingCallRequest_Accept2 {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseIncomingCallData_IncomingCallRequest_Accept2();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(_: any): IncomingCallData_IncomingCallRequest_Accept2 {
+    return {};
+  },
+
+  toJSON(_: IncomingCallData_IncomingCallRequest_Accept2): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<IncomingCallData_IncomingCallRequest_Accept2>, I>>(
+    base?: I,
+  ): IncomingCallData_IncomingCallRequest_Accept2 {
+    return IncomingCallData_IncomingCallRequest_Accept2.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<IncomingCallData_IncomingCallRequest_Accept2>, I>>(
+    _: I,
+  ): IncomingCallData_IncomingCallRequest_Accept2 {
+    const message = createBaseIncomingCallData_IncomingCallRequest_Accept2();
+    return message;
+  },
+};
+
 function createBaseIncomingCallData_IncomingCallRequest_End(): IncomingCallData_IncomingCallRequest_End {
   return {};
 }
@@ -1002,7 +1405,7 @@ export const IncomingCallData_IncomingCallRequest_End = {
 };
 
 function createBaseIncomingCallData_IncomingCallResponse(): IncomingCallData_IncomingCallResponse {
-  return { reqId: 0, error: undefined, ring: undefined, accept: undefined, end: undefined };
+  return { reqId: 0, error: undefined, ring: undefined, accept: undefined, accept2: undefined, end: undefined };
 }
 
 export const IncomingCallData_IncomingCallResponse = {
@@ -1019,8 +1422,11 @@ export const IncomingCallData_IncomingCallResponse = {
     if (message.accept !== undefined) {
       IncomingCallData_IncomingCallResponse_Accept.encode(message.accept, writer.uint32(98).fork()).ldelim();
     }
+    if (message.accept2 !== undefined) {
+      IncomingCallData_IncomingCallResponse_Accept2.encode(message.accept2, writer.uint32(106).fork()).ldelim();
+    }
     if (message.end !== undefined) {
-      IncomingCallData_IncomingCallResponse_End.encode(message.end, writer.uint32(106).fork()).ldelim();
+      IncomingCallData_IncomingCallResponse_End.encode(message.end, writer.uint32(114).fork()).ldelim();
     }
     return writer;
   },
@@ -1065,6 +1471,13 @@ export const IncomingCallData_IncomingCallResponse = {
             break;
           }
 
+          message.accept2 = IncomingCallData_IncomingCallResponse_Accept2.decode(reader, reader.uint32());
+          continue;
+        case 14:
+          if (tag !== 114) {
+            break;
+          }
+
           message.end = IncomingCallData_IncomingCallResponse_End.decode(reader, reader.uint32());
           continue;
       }
@@ -1082,6 +1495,9 @@ export const IncomingCallData_IncomingCallResponse = {
       error: isSet(object.error) ? IncomingCallData_IncomingCallResponse_Error.fromJSON(object.error) : undefined,
       ring: isSet(object.ring) ? IncomingCallData_IncomingCallResponse_Ring.fromJSON(object.ring) : undefined,
       accept: isSet(object.accept) ? IncomingCallData_IncomingCallResponse_Accept.fromJSON(object.accept) : undefined,
+      accept2: isSet(object.accept2)
+        ? IncomingCallData_IncomingCallResponse_Accept2.fromJSON(object.accept2)
+        : undefined,
       end: isSet(object.end) ? IncomingCallData_IncomingCallResponse_End.fromJSON(object.end) : undefined,
     };
   },
@@ -1099,6 +1515,9 @@ export const IncomingCallData_IncomingCallResponse = {
     }
     if (message.accept !== undefined) {
       obj.accept = IncomingCallData_IncomingCallResponse_Accept.toJSON(message.accept);
+    }
+    if (message.accept2 !== undefined) {
+      obj.accept2 = IncomingCallData_IncomingCallResponse_Accept2.toJSON(message.accept2);
     }
     if (message.end !== undefined) {
       obj.end = IncomingCallData_IncomingCallResponse_End.toJSON(message.end);
@@ -1124,6 +1543,9 @@ export const IncomingCallData_IncomingCallResponse = {
       : undefined;
     message.accept = (object.accept !== undefined && object.accept !== null)
       ? IncomingCallData_IncomingCallResponse_Accept.fromPartial(object.accept)
+      : undefined;
+    message.accept2 = (object.accept2 !== undefined && object.accept2 !== null)
+      ? IncomingCallData_IncomingCallResponse_Accept2.fromPartial(object.accept2)
       : undefined;
     message.end = (object.end !== undefined && object.end !== null)
       ? IncomingCallData_IncomingCallResponse_End.fromPartial(object.end)
@@ -1222,6 +1644,99 @@ export const IncomingCallData_IncomingCallResponse_Accept = {
     _: I,
   ): IncomingCallData_IncomingCallResponse_Accept {
     const message = createBaseIncomingCallData_IncomingCallResponse_Accept();
+    return message;
+  },
+};
+
+function createBaseIncomingCallData_IncomingCallResponse_Accept2(): IncomingCallData_IncomingCallResponse_Accept2 {
+  return { room: "", peer: "", token: "" };
+}
+
+export const IncomingCallData_IncomingCallResponse_Accept2 = {
+  encode(message: IncomingCallData_IncomingCallResponse_Accept2, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.room !== "") {
+      writer.uint32(10).string(message.room);
+    }
+    if (message.peer !== "") {
+      writer.uint32(18).string(message.peer);
+    }
+    if (message.token !== "") {
+      writer.uint32(26).string(message.token);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): IncomingCallData_IncomingCallResponse_Accept2 {
+    const reader = input instanceof _m0.Reader ? input : _m0.Reader.create(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseIncomingCallData_IncomingCallResponse_Accept2();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          if (tag !== 10) {
+            break;
+          }
+
+          message.room = reader.string();
+          continue;
+        case 2:
+          if (tag !== 18) {
+            break;
+          }
+
+          message.peer = reader.string();
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.token = reader.string();
+          continue;
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skipType(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): IncomingCallData_IncomingCallResponse_Accept2 {
+    return {
+      room: isSet(object.room) ? globalThis.String(object.room) : "",
+      peer: isSet(object.peer) ? globalThis.String(object.peer) : "",
+      token: isSet(object.token) ? globalThis.String(object.token) : "",
+    };
+  },
+
+  toJSON(message: IncomingCallData_IncomingCallResponse_Accept2): unknown {
+    const obj: any = {};
+    if (message.room !== "") {
+      obj.room = message.room;
+    }
+    if (message.peer !== "") {
+      obj.peer = message.peer;
+    }
+    if (message.token !== "") {
+      obj.token = message.token;
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<IncomingCallData_IncomingCallResponse_Accept2>, I>>(
+    base?: I,
+  ): IncomingCallData_IncomingCallResponse_Accept2 {
+    return IncomingCallData_IncomingCallResponse_Accept2.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<IncomingCallData_IncomingCallResponse_Accept2>, I>>(
+    object: I,
+  ): IncomingCallData_IncomingCallResponse_Accept2 {
+    const message = createBaseIncomingCallData_IncomingCallResponse_Accept2();
+    message.room = object.room ?? "";
+    message.peer = object.peer ?? "";
+    message.token = object.token ?? "";
     return message;
   },
 };

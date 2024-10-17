@@ -60,3 +60,39 @@ export async function make_outgoing_call(params: MakeCallParams) {
         throw new Error(content.error);
     }
 }
+
+interface CreateNotifyTokenParams {
+    client_id: string,
+    ttl: number,
+}
+
+interface CreateNotifyTokenResponse {
+    status: boolean,
+    data?: {
+        token: string
+    },
+    error?: string
+}
+
+export async function create_notify_ws(params: CreateNotifyTokenParams) {
+    console.log("Creating notify token");
+    const url = env.SIP_GATEWAY + "/token/notify";
+    const rawResponse = await fetch(url, {
+        method: "POST",
+        headers: {
+            Authorization: "Bearer " + env.APP_SECRET,
+            Accept: "application/json",
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
+        cache: "no-cache",
+    });
+
+    const content = await rawResponse.json() as CreateNotifyTokenResponse;
+    if (content.status && content.data) {
+        return env.SIP_GATEWAY + "/call/incoming/notify?token=" + content.data.token;
+    } else {
+        throw new Error(content.error);
+    }
+}
+

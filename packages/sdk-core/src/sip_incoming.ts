@@ -1,4 +1,4 @@
-import { IncomingCallData } from "./generated/protobuf/sip_gateway";
+import { IncomingCallData, IncomingCallData_IncomingCallRequest_Accept2, IncomingCallData_IncomingCallResponse_Accept2 } from "./generated/protobuf/sip_gateway";
 import { EventEmitter } from "./utils";
 
 export interface IncomingSipCallStatus {
@@ -11,7 +11,7 @@ export class SipIncomingCall extends EventEmitter {
     _status: IncomingSipCallStatus = { wsState: "WsConnecting" }
     wsConn: WebSocket;
     reqIdSeed = 1;
-    reqs: Map<number, [() => void, (err: Error) => void]> = new Map();
+    reqs: Map<number, [(data: any) => void, (err: Error) => void]> = new Map();
 
     constructor(private callWs: string) {
         super()
@@ -64,7 +64,7 @@ export class SipIncomingCall extends EventEmitter {
                     if (response.error) {
                         reject(new Error(response.error.message))
                     } else {
-                        resolve()
+                        resolve(response.accept || response.end || response.end || response.ring || response.accept2)
                     }
                 } else {
                     console.error("Invalid response:", response);
@@ -97,6 +97,20 @@ export class SipIncomingCall extends EventEmitter {
                         peer,
                         record
                     }
+                }
+            }).finish();
+            this.reqs.set(this.reqIdSeed, [resolve, reject]);
+            this.reqIdSeed += 1;
+            this.wsConn.send(buf);
+        });
+    }
+
+    async accept2(room: string, peer: string, record: boolean): Promise<IncomingCallData_IncomingCallResponse_Accept2> {
+        return new Promise((resolve, reject) => {
+            const buf = IncomingCallData.encode({
+                request: {
+                    reqId: this.reqIdSeed,
+                    accept2: {}
                 }
             }).finish();
             this.reqs.set(this.reqIdSeed, [resolve, reject]);

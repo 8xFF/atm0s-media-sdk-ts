@@ -65,6 +65,9 @@ export default function Page(): JSX.Element {
         <div>
           <Link href="/react_ui_samples/sipIncoming">Sip Incoming call</Link>
         </div>
+        <div>
+          <Link href="/react_ui_samples/sipNotify">Sip Notify Handler</Link>
+        </div>
       </div>
     </main>
   );

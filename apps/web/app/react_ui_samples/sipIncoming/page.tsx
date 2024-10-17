@@ -12,7 +12,7 @@ export default function SipIncoming({
   // Create a single session state object using the Session interface
   const [session, setSession] = useState<IncomingCallPanelProps | null>(null);
 
-  const [wsUrl, setWsUrl] = useState("");
+  const [callWs, setCallWs] = useState("");
   const [callFrom, setCallFrom] = useState("");
   const [record, setRecord] = useState(false);
 
@@ -20,7 +20,7 @@ export default function SipIncoming({
     const [room, peer, token] = await generate_random_token();
     setSession({
       callFrom,
-      wsUrl,
+      callWs,
       room,
       peer,
       token,
@@ -35,8 +35,8 @@ export default function SipIncoming({
         <input
           type="text"
           placeholder="Websocket Call URL"
-          value={wsUrl}
-          onChange={(e) => setWsUrl(e.target.value)}
+          value={callWs}
+          onChange={(e) => setCallWs(e.target.value)}
           className="input-class p-2 border border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500" // Reduced padding
         />
         <input

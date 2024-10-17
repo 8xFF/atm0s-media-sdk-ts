@@ -16,7 +16,7 @@ export interface IncomingCallPanelProps {
   onEnd?: () => void;
 }
 
-export default function PageContent({ callFrom, callWs, room, peer, token, record, onEnd }: IncomingCallPanelProps) {
+export default function IncomingCallPanel({ callFrom, callWs, room, peer, token, record, onEnd }: IncomingCallPanelProps) {
   const [active, setActive] = useState(true);
   const onEnd2 = useCallback(() => {
     setActive(false);
