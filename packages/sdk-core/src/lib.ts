@@ -48,4 +48,3 @@ export { Receiver_Source as AudioMixerSource } from "./generated/protobuf/shared
 
 export { SipIncomingCall, type IncomingSipCallStatus } from "./sip_incoming";
 export { SipOutgoingCall, type OutgoingSipCallStatus } from "./sip_outgoing";
-export { SipIncomingCallListener, SipIncomingCallNotify } from "./sip_notification";
