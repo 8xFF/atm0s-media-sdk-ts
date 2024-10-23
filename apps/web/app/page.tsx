@@ -59,6 +59,12 @@ export default function Page(): JSX.Element {
         <div>
           <Link href="/react_ui_samples/meet">Meet</Link>
         </div>
+        <div>
+          <Link href="/react_ui_samples/sipOutgoing">Sip Outgoing call</Link>
+        </div>
+        <div>
+          <Link href="/react_ui_samples/sipIncoming">Sip Incoming call</Link>
+        </div>
       </div>
     </main>
   );

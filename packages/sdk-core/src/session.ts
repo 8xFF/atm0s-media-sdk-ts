@@ -55,7 +55,7 @@ export class Session extends EventEmitter {
   conn_id?: string;
   receivers: TrackReceiver[] = [];
   senders: TrackSender[] = [];
-  msgChannels: Map<string ,RoomMessageChannel> = new Map();
+  msgChannels: Map<string, RoomMessageChannel> = new Map();
   _mixer?: mixer.AudioMixer;
 
   /// Prepaer state for flagging when ever this peer is created offer.
@@ -68,7 +68,7 @@ export class Session extends EventEmitter {
   ) {
     super();
     this.created_at = new Date().getTime();
-    console.warn("Create session", this.created_at);
+    console.info("Create session", this.created_at);
     this.peer = new RTCPeerConnection();
     this.dc = new Datachannel(
       this.peer.createDataChannel("data", { negotiated: true, id: 0 }),
@@ -195,7 +195,7 @@ export class Session extends EventEmitter {
     }
     this.prepareState = false;
     this.version = version;
-    console.warn("Prepare senders and receivers to connect");
+    console.info("Prepare senders and receivers to connect");
     //prepare for senders. We need to lazy prepare because some transceiver dont allow update before connected
     for (let i = 0; i < this.senders.length; i++) {
       console.log("Prepare sender ", this.senders[i]!.name);
@@ -358,9 +358,9 @@ export class Session extends EventEmitter {
     config?: MessageChannelConfig | undefined,
   ) {
     await this.dc.ready();
-    console.warn("[MessageChannel] creating a new channel:", key);
+    console.info("[MessageChannel] creating a new channel:", key);
     if (this.msgChannels.has(key)) {
-      console.warn("[MessageChannel] a channel already exist with key:", key);
+      console.info("[MessageChannel] a channel already exist with key:", key);
       return this.msgChannels.get(key)!;
     }
     const msgChannel = new RoomMessageChannel(key, this.dc, config);
@@ -387,11 +387,19 @@ export class Session extends EventEmitter {
   }
 
   async disconnect() {
-    console.warn("Disconnecting session", this.created_at);
+    if (this.prepareState) {
+      console.info("Disconnect session in prepare state");
+      return;
+    }
+    if (["closed", "disconnected", "failed", "new"].includes(this.peer.connectionState)) {
+      console.info("Disconnect already disconnected session");
+      return;
+    }
+    console.info("Disconnecting session", this.created_at);
     await this.dc.requestSession({
       disconnect: {},
     });
-    console.warn("Disconnected session", this.created_at);
+    console.info("Disconnected session", this.created_at);
     this.peer.close();
   }
 }

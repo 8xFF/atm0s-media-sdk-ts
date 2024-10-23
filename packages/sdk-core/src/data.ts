@@ -44,7 +44,7 @@ export class Datachannel extends EventEmitter {
     dc.onmessage = (e) => {
       const msg = ServerEvent.decode(new Uint8Array(e.data));
 
-      console.log("[Datachannel] on event", msg);
+      console.debug("[Datachannel] on event", msg);
       if (msg.room) {
         this.emit(DatachannelEvent.ROOM, msg.room);
       } else if (msg.session) {

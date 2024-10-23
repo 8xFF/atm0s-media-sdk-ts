@@ -10,11 +10,11 @@ export function DevicesSelection({ audio_name, video_name }: Props) {
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex-grow">
-        <CameraPreview source_name={video_name} />
+        <CameraPreview trackName={video_name} />
       </div>
       <div className="flex flex-row">
-        <CameraSelection source_name={video_name} first_page />
-        <MicrophoneSelection source_name={audio_name} first_page />
+        <CameraSelection trackName={video_name} defaultEnable />
+        <MicrophoneSelection trackName={audio_name} defaultEnable />
       </div>
     </div>
   );
