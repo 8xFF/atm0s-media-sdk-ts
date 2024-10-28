@@ -9,7 +9,7 @@
     "src/*"
   ],
   "dependencies": {
-    "@atm0s-media-sdk/core": "1.0.0-alpha.4"
+    "@atm0s-media-sdk/core": "1.0.0-alpha.6"
   },
   "peerDependencies": {
     "react": "^18.2.0"
