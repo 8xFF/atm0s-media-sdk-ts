@@ -39,6 +39,6 @@ export function Atm0sMediaProvider({
       {children}
     </Atm0sMediaContext.Provider>
   ) : (
-    <div></div>
+    <></>
   );
 }

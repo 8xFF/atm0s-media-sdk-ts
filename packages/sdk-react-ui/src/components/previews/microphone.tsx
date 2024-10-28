@@ -6,12 +6,12 @@ import { Kind } from "@atm0s-media-sdk/core";
 import { MicIcon, MicOffIcon } from "../icons/microphone";
 
 interface MicrophonePreviewProps {
-  source_name: string;
+  trackName: string;
 }
 
-export function MicrophonePreview({ source_name }: MicrophonePreviewProps) {
+export function MicrophonePreview({ trackName }: MicrophonePreviewProps) {
   const audioRef = useRef<HTMLVideoElement>(null);
-  const stream = useDeviceStream(source_name);
+  const stream = useDeviceStream(trackName);
   useEffect(() => {
     if (stream && audioRef.current) {
       audioRef.current.srcObject = stream;
@@ -31,23 +31,23 @@ export function MicrophonePreview({ source_name }: MicrophonePreviewProps) {
 }
 
 interface MicrophoneSelectionProps {
-  source_name: string;
-  first_page?: boolean;
+  trackName: string;
+  defaultEnable?: boolean,
 }
 
 export function MicrophoneSelection({
-  source_name,
-  first_page,
+  trackName,
+  defaultEnable,
 }: MicrophoneSelectionProps) {
-  const publisher = usePublisher(source_name, Kind.AUDIO);
+  const publisher = usePublisher(trackName, Kind.AUDIO);
   const [devices, setDevices] = useState<{ id: string; label: string }[]>([]);
   const ctx = useContext(Atm0sMediaUIContext);
-  const stream = useDeviceStream(source_name);
+  const stream = useDeviceStream(trackName);
 
   useEffect(() => {
     const init = async () => {
-      if (first_page) {
-        await ctx.requestDevice(source_name, "audio");
+      if (defaultEnable) {
+        await ctx.requestDevice(trackName, "audio");
       }
       const devices = await navigator.mediaDevices.enumerateDevices();
       console.log(devices);
@@ -61,7 +61,12 @@ export function MicrophoneSelection({
     };
 
     init();
-  }, [ctx, source_name, setDevices, first_page]);
+    return () => {
+      if (defaultEnable) { //TODO more better way
+        ctx.turnOffDevice(trackName);
+      }
+    }
+  }, [ctx, trackName, setDevices, defaultEnable]);
 
   useEffect(() => {
     let track = stream?.getAudioTracks()[0];
@@ -74,10 +79,10 @@ export function MicrophoneSelection({
 
   const onToggle = useCallback(() => {
     if (stream) {
-      ctx.turnOffDevice(source_name);
+      ctx.turnOffDevice(trackName);
     } else {
       ctx
-        .requestDevice(source_name, "audio")
+        .requestDevice(trackName, "audio")
         .then(console.log)
         .catch(console.error);
     }
@@ -85,7 +90,7 @@ export function MicrophoneSelection({
   const onChange = useCallback((event: any) => {
     let selected = event.target.options[event.target.selectedIndex].value;
     ctx
-      .requestDevice(source_name, "audio", selected)
+      .requestDevice(trackName, "audio", selected)
       .then(console.log)
       .catch(console.error);
   }, []);
