@@ -10,16 +10,13 @@
         }
     ],
     "packages": {
-        "sdk-core": {
-            "path": "packages/sdk-core",
+        "packages/sdk-core": {
             "package-name": "@atm0s-media-sdk/core"
         },
-        "sdk-react-hooks": {
-            "path": "packages/sdk-react-hooks",
+        "packages/sdk-react-hooks": {
             "package-name": "@atm0s-media-sdk/react-hooks"
         },
-        "sdk-react-ui": {
-            "path": "packages/sdk-react-ui",
+        "packages/sdk-react-ui": {
             "package-name": "@atm0s-media-sdk/react-ui"
         }
     },
