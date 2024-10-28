@@ -72,7 +72,12 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 8
-      - name: Build Packages
+      - name: Build Core
+        working-directory: ./packages/sdk-core
+        run: |
+          pnpm install
+          pnpm build
+      - name: Build Hooks
         working-directory: ./packages/sdk-react-hooks
         run: |
           pnpm install
@@ -96,7 +101,17 @@ jobs:
       - uses: pnpm/action-setup@v2
         with:
           version: 8
-      - name: Build Packages
+      - name: Build Core
+        working-directory: ./packages/sdk-core
+        run: |
+          pnpm install
+          pnpm build
+      - name: Build Hooks
+        working-directory: ./packages/sdk-react-hooks
+        run: |
+          pnpm install
+          pnpm build
+      - name: Build UI
         working-directory: ./packages/sdk-react-ui
         run: |
           pnpm install
