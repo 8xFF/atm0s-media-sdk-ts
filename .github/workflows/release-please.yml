@@ -1,0 +1,100 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+name: Run Release Please
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      sdk-core--tag_name: ${{ steps.release.outputs.sdk-core--tag_name}}
+      sdk-core--release_created: ${{ steps.release.outputs.sdk-core--release_created}}
+      sdk-react-hooks--tag_name: ${{ steps.release.outputs.sdk-react-hooks--tag_name}}
+      sdk-react-hooks--release_created: ${{ steps.release.outputs.sdk-react-hooks--release_created}}
+      sdk-react-ui--tag_name: ${{ steps.release.outputs.sdk-react-ui--tag_name}}
+      sdk-react-ui--release_created: ${{ steps.release.outputs.sdk-react-ui--release_created}}
+    steps:
+      - uses: googleapis/release-please-action@v2
+        id: release
+        with:
+          release-type: node
+          command: manifest
+          token: ${{secrets.GITHUB_TOKEN}}
+      - name: Print release outputs for debugging
+        continue-on-error: true
+        run: |
+          echo "Release outputs:"
+          echo "${{ toJson(steps.release.outputs) }}"
+
+  release-sdk-core:
+    if: ${{needs.release-please.outputs.sdk-core--release_created}}
+    runs-on: ubunbtu-latest
+    steps:
+      # The logic below handles the npm publication:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+      - name: Build Packages
+        working-directory: ./packages/sdk-core
+        run: |
+          pnpm install
+          pnpm build
+      - name: Publish to NPM
+        working-directory: ./packages/sdk-core
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: pnpm publish
+  release-sdk-react-hooks:
+    if: ${{needs.release-please.outputs.sdk-react-hooks--release_created}}
+    runs-on: ubunbtu-latest
+    steps:
+      # The logic below handles the npm publication:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+      - name: Build Packages
+        working-directory: ./packages/sdk-react-hooks
+        run: |
+          pnpm install
+          pnpm build
+      - name: Publish to NPM
+        working-directory: ./packages/sdk-react-hooks
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: pnpm publish
+  release-sdk-react-ui:
+    if: ${{needs.release-please.outputs.sdk-react-ui--release_created}}
+    runs-on: ubunbtu-latest
+    steps:
+      # The logic below handles the npm publication:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Node
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+      - name: Build Packages
+        working-directory: ./packages/sdk-react-ui
+        run: |
+          pnpm install
+          pnpm build
+      - name: Publish to NPM
+        working-directory: ./packages/sdk-react-ui
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: pnpm publish
+  
