@@ -1,6 +1,6 @@
 {
   "name": "@atm0s-media-sdk/react-ui",
-  "version": "1.0.0-alpha.4",
+  "version": "1.0.0-alpha.5",
   "main": "./dist/lib.js",
   "module": "./dist/lib.mjs",
   "types": "./dist/lib.d.ts",

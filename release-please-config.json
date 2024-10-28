@@ -1,0 +1,24 @@
+{
+    "include-component-in-tag": true,
+    "tag-separator": "@",
+    "release-type": "node",
+    "separate-pull-requests": true,
+    "plugins": [
+        {
+            "type": "node-workspace",
+            "updatePeerDependencies": true
+        }
+    ],
+    "packages": {
+        "packages/sdk-core": {
+            "package-name": "@atm0s-media-sdk/core"
+        },
+        "packages/sdk-react-hooks": {
+            "package-name": "@atm0s-media-sdk/react-hooks"
+        },
+        "packages/sdk-react-ui": {
+            "package-name": "@atm0s-media-sdk/react-ui"
+        }
+    },
+    "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json"
+}

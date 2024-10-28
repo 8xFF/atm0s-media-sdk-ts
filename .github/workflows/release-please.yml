@@ -1,0 +1,108 @@
+on:
+  push:
+    branches:
+      - main
+
+concurrency: 
+  group: "release-${{ github.ref }}"
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+  pull-requests: write
+
+name: Run Release Please
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      sdk-core--tag_name: ${{ steps.release.outputs['packages/sdk-core--tag_name']}}
+      sdk-core--release_created: ${{ steps.release.outputs['packages/sdk-core--release_created']}}
+      sdk-react-hooks--tag_name: ${{ steps.release.outputs['packages/sdk-react-hooks--tag_name']}}
+      sdk-react-hooks--release_created: ${{ steps.release.outputs['packages/sdk-react-hooks--release_created']}}
+      sdk-react-ui--tag_name: ${{ steps.release.outputs['packages/sdk-react-ui--tag_name']}}
+      sdk-react-ui--release_created: ${{ steps.release.outputs['packages/sdk-react-ui--release_created']}}
+    steps:
+      - uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          token: ${{secrets.GITHUB_TOKEN}}
+      - name: Print release outputs for debugging
+        continue-on-error: true
+        run: |
+          echo "Release outputs:"
+          echo "${{ toJson(steps.release.outputs) }}"
+
+  release-sdk-core:
+    needs: release-please
+    if: ${{needs.release-please.outputs.sdk-core--release_created}}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Build Packages
+        working-directory: ./packages/sdk-core
+        run: |
+          pnpm install
+          pnpm build
+      - name: Publish to NPM
+        working-directory: ./packages/sdk-core
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: pnpm publish
+
+  release-sdk-react-hooks:
+    needs: release-please
+    if: ${{needs.release-please.outputs.sdk-react-hooks--release_created}}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Build Packages
+        working-directory: ./packages/sdk-react-hooks
+        run: |
+          pnpm install
+          pnpm build
+      - name: Publish to NPM
+        working-directory: ./packages/sdk-react-hooks
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: pnpm publish
+
+  release-sdk-react-ui:
+    needs: release-please
+    if: ${{needs.release-please.outputs.sdk-react-ui--release_created}}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: 'https://registry.npmjs.org'
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Build Packages
+        working-directory: ./packages/sdk-react-ui
+        run: |
+          pnpm install
+          pnpm build
+      - name: Publish to NPM
+        working-directory: ./packages/sdk-react-ui
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+        run: pnpm publish
