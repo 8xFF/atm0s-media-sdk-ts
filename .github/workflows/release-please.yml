@@ -16,12 +16,12 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     outputs:
-      sdk-core--tag_name: ${{ steps.release.outputs.sdk-core--tag_name}}
-      sdk-core--release_created: ${{ steps.release.outputs.sdk-core--release_created}}
-      sdk-react-hooks--tag_name: ${{ steps.release.outputs.sdk-react-hooks--tag_name}}
-      sdk-react-hooks--release_created: ${{ steps.release.outputs.sdk-react-hooks--release_created}}
-      sdk-react-ui--tag_name: ${{ steps.release.outputs.sdk-react-ui--tag_name}}
-      sdk-react-ui--release_created: ${{ steps.release.outputs.sdk-react-ui--release_created}}
+      sdk-core--tag_name: ${{ steps.release.outputs['packages/sdk-core--tag_name']}}
+      sdk-core--release_created: ${{ steps.release.outputs['packages/sdk-core--release_created']}}
+      sdk-react-hooks--tag_name: ${{ steps.release.outputs['packages/sdk-react-hooks--tag_name']}}
+      sdk-react-hooks--release_created: ${{ steps.release.outputs['packages/sdk-react-hooks--release_created']}}
+      sdk-react-ui--tag_name: ${{ steps.release.outputs['packages/sdk-react-ui--tag_name']}}
+      sdk-react-ui--release_created: ${{ steps.release.outputs['packages/sdk-react-ui--release_created']}}
     steps:
       - uses: googleapis/release-please-action@v4
         id: release
