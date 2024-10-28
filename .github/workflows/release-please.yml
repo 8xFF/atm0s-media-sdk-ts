@@ -23,12 +23,11 @@ jobs:
       sdk-react-ui--tag_name: ${{ steps.release.outputs.sdk-react-ui--tag_name}}
       sdk-react-ui--release_created: ${{ steps.release.outputs.sdk-react-ui--release_created}}
     steps:
-      - uses: googleapis/release-please-action@v2
+      - uses: googleapis/release-please-action@v4
         id: release
         with:
-          monorepo-tags: true
-          release-type: node
-          command: manifest
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
           token: ${{secrets.GITHUB_TOKEN}}
       - name: Print release outputs for debugging
         continue-on-error: true
