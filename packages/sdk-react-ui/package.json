@@ -11,8 +11,8 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
-    "@atm0s-media-sdk/core": "0.0.0",
-    "@atm0s-media-sdk/react-hooks": "1.0.0-alpha.7"
+    "@atm0s-media-sdk/core": "1.0.0-alpha.6",
+    "@atm0s-media-sdk/react-hooks": "1.0.0-alpha.5"
   },
   "peerDependencies": {
     "react": "^18.2.0"
