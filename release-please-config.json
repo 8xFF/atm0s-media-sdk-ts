@@ -11,15 +11,21 @@
     ],
     "packages": {
         "packages/sdk-core": {
-            "release-type": "alpha",
+            "versioning": "prerelease",
+            "prerelease": true,
+            "prerelease-type": "alpha",
             "package-name": "@atm0s-media-sdk/core"
         },
         "packages/sdk-react-hooks": {
-            "release-type": "alpha",
+            "versioning": "prerelease",
+            "prerelease": true,
+            "prerelease-type": "alpha",
             "package-name": "@atm0s-media-sdk/react-hooks"
         },
         "packages/sdk-react-ui": {
-            "release-type": "alpha",
+            "versioning": "prerelease",
+            "prerelease": true,
+            "prerelease-type": "alpha",
             "package-name": "@atm0s-media-sdk/react-ui"
         }
     },
