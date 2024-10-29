@@ -229,7 +229,7 @@ importers:
         specifier: 1.0.0-alpha.6
         version: link:../sdk-core
       '@atm0s-media-sdk/react-hooks':
-        specifier: 1.0.0-alpha.5
+        specifier: 1.0.0-alpha.6
         version: link:../sdk-react-hooks
       '@emotion/react':
         specifier: ^11.11.4
