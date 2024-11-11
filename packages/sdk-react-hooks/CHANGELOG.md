@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0-alpha.8](https://github.com/8xFF/atm0s-media-sdk-ts/compare/react-hooks@v1.0.0-alpha.7...react-hooks@v1.0.0-alpha.8) (2024-11-11)
+
+
+### Bug Fixes
+
+* internal deps ([#47](https://github.com/8xFF/atm0s-media-sdk-ts/issues/47)) ([92af479](https://github.com/8xFF/atm0s-media-sdk-ts/commit/92af479d334e81ff27e5f6c102d9722beb2f42b1))
+
 ## [1.0.0-alpha.7](https://github.com/8xFF/atm0s-media-sdk-ts/compare/react-hooks@v1.0.0-alpha.6...react-hooks@v1.0.0-alpha.7) (2024-11-11)
 
 
