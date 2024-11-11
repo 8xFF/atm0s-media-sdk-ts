@@ -5,7 +5,6 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   useConsumer,
   usePublisher,
-  useRemoteVideoTracks,
   useSession,
   RemoteTrack,
   useConsumerStatus,
@@ -13,6 +12,7 @@ import {
   useMessageChannel,
   useSessionStatus,
   usePublisherStatus,
+  useLocalVideoTracks,
 } from "@atm0s-media-sdk/react-hooks";
 
 import { Kind, MessageChannelEvent } from "@atm0s-media-sdk/core";
@@ -71,7 +71,7 @@ function EchoContent(): JSX.Element {
   const [chats, setChats] = useState<Message[]>([]);
   const [view, setView] = useState(true);
 
-  const video_tracks = useRemoteVideoTracks();
+  const video_tracks = useLocalVideoTracks();
   const msgChannel = useMessageChannel("test", (e: MessageChannelEvent) => {
     setChats((chats) => [
       ...chats,
