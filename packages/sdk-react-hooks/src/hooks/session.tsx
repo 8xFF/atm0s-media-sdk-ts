@@ -1,7 +1,7 @@
 import { useContext, useEffect, useMemo, useState } from "react";
 import { Atm0sMediaContext } from "../provider";
 import { Context, ContextEvent } from "../context";
-import { JoinInfo } from "@atm0s-media-sdk/core";
+import { JoinInfo, SessionStatus } from "@atm0s-media-sdk/core";
 
 const VERSION = "react@0.0.0"; //TODO auto version
 
@@ -29,6 +29,21 @@ export function useSession() {
   return useMemo(() => {
     return new SessionWrap(ctx);
   }, [ctx]);
+}
+
+export function useSessionStatus(): SessionStatus {
+  const ctx = useContext(Atm0sMediaContext);
+  const [state, setState] = useState(() => ctx.session.state);
+  useEffect(() => {
+    const handler = (state: SessionStatus) => {
+      setState(state);
+    };
+    ctx.on(ContextEvent.SessionUpdated, handler);
+    return () => {
+      ctx.off(ContextEvent.SessionUpdated, handler);
+    };
+  }, [ctx]);
+  return state;
 }
 
 export function useRoom(): JoinInfo | undefined {

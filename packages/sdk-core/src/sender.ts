@@ -80,7 +80,7 @@ export class TrackSender extends EventEmitter {
   }
 
   public get status(): TrackSenderStatus | undefined {
-    return this.status;
+    return this._status;
   }
 
   public get attached() {

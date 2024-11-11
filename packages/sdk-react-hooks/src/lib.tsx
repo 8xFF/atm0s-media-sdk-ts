@@ -1,15 +1,26 @@
+export { SessionStatus, AudioMixerMode, EventEmitter, Kind, BitrateControlMode } from "@atm0s-media-sdk/core";
+export type { SessionConfig, JoinInfo, AudioMixerConfig } from "@atm0s-media-sdk/core";
+
 export { Context, Publisher } from "./context";
 export type { PublisherConfig } from "./context";
 
 export { Atm0sMediaProvider } from "./provider";
-export { useSession, useRoom } from "./hooks/session";
+export { useSession, useSessionStatus, useRoom } from "./hooks/session";
 export { useMixer, useMixerPeerVoiceActivity } from "./hooks/mixer";
 export type { AudioMixer } from "./hooks/mixer";
 
 export {
-  useRemoteAudioTracks,
+  usePeers,
+  useTracks,
+  useAudioTracks,
+  useVideoTracks,
+  useLocalPeer,
+  useLocalTracks,
+  useLocalAudioTracks,
+  useLocalVideoTracks,
   useRemotePeers,
   useRemoteTracks,
+  useRemoteAudioTracks,
   useRemoteVideoTracks,
 } from "./hooks/meta";
 export type { RemotePeer, RemoteTrack } from "./hooks/meta";

@@ -1,4 +1,4 @@
-import { useRemotePeers, useRoom } from "@atm0s-media-sdk/react-hooks";
+import { usePeers, useRoom } from "@atm0s-media-sdk/react-hooks";
 import {
   PeerRemoteDirectAudio,
   PeerRemoteMixerAudio,
@@ -18,11 +18,11 @@ interface Props {
 
 export function PeersPanel({ audio_direct, my_video }: Props) {
   const room = useRoom();
-  const remote_peers = useRemotePeers();
+  const peers = usePeers();
   return (
     <div className="w-full h-full grid grid-cols-3 grid-rows-3 gap-4">
       {my_video && <PeerLocal video={my_video} />}
-      {remote_peers
+      {peers
         .filter((p) => p.peer != room?.peer)
         .map((p) =>
           audio_direct ? (

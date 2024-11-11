@@ -83,12 +83,28 @@ export class ReadyWaiter {
     this.waits = [];
   };
 
-  waitReady = () => {
+  waitReady = (timeout?: number) => {
     if (this.ready) {
       return Promise.resolve();
     } else {
       return new Promise<void>((resolve, reject) => {
-        this.waits.push([resolve, reject]);
+        if (timeout) {
+          let timeout_id: any = setTimeout(() => {
+            reject(new Error("Timeout"));
+          }, timeout);
+          this.waits.push([
+            () => {
+              if (timeout_id) {
+                clearTimeout(timeout_id);
+                timeout_id = undefined;
+                resolve();
+              }
+            },
+            reject,
+          ]);
+        } else {
+          this.waits.push([resolve, reject]);
+        }
       });
     }
   };
