@@ -5,11 +5,6 @@ export { TrackReceiver, TrackReceiverEvent } from "./receiver";
 export * from "./events";
 export { EventEmitter } from "./utils";
 
-import {
-  SessionConfig as SessionConfigRaw,
-  JoinInfo as JoinInfoRaw,
-} from "./session";
-
 export type {
   AudioMixerConfig,
   AudioMixer,
@@ -33,8 +28,8 @@ export {
   kindToString,
   Kind,
 } from "./types";
-export type SessionConfig = SessionConfigRaw;
-export type JoinInfo = JoinInfoRaw;
+export { SessionStatus  } from "./session";
+export type { SessionConfig, JoinInfo  } from "./session";
 
 export {
   Receiver_Status as TrackReceiverStatus,

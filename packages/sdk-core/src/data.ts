@@ -18,7 +18,13 @@ import {
 } from "./generated/protobuf/features.mixer";
 import { EventEmitter, ReadyWaiter } from "./utils";
 
+export enum DatachannelState {
+  CONNECTED = "connected",
+  DISCONNECTED = "disconnected",
+}
+
 export enum DatachannelEvent {
+  STATE = "event.state",
   ROOM = "event.room",
   SESSION = "event.session",
   SENDER = "event.sender.",
@@ -40,6 +46,7 @@ export class Datachannel extends EventEmitter {
     dc.onopen = () => {
       console.log("[Datachannel] on open");
       this.waiter.setReady();
+      this.emit(DatachannelEvent.STATE, DatachannelState.CONNECTED);
     };
     dc.onmessage = (e) => {
       const msg = ServerEvent.decode(new Uint8Array(e.data));
@@ -79,6 +86,7 @@ export class Datachannel extends EventEmitter {
     };
     dc.onclose = () => {
       console.log("[Datachannel] on close");
+      this.emit(DatachannelEvent.STATE, DatachannelState.DISCONNECTED);
       // TODO: Cleanup all requests
     };
   }
@@ -87,8 +95,8 @@ export class Datachannel extends EventEmitter {
     return this.dc.readyState == "open";
   }
 
-  public async ready(): Promise<void> {
-    return this.waiter.waitReady();
+  public async ready(timeout?: number): Promise<void> {
+    return this.waiter.waitReady(timeout);
   }
 
   public async requestSession(req: Request_Session): Promise<Response_Session> {

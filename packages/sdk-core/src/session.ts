@@ -7,7 +7,7 @@ import {
 import { TrackReceiver } from "./receiver";
 import { TrackSender, TrackSenderConfig } from "./sender";
 import { EventEmitter, postProtobuf } from "./utils";
-import { Datachannel, DatachannelEvent } from "./data";
+import { Datachannel, DatachannelEvent, DatachannelState } from "./data";
 import {
   Request_Session_UpdateSdp,
   ServerEvent_Room,
@@ -34,7 +34,19 @@ export interface SessionConfig {
   join?: JoinInfo;
 }
 
+export enum SessionStatus {
+  NEW = "new",
+  CONNECTING = "connecting",
+  CONNECTED = "connected",
+  //TODO handle reconnect
+  RECONNECTING = "reconnecting",
+  RECONNECTED = "reconnected",
+  DISCONNECTED = "disconnected",
+  ERROR = "error",
+}
+
 export enum SessionEvent {
+  SESSION_CHANGED = "session.changed",
   ROOM_CHANGED = "room.changed",
   ROOM_PEER_JOINED = "room.peer.joined",
   ROOM_PEER_UPDATED = "room.peer.updated",
@@ -48,6 +60,7 @@ export class Session extends EventEmitter {
   peer: RTCPeerConnection;
   dc: Datachannel;
 
+  state: SessionStatus = SessionStatus.NEW;
   ice_lite: boolean = false;
   restarting_ice: boolean = false;
   created_at: number;
@@ -89,6 +102,12 @@ export class Session extends EventEmitter {
       }
     });
 
+    this.dc.on(DatachannelEvent.STATE, (state: DatachannelState) => {
+      if (state == DatachannelState.DISCONNECTED) {
+        this.setState(SessionStatus.DISCONNECTED);
+      }
+    });
+
     //TODO add await to throtle for avoiding too much update in short time
     this.peer.onnegotiationneeded = (event) => {
       console.log("[Session] RTCPeer negotiation needed", event);
@@ -96,11 +115,16 @@ export class Session extends EventEmitter {
         this.syncSdp().then(console.log).catch(console.error);
     };
 
-    this.peer.onconnectionstatechange = (_event) => {
+    this.peer.onconnectionstatechange = (event) => {
       console.log(
         "[Session] RTCPeer connection state changed",
         this.peer.connectionState,
       );
+      switch (this.peer.connectionState) {
+        case "disconnected":
+          this.setState(SessionStatus.DISCONNECTED);
+          break;
+      }
     };
 
     this.peer.oniceconnectionstatechange = (_event) => {
@@ -193,6 +217,7 @@ export class Session extends EventEmitter {
     if (!this.prepareState) {
       throw new Error("Not in prepare state");
     }
+    this.setState(SessionStatus.CONNECTING);
     this.prepareState = false;
     this.version = version;
     console.info("Prepare senders and receivers to connect");
@@ -228,22 +253,28 @@ export class Session extends EventEmitter {
       sdp: local_desc.sdp,
     });
     console.log("Connecting");
-    const res = await postProtobuf(
-      ConnectRequest,
-      ConnectResponse,
-      this.gateway + "/webrtc/connect",
-      req,
-      {
-        Authorization: "Bearer " + this.cfg.token,
-        "Content-Type": "application/grpc",
-      },
-    );
-    this.conn_id = res.connId;
-    this.ice_lite = res.iceLite;
-    await this.peer.setLocalDescription(local_desc);
-    await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
-    await this.dc.ready();
-    console.log("Connected");
+    try {
+      const res = await postProtobuf(
+        ConnectRequest,
+        ConnectResponse,
+        this.gateway + "/webrtc/connect",
+        req,
+        {
+          Authorization: "Bearer " + this.cfg.token,
+          "Content-Type": "application/grpc",
+        },
+      );
+      this.conn_id = res.connId;
+      this.ice_lite = res.iceLite;
+      await this.peer.setLocalDescription(local_desc);
+      await this.peer.setRemoteDescription({ type: "answer", sdp: res.sdp });
+      await this.dc.ready(30000); //connect timeout at 30s
+      this.setState(SessionStatus.CONNECTED);
+      console.log("Connected");
+    } catch (e) {
+      this.setState(SessionStatus.ERROR);
+      console.error("Connect error", e);
+    }
   }
 
   async restartIce() {
@@ -401,5 +432,11 @@ export class Session extends EventEmitter {
     });
     console.info("Disconnected session", this.created_at);
     this.peer.close();
+    this.setState(SessionStatus.DISCONNECTED);
+  }
+
+  private setState(state: SessionStatus) {
+    this.state = state;
+    this.emit(SessionEvent.SESSION_CHANGED, this.state);
   }
 }

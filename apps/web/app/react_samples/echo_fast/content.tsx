@@ -11,6 +11,8 @@ import {
   useConsumerStatus,
   Atm0sMediaProvider,
   useMessageChannel,
+  useSessionStatus,
+  usePublisherStatus,
 } from "@atm0s-media-sdk/react-hooks";
 
 import { Kind, MessageChannelEvent } from "@atm0s-media-sdk/core";
@@ -60,9 +62,12 @@ interface Message {
 function EchoContent(): JSX.Element {
   const previewVideoRef = useRef<HTMLVideoElement>(null);
   const session = useSession();
+  const sessionStatus = useSessionStatus();
   const router = useRouter();
   const audio_sender = usePublisher("audio_main", Kind.AUDIO);
   const video_sender = usePublisher("video_main", Kind.VIDEO);
+  const audio_status = usePublisherStatus(audio_sender);
+  const video_status = usePublisherStatus(video_sender);
   const [chats, setChats] = useState<Message[]>([]);
   const [view, setView] = useState(true);
 
@@ -123,6 +128,9 @@ function EchoContent(): JSX.Element {
           <audio autoPlay id="audio-echo" />
           {view &&
             video_tracks.map((t) => <EchoViewer key={t.peer} track={t} />)}
+          <div>Status: {sessionStatus}</div>
+          <div>Audio: {audio_status}</div>
+          <div>Video: {video_status}</div>
         </div>
       </div>
       {/* This is for control buttons */}

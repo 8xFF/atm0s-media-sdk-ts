@@ -14,9 +14,11 @@ import {
   Sender_Config,
   stringToKind,
   JoinInfo,
+  SessionStatus,
 } from "@atm0s-media-sdk/core";
 
 export enum ContextEvent {
+  SessionUpdated = "session.updated",
   RoomUpdated = "room.updated",
   PeersUpdated = "peers.updated",
   TracksUpdated = "tracks.updated",
@@ -85,6 +87,10 @@ export class Context extends EventEmitter {
       console.log("[SessionContext] prepare video receiver", i);
       this.free_video_receivers.push(this.session.receiver(Kind.VIDEO));
     }
+
+    this.session.on(SessionEvent.SESSION_CHANGED, (state: SessionStatus) => {
+      this.emit(ContextEvent.SessionUpdated, state);
+    });
 
     this.session.on(SessionEvent.ROOM_PEER_JOINED, (peer: RoomPeerJoined) => {
       this.peers.set(peer.peer, peer);
