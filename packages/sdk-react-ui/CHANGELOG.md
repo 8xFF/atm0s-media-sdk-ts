@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.0-alpha.8](https://github.com/8xFF/atm0s-media-sdk-ts/compare/react-ui@v1.0.0-alpha.7...react-ui@v1.0.0-alpha.8) (2024-11-11)
+
+
+### Features
+
+* add more react hooks ([#39](https://github.com/8xFF/atm0s-media-sdk-ts/issues/39)) ([0f8d4cd](https://github.com/8xFF/atm0s-media-sdk-ts/commit/0f8d4cd98228e7a6c0ac57959f21328acccd5221))
+
 ## [1.0.0-alpha.7](https://github.com/8xFF/atm0s-media-sdk-ts/compare/react-ui@v1.0.0-alpha.6...react-ui@v1.0.0-alpha.7) (2024-10-29)
 
 
