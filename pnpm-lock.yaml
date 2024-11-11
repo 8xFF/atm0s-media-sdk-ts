@@ -186,7 +186,7 @@ importers:
   packages/sdk-react-hooks:
     dependencies:
       '@atm0s-media-sdk/core':
-        specifier: 1.0.0-alpha.6
+        specifier: 1.0.0-alpha.7
         version: link:../sdk-core
       react:
         specifier: ^18.2.0
@@ -226,10 +226,10 @@ importers:
   packages/sdk-react-ui:
     dependencies:
       '@atm0s-media-sdk/core':
-        specifier: 1.0.0-alpha.6
+        specifier: 1.0.0-alpha.7
         version: link:../sdk-core
       '@atm0s-media-sdk/react-hooks':
-        specifier: 1.0.0-alpha.6
+        specifier: 1.0.0-alpha.7
         version: link:../sdk-react-hooks
       '@emotion/react':
         specifier: ^11.11.4
