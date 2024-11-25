@@ -45,7 +45,7 @@ export default function PageContent({ callFrom, callWs, room, peer, token, recor
           }}
         >
           <Atm0sMediaUIProvider>
-            <SipIncomingCallWidget callFrom={callFrom} callWs={callWs} room={room} record={record} onEnd={onEnd2} />
+            <SipIncomingCallWidget callFrom={callFrom} callWs={callWs} room={room} sipPeer={callFrom} record={record} onEnd={onEnd2} />
           </Atm0sMediaUIProvider>
         </Atm0sMediaProvider>}
       </div>
