@@ -151,6 +151,9 @@ importers:
 
   packages/sdk-core:
     dependencies:
+      long:
+        specifier: ^5.2.3
+        version: 5.2.3
       protobufjs:
         specifier: ^7.3.0
         version: 7.3.0
@@ -230,7 +233,7 @@ importers:
         version: link:../sdk-core
       '@atm0s-media-sdk/react-hooks':
         specifier: 1.0.0-alpha.7
-        version: link:../sdk-react-hooks
+        version: 1.0.0-alpha.7(react@18.2.0)
       '@emotion/react':
         specifier: ^11.11.4
         version: 11.11.4(@types/react@18.2.61)(react@18.2.0)
@@ -293,6 +296,21 @@ packages:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.20
     dev: true
+
+  /@atm0s-media-sdk/core@1.0.0-alpha.6:
+    resolution: {integrity: sha512-fOUVjmv43qpH/Nrl9G85X+cfimoKJlS4tWhHLPg0+C94drvLBTGWZxgAnkM90ZqPJOy3Ryi0k8kQMBkWQ1UXSw==}
+    dependencies:
+      protobufjs: 7.3.0
+    dev: false
+
+  /@atm0s-media-sdk/react-hooks@1.0.0-alpha.7(react@18.2.0):
+    resolution: {integrity: sha512-sKr1uYR3hSwspu9pU/SDJDbokl46BFt3hqqYyqbg/zGt1bV0oCdhDiOH23ayfgl4cZ6KsLxZT77NnHVEi3DpLw==}
+    peerDependencies:
+      react: ^18.2.0
+    dependencies:
+      '@atm0s-media-sdk/core': 1.0.0-alpha.6
+      react: 18.2.0
+    dev: false
 
   /@babel/code-frame@7.22.13:
     resolution: {integrity: sha512-XktuhWlJ5g+3TJXc5upd9Ks1HutSArik6jf2eAjYFyIOf4ej3RN+184cZbzDvbPnuTJIUhPKKJE3cIsYTiAT3w==}
