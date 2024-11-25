@@ -1,6 +1,6 @@
 {
   "name": "@atm0s-media-sdk/react-ui",
-  "version": "1.0.0-alpha.8",
+  "version": "1.0.0-alpha.9",
   "main": "./dist/lib.js",
   "module": "./dist/lib.mjs",
   "types": "./dist/lib.d.ts",
@@ -11,8 +11,8 @@
   "dependencies": {
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
-    "@atm0s-media-sdk/core": "1.0.0-alpha.7",
-    "@atm0s-media-sdk/react-hooks": "1.0.0-alpha.7"
+    "@atm0s-media-sdk/core": "1.0.0-alpha.8",
+    "@atm0s-media-sdk/react-hooks": "1.0.0-alpha.9"
   },
   "peerDependencies": {
     "react": "^18.2.0"

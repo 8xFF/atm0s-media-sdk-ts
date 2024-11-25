@@ -7,8 +7,12 @@ export interface SipIncomingCallProps {
     callFrom: string,
     callWs: string;
     room: string,
+    sipPeer: string,
     record: boolean,
-    onEnd: () => void;
+    onAccept?: () => void;
+    onCancel?: () => void;
+    onReject?: () => void;
+    onEnd?: () => void;
 }
 
 type AcceptState = "Connecting" | "Accepting" | "Accepted";
@@ -30,21 +34,51 @@ export function SipIncomingCallWidget(props: SipIncomingCallProps): JSX.Element 
         };
     }, [session]);
 
+    useEffect(() => {
+        switch (status.sipState) {
+            case "Bye": {
+                if (props.onEnd) {
+                    props.onEnd();
+                }
+                break;
+            }
+            case "Cancelled": {
+                if (props.onCancel) {
+                    props.onCancel();
+                }
+                break;
+            }
+        }
+    }, [status])
+
     const accept = useCallback(() => {
         setAcceptState("Connecting")
         session.connect().then(() => {
             setAcceptState("Accepting")
-            return call.accept(props.room, props.callFrom, props.record).then(() => {
+            if (props.onAccept) {
+                props.onAccept();
+            }
+            return call.accept(props.room, props.sipPeer, props.record).then(() => {
                 setAcceptState("Accepted")
             }).catch(() => setAcceptError("SipFailed"))
         }).catch(() => setAcceptError("MediaFailed"))
 
-    }, [call]);
+    }, [session, call, props.onAccept]);
 
     const reject = useCallback(() => {
         call.reject()
         session.disconnect();
-        props.onEnd()
+        if (props.onReject) {
+            props.onReject();
+        }
+    }, [session, call, props.onReject]);
+
+    const end = useCallback(() => {
+        call.end()
+        session.disconnect();
+        if (props.onEnd) {
+            props.onEnd();
+        }
     }, [session, call, props.onEnd]);
 
     return (
@@ -58,8 +92,8 @@ export function SipIncomingCallWidget(props: SipIncomingCallProps): JSX.Element 
             {/* Time Counting */}
             <div className="text-xl">{status.startedAt && <ClockTimer started_at={status.startedAt} />}</div>
 
-            {/* Destination Number Info */}
-            <p className="text-md">Destination: {props.callFrom}</p>
+            {/* From Number Info */}
+            <p className="text-md">From: {props.callFrom}</p>
 
             <MicrophoneSelection trackName={'audio_main'} defaultEnable />
             <AudioMixerPlayer />
@@ -82,7 +116,7 @@ export function SipIncomingCallWidget(props: SipIncomingCallProps): JSX.Element 
             {/* Reject Button */}
             {showHangup && <button
                 className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                onClick={reject}
+                onClick={end}
             >
                 Hangup
             </button>}

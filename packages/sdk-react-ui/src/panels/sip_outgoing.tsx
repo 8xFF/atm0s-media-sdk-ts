@@ -6,7 +6,9 @@ import { ClockTimer } from "../components/uis/clock_timer";
 export interface SipOutgoingCallProps {
     callTo: string,
     callWs: string;
-    onEnd: () => void;
+    onAccept?: () => void;
+    onEnd?: () => void;
+    onFailed?: () => void;
 }
 
 export function SipOutgoingCallWidget(props: SipOutgoingCallProps): JSX.Element {
@@ -20,9 +22,34 @@ export function SipOutgoingCallWidget(props: SipOutgoingCallProps): JSX.Element 
         };
     }, [session]);
 
+    useEffect(() => {
+        switch (status.sipState) {
+            case "Accepted": {
+                if (props.onAccept) {
+                    props.onAccept();
+                }
+                break;
+            }
+            case "Failure": {
+                if (props.onFailed) {
+                    props.onFailed();
+                }
+                break;
+            }
+            case "Bye": {
+                if (props.onEnd) {
+                    props.onEnd();
+                }
+                break;
+            }
+        }
+    }, [status])
+
     const hangUp = useCallback(() => {
         session.disconnect();
-        props.onEnd()
+        if (props.onEnd) {
+            props.onEnd();
+        }
     }, [session, props.onEnd]);
 
     return (

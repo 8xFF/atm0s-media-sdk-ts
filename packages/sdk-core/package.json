@@ -1,6 +1,6 @@
 {
   "name": "@atm0s-media-sdk/core",
-  "version": "1.0.0-alpha.7",
+  "version": "1.0.0-alpha.8",
   "main": "./dist/lib.js",
   "module": "./dist/lib.mjs",
   "types": "./dist/lib.d.ts",
@@ -9,17 +9,18 @@
     "src/*"
   ],
   "devDependencies": {
+    "@atm0s-media-sdk/eslint-config": "0.0.0",
+    "@atm0s-media-sdk/typescript-config": "0.0.0",
     "@turbo/gen": "^1.12.4",
     "@types/eslint": "^8.56.5",
     "@types/node": "^20.11.24",
     "eslint": "^8.57.0",
     "ts-proto": "^1.174.0",
     "tsup": "^8.1.0",
-    "typescript": "^5.3.3",
-    "@atm0s-media-sdk/typescript-config": "0.0.0",
-    "@atm0s-media-sdk/eslint-config": "0.0.0"
+    "typescript": "^5.3.3"
   },
   "dependencies": {
+    "long": "^5.2.3",
     "protobufjs": "^7.3.0"
   },
   "scripts": {
